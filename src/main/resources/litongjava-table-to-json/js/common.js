@@ -16,12 +16,14 @@ function getParamter(variable) {
 }
 
 function layerOpenForm(layer, title, content) {
-  var w = ($(window).width() * 0.7);
-  var h = ($(window).height() - 50);
+//var w = ($(window).width() * 0.7);
+//var h = ($(window).height() - 50);
+  var width = (window.cols[0].length - 2 )* 50;
+  debugger;
   var index = layer.open({
     type: 2,
     title: title,
-    area: ['60%', '60%'],
+    area: ['60%', width+'px'],
     fix: false,
     maxmin: true,
     shadeClose: true,
@@ -50,23 +52,40 @@ function getIdValue(data) {
   return data[idField];
 }
 
-function layuiTableRender(uri, title, cols, formPageName, table, layer, form, laypage) {
-  $.ajaxSetup({
-    complete: function(XMLHttpRequest, textStatus) {
-      if(textStatus == "parsererror") {
-        //提示,调整到登录界面
-        layer.alert('检测到没有登录,请重新登录', { skin: 'layui-layer-molv', closeBtn: 0, },
-          function() {
-            layer.close(layui.index);
-            saveToSessionStorage({});
-            var url = projectName + '/login.html';
-            window.open(url);
-          });
-      } else if(textStatus == "error") {
-        $.messager.alert('提示信息', "请求超时！请稍后再试！", 'info');
-      }
+/**
+ * 弹出没有登录提示
+ */
+function toLogin() {
+  //提示,调整到登录界面
+  layer.alert('检测到没有登录,请重新登录', { skin: 'layui-layer-molv', closeBtn: 0, },
+    function() {
+      layer.close(layui.index);
+      saveToSessionStorage({});
+      var url = projectName + '/login.html';
+      window.parent.open(url, '_self');
+    });
+}
+/**
+ * 如果没有登录,弹出提示框,依赖user.js
+ */
+$.ajaxSetup({
+  complete: function(xMLHttpRequest, textStatus) {
+    if(textStatus == "parsererror") {
+      toLogin();
     }
-  });
+    try {
+      var resp = JSON.parse(xMLHttpRequest.responseText);
+    } catch(error) {
+      toLogin();
+    }
+
+    if(textStatus == "error") {
+      $.messager.alert('提示信息', "请求超时！请稍后再试！", 'info');
+    }
+  }
+});
+
+function layuiTableRender(uri, title, cols, formPageName, table, layer, form, laypage) {
 
   var listUrl = uri + "/list?tableName=" + tableName;
   if(orderBy) {
@@ -189,7 +208,7 @@ function layuiTableRender(uri, title, cols, formPageName, table, layer, form, la
   });
 }
 
-function layuiFormRender(uri, form) {
+function layuiFormRender(uri, form, layer) {
   form.render();
   var formData;
   var id = getParamter("id");

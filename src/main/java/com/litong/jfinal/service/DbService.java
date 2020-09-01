@@ -23,7 +23,7 @@ public class DbService {
     for (Record record : cloumns) {
       String key = record.getStr("Key");
       if ("PRI".equals(key)) {
-        ret.add(key);
+        ret.add(record.getStr("Field"));
       }
     }
     if (ret.size() == 0) {
@@ -70,9 +70,9 @@ public class DbService {
    * @param comment
    */
   public void addColumn(String tableName, String field, String type, String comment) {
-    String sql="ALTER TABLE %s ADD COLUMN `%s` %s comment '%s';";
-    sql=String.format(sql, tableName,field,type,comment);
+    String sql = "ALTER TABLE %s ADD COLUMN `%s` %s comment '%s';";
+    sql = String.format(sql, tableName, field, type, comment);
     int update = Db.update(sql);
-    log.info("execute sql:{},return code:{}",sql,update);
+    log.info("execute sql:{},return code:{}", sql, update);
   }
 }
