@@ -1,0 +1,51 @@
+<!-- status为不记录log4j本身的日志 -->
+<configuration status="OFF">
+  <properties>
+    <property name="LOG_HOME">logs</property>
+    <property name="FILE_NAME">stdout</property>
+  </properties>
+  <appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <!-- ThresholdFilter相当于拦截器.info以上的命令不会被拦截. -->
+      <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-6level%logger{0}.%M:%L - %msg%n" />
+    </Console>
+
+    <File name="File" fileName="${LOG_HOME}/${FILE_NAME}.log">
+      <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-6level%logger{0}.%M:%L - %msg%n" />
+    </File>
+
+    <RollingFile name="RollingFile" fileName="${LOG_HOME}/${FILE_NAME}-rolling.log"
+      filePattern="${LOG_HOME}/$${date:yyyy-MM-dd}/${FILE_NAME}-%d{yyyy-MM-dd}-%i.log.gz">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-6level%logger{0}.%M:%L - %msg%n" />
+      <Policies>
+        <TimeBasedTriggeringPolicy />
+        <SizeBasedTriggeringPolicy size="10 MB" />
+      </Policies>
+    </RollingFile>
+
+    <Routing name="RoutingAppender">
+      <Routes pattern="${ctx:logFileName}">
+        <Route>
+          <RollingFile name="Rolling-${ctx:logFileName}" fileName="logs/ask/${ctx:logFileName}"
+            filePattern="logs/${ctx:logFileName}.%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level%logger{0}.%M:%L - %msg%n"/>
+            <SizeBasedTriggeringPolicy size="10 MB" />
+          </RollingFile>
+        </Route>
+
+        <!-- By having this set to ${ctx:logFileName} it will match when filename is not set in the context -->
+        <Route ref="File" key="${ctx:logFileName}" />
+      </Routes>
+    </Routing>
+  </appenders>
+  <loggers>
+    <root level="info">
+      <appender-ref ref="Console" />
+      <appender-ref ref="File" />
+      <appender-ref ref="RollingFile" />
+      <appender-ref ref="RoutingAppender" />
+    </root>
+  </loggers>
+</configuration>

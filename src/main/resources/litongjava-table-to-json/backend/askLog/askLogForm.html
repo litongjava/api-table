@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title></title>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui-v2.5.5/css/layui.css" />
+<style type="text/css">
+
+</style>
+</head>
+
+<body>
+<form class="layui-form" action="" style="display: block;" id="form-data" lay-filter="data-form">
+  <div class="layui-form-item">
+    <input type="hidden" name="ID" class="layui-input">
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">USER_ID</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" name="USER_ID" required lay-verify="required" placeholder="请输入USER_ID" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <lable class="layui-form-label">SESSION_ID</lable>
+      <div class="layui-input-block">
+        <input type="text" name="SESSION_ID" class="layui-input" placeholder="请输入" autocomplet="off" required layui-verify='required' /></div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">IP_ADDRESS</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" name="IP_ADDRESS" placeholder="请输入" autocomplete='off' required layui-verify='required' />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">QUESTION</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="QUESTION" autocomplete="off" required layui-verify="required" /></div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">ANSWER</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="ANSWER" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">FAQ_ID</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="FAQ_ID" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">FAQ_NAME</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="FAQ_NAME" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">VISIT_TIME</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="VISIT_TIME" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">QUESTION_TYPE</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="QUESTION_TYPE" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">ANSWER_TYPE</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="ANSWER_TYPE" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">KEYWORD</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="KEYWORD" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">PLATFORM</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="PLATFORM" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="" class="layui-form-label">CITY</label>
+      <div class="layui-input-block">
+        <input type="text" class="layui-input" placeholder="请输入" name="CITY" autocomplete="off" required layui-verify="required" />
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="front-submit" id="front-submit">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        <input type="button" class="layui-btn layui-btn-danger" value="关闭" onclick="layer_close()" />
+      </div>
+    </div>
+</form>
+
+</body>
+<script src="https://www.layuicdn.com/layui-v2.5.5/layui.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+var title = "问答日志";
+var tableName = "om_log_ask_detail_202008"
+var uri = projectName + '/api/form';
+document.title = title + '数据表单';
+var listPageName = "askLogList.html";
+layui.use(['form'], function() {
+  form = layui.form,
+    layuiFormRender(uri, form);
+});
+</script>
+
+</html>

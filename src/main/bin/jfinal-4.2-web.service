@@ -1,0 +1,12 @@
+[Unit]
+Description=ip
+After=network.target
+[Service]
+ExecStart=/opt/jfinal/jfinal-4.2-web/jfinal.sh start
+ExecStop=/opt/jfinal/jfinal-4.2-web/jfinal.sh stop
+ExecReload=/opt/jfinal/jfinal-4.2-web/jfinal.sh restart
+Type=forking
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
