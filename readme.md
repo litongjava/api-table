@@ -244,8 +244,7 @@ document.title = title + '数据列表';
 var formPageName = "askLogForm.html";
 var orderBy = 'VISIT_TIME';
 var isAsc = "false";
-
-
+var idField="file_id";
 
 var cols = [
   [

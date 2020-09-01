@@ -698,3 +698,23 @@
 2020-09-01 11:25:59.800 INFO  ApiFormController.list:52 - kv : {sblsh=null, end.create_time=null, pageNo=1, orderBy=VISIT_TIME, pageSize=20, start.create_time=null, end.update_time=null, isAsc=false, id=001598885394000998480242ac110006, start.update_time=null, tableName=om_log_ask_detail_202008}
 2020-09-01 11:26:20.708 INFO  ApiFormController.list:52 - kv : {sblsh=null, end.create_time=null, pageNo=1, orderBy=VISIT_TIME, pageSize=20, start.create_time=null, end.update_time=null, isAsc=false, id=001598885394000998480242ac110006, start.update_time=null, tableName=om_log_ask_detail_202008}
 2020-09-01 11:26:20.708 INFO  ApiFormController.list:52 - kv : {sblsh=null, end.create_time=null, pageNo=1, orderBy=VISIT_TIME, pageSize=20, start.create_time=null, end.update_time=null, isAsc=false, id=001598885394000998480242ac110006, start.update_time=null, tableName=om_log_ask_detail_202008}
+2020-09-01 11:58:35.050 INFO  Application.main:33 - create server
+2020-09-01 11:58:35.050 INFO  Application.main:33 - create server
+2020-09-01 11:58:35.083 INFO  Application.main:37 - start server
+2020-09-01 11:58:35.083 INFO  Application.main:37 - start server
+2020-09-01 11:58:35.331 INFO  DbConfig.config:31 - 添加主数据源完成
+2020-09-01 11:58:35.331 INFO  DbConfig.config:31 - 添加主数据源完成
+2020-09-01 11:58:35.634 INFO  undertow.start:117 - starting server: Undertow - 2.0.30.Final
+2020-09-01 11:58:35.634 INFO  undertow.start:117 - starting server: Undertow - 2.0.30.Final
+2020-09-01 11:58:35.646 INFO  xnio.<clinit>:104 - XNIO version 3.3.8.Final
+2020-09-01 11:58:35.646 INFO  xnio.<clinit>:104 - XNIO version 3.3.8.Final
+2020-09-01 11:58:35.663 INFO  nio.<clinit>:55 - XNIO NIO Implementation Version 3.3.8.Final
+2020-09-01 11:58:35.663 INFO  nio.<clinit>:55 - XNIO NIO Implementation Version 3.3.8.Final
+2020-09-01 11:58:51.831 INFO  ApiFormController.list:52 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-01 11:58:51.831 INFO  ApiFormController.list:52 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-01 11:59:18.503 INFO  ApiFormController.list:52 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-01 11:59:18.503 INFO  ApiFormController.list:52 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-01 11:59:20.462 INFO  ApiFormController.getById:78 - kv : {id=001598885394000998480242ac110006, tableName=om_log_ask_detail_202008}
+2020-09-01 11:59:20.462 INFO  ApiFormController.getById:78 - kv : {id=001598885394000998480242ac110006, tableName=om_log_ask_detail_202008}
+2020-09-01 11:59:30.105 INFO  ApiFormController.list:52 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-01 11:59:30.105 INFO  ApiFormController.list:52 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}

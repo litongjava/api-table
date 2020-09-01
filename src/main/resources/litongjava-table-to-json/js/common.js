@@ -1,5 +1,4 @@
 var projectName = '/litongjava-table-to-json';
-
 /**
  * 获取请求参数
  * @param {Object} variable
@@ -48,22 +47,27 @@ function layer_close() {
  * @param {Object} data
  */
 function getIdValue(data) {
-  var idValue=data.id;
-  if(idValue){
-	return idValue;
-  }
-  idValue=data.ID;
-  if(idValue){
-	 return idValue;
-  }
-  for(var key in data) {
-	if(data[key]){
-	  return data[key];	
-	} 
-  }
+  return data[idField];
 }
 
 function layuiTableRender(uri, title, cols, formPageName, table, layer, form, laypage) {
+  $.ajaxSetup({
+    complete: function(XMLHttpRequest, textStatus) {
+      if(textStatus == "parsererror") {
+        //提示,调整到登录界面
+        layer.alert('检测到没有登录,请重新登录', { skin: 'layui-layer-molv', closeBtn: 0, },
+          function() {
+            layer.close(layui.index);
+            saveToSessionStorage({});
+            var url = projectName + '/login.html';
+            window.open(url);
+          });
+      } else if(textStatus == "error") {
+        $.messager.alert('提示信息', "请求超时！请稍后再试！", 'info');
+      }
+    }
+  });
+
   var listUrl = uri + "/list?tableName=" + tableName;
   if(orderBy) {
     listUrl += "&orderBy=" + orderBy + "&isAsc=" + isAsc;
@@ -98,7 +102,11 @@ function layuiTableRender(uri, title, cols, formPageName, table, layer, form, la
         layerOpenForm(layer, title + "编辑页面", formPageName);
         break;
       case 'editNewTab':
-        var idValue= getIdValue(obj.data);  
+        var idValue = obj.data.id;
+        if(!idValue) {
+          idValue = getIdValue(obj.data);
+        }
+
         //layerOpenForm(layer, title + "编辑页面", formPageName);
         window.open(formPageName + "?id=" + idValue, '_blank')
         break;
