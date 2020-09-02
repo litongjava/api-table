@@ -72,12 +72,13 @@ public class ApiFormService {
     // 添加表
     sqlExceptSelect.append("from " + tableName);
     StringBuffer where = new StringBuffer();
+    where.append(" where");
     // 获取查询插件
     List<Object> paramList = getListWhere(tableName, kv, where);
 
     // 拼接查询条件
-    if (paramList.size() > 0) {
-      sqlExceptSelect.append(" where" + where);
+    if (paramList.size()> 0) {
+      sqlExceptSelect.append(where);
     }
     String orderField = "";
     if (orderBy != null) {
@@ -187,5 +188,4 @@ public class ApiFormService {
   public List<Object> removeByIdWhere(Kv kv, StringBuffer sql) {
     return getWhere(kv, sql);
   }
-
 }
