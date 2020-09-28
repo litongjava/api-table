@@ -1,4 +1,4 @@
-package com.litong.utils.vo;
+package com.litong.jfinal.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.litong.utils.ip;
+package com.litong.jfinal.utils.ip;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

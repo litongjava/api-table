@@ -84,17 +84,18 @@
 
 <script src="https://www.layuicdn.com/layui-v2.5.5/layui.js" type="text/javascript" charset="utf-8"></script>
 <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/layui/ext/excel.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/config.js" type="text/javascript" charset="utf-8"></script>
 <script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
 var title = "问答日志";
 var tableName = "om_log_ask_detail_202008"
 var uri = projectName + '/api/form';
 document.title = title + '数据列表';
-var formPageName = "askLogForm.html";
+var formPageName = tableName + "_form.html";
 var orderBy = 'VISIT_TIME';
 var isAsc = "false";
-var idField="file_id";
-
+var idField = 'id';
 var cols = [
   [
     { checkbox: true }, //开启多选框
@@ -125,17 +126,6 @@ layui.use(['table', 'layer', 'form', 'laypage', 'laydate'], function() {
   layuiRenderTime(laydate);
   //渲染数据
   layuiTableRender(uri, title, cols, formPageName, table, layer, form, laypage);
-  var  hiddenProperty = 'hidden' in document  ?  'hidden'  : 'webkitHidden' in document  ? 'webkitHidden' : 'mozHidden' in document ? 'mozHidden' : null;
-
-  var visibilityChangeEvent = hiddenProperty.replace(/hidden/i,  'visibilitychange');
-
-  var  onVisibilityChange = function() {    
-    if (!document[hiddenProperty])  {             //console.log('页面激活');
-      //刷新table数据
-      table.reload('data-table');    
-    }
-  }
-  document.addEventListener(visibilityChangeEvent,  onVisibilityChange);
 });
 
 function layuiRenderTime(laydate) {

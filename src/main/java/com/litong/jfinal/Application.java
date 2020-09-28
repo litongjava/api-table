@@ -19,22 +19,18 @@ import com.litong.jfinal.route.FrontRoutes;
 import com.litong.jfinal.route.SystemRoutes;
 import com.litong.jfinal.utils.PropKitUtil;
 import com.litong.jfinal.utils.UndertowUtil;
-import com.litong.utils.ip.IPUtils;
+import com.litong.jfinal.utils.ip.IPUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+//@Slf4j
 public class Application extends JFinalConfig {
   private static String configFileName = PropKitUtil.configFileName;
 
   public static void main(String[] args) {
     long start = System.currentTimeMillis();
     // 创建server
-    log.info("create server");
     UndertowUtil.server = UndertowServer.create(Application.class, configFileName);
     // 启动Server全局共享
     UndertowUtil.server.addSystemClassPrefix("com.litong.jfinal.utils.UndertowUtil");
-    log.info("start server");
     UndertowUtil.server.start();
     info(start);
 //    startFrp();

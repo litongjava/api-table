@@ -2,6 +2,9 @@ package com.litong.jfinal.utils;
 
 import com.jfinal.server.undertow.UndertowServer;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class UndertowUtil {
 
   /**
@@ -14,23 +17,17 @@ public class UndertowUtil {
    */
   public static void restart() {
     if (server != null) {
-      new Thread(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            System.err.println("Undetow Server Restarting ......");
-            Thread.sleep(500);// 延迟500ms, 避免Web来不及返回信息
-            server.restart();
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
+      new Thread(() -> {
+        log.info("Undetow Server Restarting ......");
+        try {
+          // 延迟500ms, 避免Web来不及返回信息
+          Thread.sleep(500);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
         }
+        server.restart();
       }).start();
       return;
     }
   }
-  
-  /**
-   * 检测
-   */
 }

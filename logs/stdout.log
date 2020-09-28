@@ -718,3 +718,35 @@
 2020-09-01 11:59:20.462 INFO  ApiFormController.getById:78 - kv : {id=001598885394000998480242ac110006, tableName=om_log_ask_detail_202008}
 2020-09-01 11:59:30.105 INFO  ApiFormController.list:52 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
 2020-09-01 11:59:30.105 INFO  ApiFormController.list:52 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-02 08:58:56.710 INFO  Application.main:33 - create server
+2020-09-02 08:58:56.710 INFO  Application.main:33 - create server
+2020-09-02 08:58:56.761 INFO  Application.main:37 - start server
+2020-09-02 08:58:56.761 INFO  Application.main:37 - start server
+2020-09-02 08:58:57.047 INFO  DbConfig.config:31 - 添加主数据源完成
+2020-09-02 08:58:57.047 INFO  DbConfig.config:31 - 添加主数据源完成
+2020-09-02 08:58:57.369 INFO  undertow.start:117 - starting server: Undertow - 2.0.30.Final
+2020-09-02 08:58:57.369 INFO  undertow.start:117 - starting server: Undertow - 2.0.30.Final
+2020-09-02 08:58:57.382 INFO  xnio.<clinit>:104 - XNIO version 3.3.8.Final
+2020-09-02 08:58:57.382 INFO  xnio.<clinit>:104 - XNIO version 3.3.8.Final
+2020-09-02 08:58:57.398 INFO  nio.<clinit>:55 - XNIO NIO Implementation Version 3.3.8.Final
+2020-09-02 08:58:57.398 INFO  nio.<clinit>:55 - XNIO NIO Implementation Version 3.3.8.Final
+2020-09-28 09:21:38.328 INFO  DbConfig.config:31 - 添加主数据源完成
+2020-09-28 09:21:38.328 INFO  DbConfig.config:31 - 添加主数据源完成
+2020-09-28 09:21:58.414 INFO  DbConfig.config:31 - 添加主数据源完成
+2020-09-28 09:21:58.414 INFO  DbConfig.config:31 - 添加主数据源完成
+2020-09-28 09:21:58.728 INFO  undertow.start:117 - starting server: Undertow - 2.0.30.Final
+2020-09-28 09:21:58.728 INFO  undertow.start:117 - starting server: Undertow - 2.0.30.Final
+2020-09-28 09:21:58.742 INFO  xnio.<clinit>:104 - XNIO version 3.3.8.Final
+2020-09-28 09:21:58.742 INFO  xnio.<clinit>:104 - XNIO version 3.3.8.Final
+2020-09-28 09:21:58.757 INFO  nio.<clinit>:55 - XNIO NIO Implementation Version 3.3.8.Final
+2020-09-28 09:21:58.757 INFO  nio.<clinit>:55 - XNIO NIO Implementation Version 3.3.8.Final
+2020-09-28 09:23:52.792 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=update_time, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:23:52.792 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=update_time, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:24:59.075 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:24:59.075 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:25:58.094 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:25:58.094 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:26:03.357 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:26:03.357 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:26:29.408 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}
+2020-09-28 09:26:29.408 INFO  ApiFormController.list:56 - kv : {pageNo=1, orderBy=VISIT_TIME, pageSize=20, isAsc=false, tableName=om_log_ask_detail_202008}

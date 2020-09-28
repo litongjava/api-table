@@ -105,16 +105,18 @@
 </body>
 <script src="https://www.layuicdn.com/layui-v2.5.5/layui.js" type="text/javascript" charset="utf-8"></script>
 <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/config.js" type="text/javascript" charset="utf-8"></script>
 <script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
 var title = "问答日志";
 var tableName = "om_log_ask_detail_202008"
 var uri = projectName + '/api/form';
 document.title = title + '数据表单';
-var listPageName = "askLogList.html";
-layui.use(['form'], function() {
-  form = layui.form,
-    layuiFormRender(uri, form);
+var listPageName = tableName + "_list.html";
+layui.use(['form','layer'], function() {
+  form = layui.form;
+  layer = layui.layer;
+  layuiFormRender(uri, form, layer);
 });
 </script>
 

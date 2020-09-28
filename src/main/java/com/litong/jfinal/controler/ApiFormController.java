@@ -1,5 +1,6 @@
 package com.litong.jfinal.controler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -14,12 +15,14 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import com.litong.jfinal.service.ApiFormAround;
 import com.litong.jfinal.service.ApiFormService;
+import com.litong.jfinal.service.LayuiService;
 import com.litong.jfinal.service.PrimaryKeyService;
 import com.litong.jfinal.service.TableColumnSerivce;
 import com.litong.jfinal.validate.ApiFormValidator;
+import com.litong.jfinal.vo.JsonBean;
 import com.litong.jfinal.vo.PageJsonBean;
-import com.litong.utils.vo.JsonBean;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,11 +37,15 @@ import lombok.extern.slf4j.Slf4j;
 public class ApiFormController extends Controller {
 
   @Inject
+  private ApiFormAround apiFormAround;
+  @Inject
   private ApiFormService apiFormService;
   @Inject
   private PrimaryKeyService primaryKeyService;
   @Inject
   private TableColumnSerivce tableColumnService;
+  @Inject
+  private LayuiService layuiService;
 
   /**
    * 数据列表
@@ -49,6 +56,7 @@ public class ApiFormController extends Controller {
   //   * end.update_time=2020-08-27 00:00:00, isAsc=false, id=null, start.update_time=2020-08-01 00:00:00, tableName=cron4j_task}
    */
   public void list(int pageNo, int pageSize, String tableName, String columns, String orderBy, Boolean isAsc, Kv kv) {
+    apiFormAround.listBefore(pageNo, pageSize, tableName, columns, orderBy, isAsc, kv);
     log.info("kv : " + kv);
     if (StrKit.isBlank(columns)) {
       columns = "*";
@@ -66,6 +74,7 @@ public class ApiFormController extends Controller {
 
     PageJsonBean<Record> pageJsonBean = new PageJsonBean<>(listPage);
     renderJson(pageJsonBean);
+    apiFormAround.listAfter(pageNo, pageSize, tableName, columns, orderBy, isAsc, kv, pageJsonBean);
     return;
   }
 
@@ -75,20 +84,23 @@ public class ApiFormController extends Controller {
    * {id=1, tableName=cron4j_task}
    */
   public void getById(String tableName, Kv kv) {
+    apiFormAround.getByIdBefore(tableName, kv);
     log.info("kv : " + kv);
     kv.remove("tableName");
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKey(tableName);
     // 拼接sql语句
     StringBuffer sql = new StringBuffer();
-    sql.append("select * from " + tableName + " where" + apiFormService.getRequireCondition(tableName));
+    List<Object> paramList = new ArrayList<Object>();
+    sql.append("select * from " + tableName + " where" + apiFormService.getRequireCondition(tableName, paramList));
     apiFormService.addWhereField(sql, primaryKey, "=");
     Object idValue = kv.get("id");
+    paramList.add(idValue);
 
     // 添加操作表
     Record record = null;
     try {
-      record = Db.findFirst(sql.toString(), idValue);
+      record = Db.findFirst(sql.toString(), paramList);
       // record = Db.findById(tableName, kv.get("id"));
     } catch (Exception e) {
       e.printStackTrace();
@@ -97,10 +109,12 @@ public class ApiFormController extends Controller {
     }
     JsonBean<Record> jsonBean = new JsonBean<>(record);
     renderJson(jsonBean);
+    apiFormAround.getByIdAfter(tableName, kv, jsonBean);
     return;
   }
 
   public void removeById(String tableName, Kv kv) {
+    apiFormAround.removeByIdBefore(tableName, kv);
     log.info("kv : " + kv);
     kv.remove("tableName");
     if (kv.size() == 0) {
@@ -126,10 +140,12 @@ public class ApiFormController extends Controller {
     }
     JsonBean<Void> jsonBean = new JsonBean<>();
     renderJson(jsonBean);
+    apiFormAround.removeByIdAfter(tableName, kv, jsonBean);
     return;
   }
 
   public void removeByIds(String tableName, Kv kv) {
+    apiFormAround.removeByIdsBefore(tableName, kv);
     log.info("kv : " + kv);
     kv.remove("tableName");
     if (kv.size() == 0) {
@@ -188,6 +204,7 @@ public class ApiFormController extends Controller {
     }
     JsonBean<Void> jsonBean = new JsonBean<>();
     renderJson(jsonBean);
+    apiFormAround.removeByIdsAfter(tableName, kv, jsonBean);
     return;
   }
 
@@ -199,6 +216,13 @@ public class ApiFormController extends Controller {
   public void saveOrUpdate(String tableName, Kv kv) {
     log.info("kv : " + kv);
     kv.remove("tableName");
+    
+    JsonBean<Void> saveOrUpdateBefore = apiFormAround.saveOrUpdateBefore(tableName, kv);
+    if(saveOrUpdateBefore!=null) {
+      renderJson(saveOrUpdateBefore);
+      log.info("saveOrUpdateBefore 返回错误信息:{}",saveOrUpdateBefore);
+      return ;
+    }
 
     true21(kv);
     Record record = new Record();
@@ -229,9 +253,22 @@ public class ApiFormController extends Controller {
         return;
       }
     }
+    
+    JsonBean<Void> saveOrUpdateAfter = apiFormAround.saveOrUpdateAfter(tableName, kv);
+    if(saveOrUpdateAfter!=null) {
+      renderJson(saveOrUpdateBefore);
+      log.info("saveOrUpdateAfter 返回错误信息:{}",saveOrUpdateBefore);
+      return ;
+    }
+    
     JsonBean<Void> jsonBean = new JsonBean<>();
     renderJson(jsonBean);
     return;
+  }
+  
+  public void getTableCols(Kv kv) {
+    renderJson(layuiService.getTableCols(kv));
+    
   }
 
   /**

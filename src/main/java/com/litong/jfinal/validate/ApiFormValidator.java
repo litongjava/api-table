@@ -3,7 +3,7 @@ package com.litong.jfinal.validate;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
 import com.jfinal.validate.Validator;
-import com.litong.utils.vo.JsonBean;
+import com.litong.jfinal.utils.vo.JsonBean;
 
 public class ApiFormValidator extends Validator {
   protected void validate(Controller c) {

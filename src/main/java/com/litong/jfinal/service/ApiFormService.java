@@ -39,9 +39,10 @@ public class ApiFormService {
    * id_del 必须为0
    * @return
    */
-  public String getRequireCondition(String tableName) {
+  public String getRequireCondition(String tableName,List<Object> paramList) {
     if (tableColumnService.isExists("is_del", tableName)) {
-      return " is_del=0";
+      paramList.add(0);
+      return " is_del=?";
     }
     return "";
   }
@@ -77,7 +78,7 @@ public class ApiFormService {
     List<Object> paramList = getListWhere(tableName, kv, where);
 
     // 拼接查询条件
-    if (paramList.size()> 0) {
+    if (paramList.size() > 0) {
       sqlExceptSelect.append(where);
     }
     String orderField = "";
@@ -129,10 +130,11 @@ public class ApiFormService {
    */
   public List<Object> getListWhere(String tableName, Kv kv, StringBuffer where) {
 
-    // 1.添加过滤
-    where.append(getRequireCondition(tableName));
-    // 2.添加id
+    // 1.查询条件的值
     List<Object> paramList = new ArrayList<>();
+
+    // 2.添加过滤
+    where.append(getRequireCondition(tableName,paramList));
 
     // 3.处理时间查询和其他条件
     @SuppressWarnings("unchecked")
@@ -178,9 +180,9 @@ public class ApiFormService {
     }
   }
 
-  public List<Object> getByIdWhere(String tableName, Kv kv, StringBuffer where) {
+  public List<Object> getByIdWhere(String tableName, Kv kv, StringBuffer where,List<Object> paramList) {
     // 1.添加过滤
-    where.append(getRequireCondition(tableName));
+    where.append(getRequireCondition(tableName,paramList));
     // 3.处理时间查询和其他条件
     return getWhere(kv, where);
   }
@@ -188,4 +190,5 @@ public class ApiFormService {
   public List<Object> removeByIdWhere(Kv kv, StringBuffer sql) {
     return getWhere(kv, sql);
   }
+
 }
