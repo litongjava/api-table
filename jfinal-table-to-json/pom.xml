@@ -70,7 +70,13 @@
     <dependency>
       <groupId>com.litognjava</groupId>
       <artifactId>table-to-json</artifactId>
-      <version>1.0</version>
+      <version>1.0.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.jfinal</groupId>
+      <artifactId>jfinal</artifactId>
+      <version>5.0.8</version>
     </dependency>
     <dependency>
       <groupId>com.jfinal</groupId>

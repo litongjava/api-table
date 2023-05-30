@@ -11,7 +11,6 @@ import com.jfinal.config.Plugins;
 import com.jfinal.config.Routes;
 import com.jfinal.core.paragetter.ParaProcessorBuilder;
 import com.jfinal.kit.Kv;
-import com.jfinal.server.undertow.UndertowConfig;
 import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
 import com.litong.jfinal.db.TableToJsonDbConfig;

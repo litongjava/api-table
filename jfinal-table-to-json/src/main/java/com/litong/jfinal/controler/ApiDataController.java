@@ -5,8 +5,8 @@ import com.jfinal.aop.Inject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.Kv;
 import com.litong.jfinal.validate.TableNameValidator;
-import com.litongjava.data.model.DataJsonBean;
 import com.litongjava.data.model.DataPageRequest;
+import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.services.DbDataService;
 import com.litongjava.data.services.DbJsonService;
 import com.litongjava.data.services.PrimaryKeyService;
@@ -67,7 +67,7 @@ public class ApiDataController extends Controller {
 
   public void delById(String tableName, Kv kv) {
     if (kv.size() == 0) {
-      renderJson(new DataJsonBean<Void>(-1, "no params"));
+      renderJson(new DbJsonBean<Void>(-1, "no params"));
       return;
     }
     log.info("kv : " + kv);
@@ -77,7 +77,7 @@ public class ApiDataController extends Controller {
   public void removeByIds(String tableName, Kv kv) {
     log.info("kv : " + kv);
     if (kv.size() == 0) {
-      renderJson(new DataJsonBean<Void>(-1, "no params"));
+      renderJson(new DbJsonBean<Void>(-1, "no params"));
       return;
     }
     renderJson(dbJsonService.removeByIds(tableName, kv));
