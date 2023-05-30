@@ -1,9 +1,13 @@
 package com.litongjava.data.utils;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.jfinal.kit.Kv;
+import com.jfinal.plugin.activerecord.Record;
 
 /**
  * @author litong
@@ -20,16 +24,44 @@ public class KvUtils {
   public static Kv removeEmptyValue(Kv kv) {
     @SuppressWarnings("unchecked")
     Set<Object> keySet = kv.keySet();
-    Set<Object> removeKeySet=new HashSet<>();
+    Set<Object> removeKeySet = new HashSet<>();
     for (Object k : keySet) {
       if (kv.isNull(k)) {
         removeKeySet.add(k);
       }
     }
-    for(Object k:removeKeySet) {
+    for (Object k : removeKeySet) {
       kv.remove(k);
     }
     return kv;
+  }
+
+  /**
+   * 1.将Map中key由驼峰转为转为下划线
+   * 2.将Map转为Kv 
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static Kv camelToUnderscore(Map<String, Object> map) {
+    map.remove("tableName");
+    Kv kv = new Kv();
+    // map.replaceAll((key, value) -> CamelNameUtils.convertCamelToUnderscore(key));
+
+    map.forEach((key, value) -> kv.put(CamelNameUtils.convertCamelToUnderscore(key), value));
+
+    return kv;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Kv underscoreToCamel(Map<String, Object> map) {
+    Kv kv = new Kv();
+    map.forEach((key, value) -> kv.put(CamelNameUtils.convertUnderscoreToCamel(key), value));
+    return kv;
+  }
+
+  public static List<Kv> tecordToKv(List<Record> list) {
+    return list.stream().map(record -> record.toMap()).map(map -> KvUtils.underscoreToCamel(map))
+        .collect(Collectors.toList());
   }
 
 }
