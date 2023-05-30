@@ -1,8 +1,10 @@
-## litongjava-table-to-json
+## table-to-json
 
 ### 简介
 
-table-to-json 创建完成表之后,js进行curd操作只需要将表名传入后台,后台自动返回json数据
+table-to-json 是自动化的Java CRUD框架
+
+创建完成表之后,前端传入表名到后端进行curd操作只需要将表名传入后台,后台自动返回json数据
 
 ### 软件架构
 完全使用jfinal开发 jfinal+mysql,目前仅支持mysql,

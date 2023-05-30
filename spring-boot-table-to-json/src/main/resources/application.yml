@@ -1,0 +1,8 @@
+spring:
+  main:
+    banner-mode: "off"
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.3.9/table_to_json_test?characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: robot_123456#
