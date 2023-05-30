@@ -1,4 +1,4 @@
-package com.litong.jfinal.utils;
+package com.litongjava.data.utils;
 
 import java.util.HashSet;
 import java.util.Set;

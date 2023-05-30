@@ -68,16 +68,16 @@
   <dependencies>
 
     <dependency>
+      <groupId>com.litognjava</groupId>
+      <artifactId>table-to-json</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
       <groupId>com.jfinal</groupId>
       <artifactId>jfinal-undertow</artifactId>
       <version>3.4</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.jfinal</groupId>
-      <artifactId>jfinal</artifactId>
-      <version>5.0.8</version>
-    </dependency>
     <!---如果需要 WebSocket 支持，再添加一个依赖，不开发 WebSocket 无需理会-->
     <dependency>
       <groupId>io.undertow</groupId>
@@ -104,7 +104,6 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-
 
     <dependency>
       <groupId>mysql</groupId>

@@ -2,7 +2,7 @@ package com.litong.jfinal.route;
 
 import com.jfinal.config.Routes;
 import com.litong.jfinal.controler.ApiDbController;
-import com.litong.jfinal.controler.ApiFormController;
+import com.litong.jfinal.controler.ApiDataController;
 import com.litong.jfinal.controler.IndexController;
 
 /**
@@ -15,9 +15,9 @@ public class ApiRoutes extends Routes {
 
   @Override
   public void config() {
-    add("api/form", ApiFormController.class);
+    add("api/data", ApiDataController.class);
     add("api/db", ApiDbController.class);
-    add("/",IndexController.class);
+    add("/", IndexController.class);
   }
 
 }

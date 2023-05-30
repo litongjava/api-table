@@ -1,4 +1,4 @@
-package com.litong.jfinal.model;
+package com.litongjava.data.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TableColumn {
+public class DbTableStruct {
   private String field,type,isNull,extra,defaultValue,key;
 }

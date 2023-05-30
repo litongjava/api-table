@@ -1,10 +1,9 @@
-package com.litong.jfinal.service;
+package com.litongjava.data.services;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.jfinal.aop.Aop;
-import com.litong.jfinal.model.TableColumn;
+import com.litongjava.data.model.DbTableStruct;
 
 /**
  * @author bill robot
@@ -13,8 +12,8 @@ import com.litong.jfinal.model.TableColumn;
  * @desc
  */
 public class PrimaryKeyService {
-  private volatile Map<String, TableColumn> primaryKeys = new ConcurrentHashMap<>();
-  private DbService dbService = Aop.get(DbService.class);
+  private volatile Map<String, DbTableStruct> primaryKeys = new ConcurrentHashMap<>();
+  private DbService dbService =new DbService();
 
   /**
    * 获取主键的列名
@@ -22,7 +21,7 @@ public class PrimaryKeyService {
    * @return
    */
   public String getPrimaryKeyName(String tableName) {
-    TableColumn primaryKey = getPrimaryKey(tableName);
+    DbTableStruct primaryKey = getPrimaryKey(tableName);
     return primaryKey.getField();
   }
 
@@ -32,7 +31,7 @@ public class PrimaryKeyService {
    * @return
    */
   public String getPrimaryKeyColumnType(String tableName) {
-    TableColumn primaryKey = getPrimaryKey(tableName);
+    DbTableStruct primaryKey = getPrimaryKey(tableName);
     return primaryKey.getType();
   }
 
@@ -41,8 +40,8 @@ public class PrimaryKeyService {
    * @param tableName
    * @return
    */
-  public TableColumn getPrimaryKey(String tableName) {
-    TableColumn primaryKey = primaryKeys.get(tableName);
+  public DbTableStruct getPrimaryKey(String tableName) {
+    DbTableStruct primaryKey = primaryKeys.get(tableName);
     if (primaryKey == null) {
       synchronized (dbService) {
         primaryKey = primaryKeys.get(tableName);

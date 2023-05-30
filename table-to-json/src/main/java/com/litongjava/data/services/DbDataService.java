@@ -1,16 +1,15 @@
-package com.litong.jfinal.service;
+package com.litongjava.data.services;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.jfinal.aop.Inject;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
-import com.litongjava.utils.vo.JsonBean;
+import com.litongjava.data.model.DbJsonBean;
 
 /**
  * @author bill robot
@@ -18,10 +17,9 @@ import com.litongjava.utils.vo.JsonBean;
  * @version 1.0 
  * @desc
  */
-public class ApiFormService {
+public class DbDataService {
 
-  @Inject
-  private TableColumnSerivce tableColumnService;
+  private TableColumnService tableColumnService = new TableColumnService();
 
   /**
    * 移除kv中不需要的值
@@ -50,18 +48,7 @@ public class ApiFormService {
     return "";
   }
 
-  /**
-   * 
-   * @param pageNo
-   * @param pageSize
-   * @param tableName
-   * @param orderBy
-   * @param isAsc
-   * @param kv
-   * @param sqlExceptSelect2 
-   * @param paramList2 
-   */
-  public List<Object> sqlExceptSelect(int pageNo, int pageSize, String tableName, String orderBy, Boolean isAsc, Kv kv,
+  public List<Object> sqlExceptSelect(String tableName, int pageNo, int pageSize, String orderBy, Boolean isAsc, Kv kv,
       StringBuffer sqlExceptSelect) {
     if (pageNo == 0) {
       pageNo = 1;
@@ -176,11 +163,12 @@ public class ApiFormService {
    * @param operator
    */
   public void addWhereField(StringBuffer sql, String field, String operator) {
-    if (sql.toString().endsWith("where")) {
-      sql.append(" " + field + " " + operator + " ?");
-    } else {
-      sql.append(" and " + field + " " + operator + " ?");
+    if (!sql.toString().endsWith("where")) {
+      sql.append(" and ");
     }
+
+    String format = "%s %s ?";
+    sql.append(String.format(format, field, operator));
   }
 
   public List<Object> getByIdWhere(String tableName, Kv kv, StringBuffer where, List<Object> paramList) {
@@ -194,7 +182,7 @@ public class ApiFormService {
     return getWhere(kv, sql);
   }
 
-  public JsonBean<List<Record>> listAll(Kv kv) {
+  public DbJsonBean<List<Record>> listAll(Kv kv) {
     String tableName = kv.getStr("tableName");
     StringBuffer sqlStringBuffer = new StringBuffer();
     sqlStringBuffer.append("select * from " + tableName);
@@ -203,13 +191,13 @@ public class ApiFormService {
     // 2.添加过滤
     StringBuffer where = new StringBuffer();
     where.append(getRequireCondition(tableName, paramList));
-    //3.判断是否添加过滤
-    if(paramList.size()>0) {
+    // 3.判断是否添加过滤
+    if (paramList.size() > 0) {
       sqlStringBuffer.append(" where ").append(where);
     }
     // 4.执行查询
-    List<Record> find = Db.find(sqlStringBuffer.toString(),paramList.toArray());
-    return new JsonBean<List<Record>>(find);
+    List<Record> find = Db.find(sqlStringBuffer.toString(), paramList.toArray());
+    return new DbJsonBean<List<Record>>(find);
   }
 
 }

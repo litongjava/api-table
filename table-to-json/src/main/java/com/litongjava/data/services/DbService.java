@@ -1,11 +1,11 @@
-package com.litong.jfinal.service;
+package com.litongjava.data.services;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
-import com.litong.jfinal.model.TableColumn;
+import com.litongjava.data.model.DbTableStruct;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,24 +18,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DbService {
 
-  public List<TableColumn> getPrimaryKey(String tableName) {
+  public List<DbTableStruct> getPrimaryKey(String tableName) {
     List<Record> cloumns = cloumns(tableName);
-    List<TableColumn> ret = new ArrayList<>();
-    //遍历出主键,添加到ret中
+    List<DbTableStruct> ret = new ArrayList<>();
+    // 遍历出主键,添加到ret中
     for (Record record : cloumns) {
       String key = record.getStr("Key");
       if ("PRI".equals(key)) {
-        TableColumn tableColumn = new TableColumn();
+        DbTableStruct tableColumn = new DbTableStruct();
         tableColumn.setField(record.getStr("Field"));
         tableColumn.setType(record.getStr("Type"));
         tableColumn.setKey(key);
         ret.add(tableColumn);
       }
     }
-    
+
     return ret;
   }
 
+  @SuppressWarnings("unused")
   private String[] toArray(List<String> list) {
     int size = list.size();
     String[] ret = new String[size];

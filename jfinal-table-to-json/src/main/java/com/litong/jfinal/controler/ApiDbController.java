@@ -3,10 +3,10 @@ package com.litong.jfinal.controler;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Inject;
 import com.jfinal.core.Controller;
-import com.litong.jfinal.service.DbService;
-import com.litong.jfinal.service.PrimaryKeyService;
-import com.litong.jfinal.service.TableColumnSerivce;
 import com.litong.jfinal.validate.TableNameValidator;
+import com.litongjava.data.services.DbService;
+import com.litongjava.data.services.PrimaryKeyService;
+import com.litongjava.data.services.TableColumnService;
 
 /**
  * @author bill robot
@@ -20,7 +20,7 @@ public class ApiDbController extends Controller {
   @Inject
   private DbService dbService;
   @Inject
-  private TableColumnSerivce tableColumnService;
+  private TableColumnService tableColumnService;
 
   @Inject
   private PrimaryKeyService primaryKeyService;

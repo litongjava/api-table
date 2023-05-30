@@ -1,11 +1,10 @@
-package com.litong.jfinal.service;
+package com.litongjava.data.services;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.jfinal.aop.Aop;
 import com.jfinal.plugin.activerecord.Record;
 
 /**
@@ -14,9 +13,9 @@ import com.jfinal.plugin.activerecord.Record;
  * @version 1.0 
  * @desc
  */
-public class TableColumnSerivce {
+public class TableColumnService {
 
-  private DbService dbService = Aop.get(DbService.class);
+  private DbService dbService = new DbService();
 
   /**
    * 存放表名和字段名
@@ -52,8 +51,7 @@ public class TableColumnSerivce {
   private boolean getColumnsToMap(String tableName, String cloumn) {
     boolean ret = false;
     /*
-     * { "Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra":
-     * "auto_increment", "Default": null, "Key": "PRI" },
+     * { "Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra": "auto_increment", "Default": null, "Key": "PRI" },
      */
     List<Record> listRecord = dbService.cloumns(tableName);
     List<String> cloumns = new ArrayList<>();
@@ -98,7 +96,7 @@ public class TableColumnSerivce {
    */
   public void addColumn(String tableName, String field, String type, String comment) {
     clear(tableName);
-    dbService.addColumn(tableName,field,type,comment);
+    dbService.addColumn(tableName, field, type, comment);
   }
 
 }
