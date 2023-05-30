@@ -13,8 +13,8 @@ import com.litongjava.data.model.DbJsonBean;
 
 /**
  * @author bill robot
- * @date 2020年8月27日_下午7:11:29 
- * @version 1.0 
+ * @version 1.0
+ * @date 2020年8月27日_下午7:11:29
  * @desc
  */
 public class DbDataService {
@@ -23,6 +23,7 @@ public class DbDataService {
 
   /**
    * 移除kv中不需要的值
+   *
    * @param kv
    */
   private void removeKv(Kv kv) {
@@ -38,6 +39,7 @@ public class DbDataService {
 
   /**
    * id_del 必须为0
+   *
    * @return
    */
   public String getRequireCondition(String tableName, List<Object> paramList) {
@@ -49,7 +51,7 @@ public class DbDataService {
   }
 
   public List<Object> sqlExceptSelect(String tableName, int pageNo, int pageSize, String orderBy, Boolean isAsc, Kv kv,
-      StringBuffer sqlExceptSelect) {
+                                      StringBuffer sqlExceptSelect) {
     if (pageNo == 0) {
       pageNo = 1;
     }
@@ -63,7 +65,7 @@ public class DbDataService {
     // 添加表
     sqlExceptSelect.append("from " + tableName);
     StringBuffer where = new StringBuffer();
-    where.append(" where");
+    where.append(" where 1=1");
     // 获取查询插件
     List<Object> paramList = getListWhere(tableName, kv, where);
 
@@ -87,9 +89,6 @@ public class DbDataService {
 
   /**
    * 根据kv中的key和value where表达式
-   * @param kv
-   * @param where
-   * @param paramList
    */
   private List<Object> getWhere(Kv kv, StringBuffer sql) {
     List<Object> paramList = new ArrayList<>();
@@ -114,6 +113,7 @@ public class DbDataService {
 
   /**
    * 根据kv中的键和值生成sql语句,并返回参数
+   *
    * @param kv
    * @param where
    * @return
@@ -136,7 +136,8 @@ public class DbDataService {
       }
       String key = entry.getKey();
 
-      if (key.startsWith("start.") || key.startsWith("end.") || key.startsWith("like.")) {
+
+      if (isContainsOperator(key)) {
         String[] fieldAndValue = key.split("\\.");
         if (fieldAndValue[0].equals("start")) {
           addWhereField(where, fieldAndValue[1], ">=");
@@ -146,7 +147,13 @@ public class DbDataService {
           paramList.add(value);
         } else if (fieldAndValue[0].equals("like")) {
           addWhereField(where, fieldAndValue[1], "like");
-          paramList.add("%" + value + "%");
+          paramList.add(value + "%");
+        } else if (fieldAndValue.equals("lt")) {
+          addWhereField(where, fieldAndValue[1], "<");
+          paramList.add(value);
+        } else if (fieldAndValue.equals("gt")) {
+          addWhereField(where, fieldAndValue[1], ">");
+          paramList.add(value);
         }
       } else {
         addWhereField(where, key, "=");
@@ -156,14 +163,23 @@ public class DbDataService {
     return paramList;
   }
 
+  private boolean isContainsOperator(String key) {
+    return key.startsWith("like.")
+      // start and end
+      || key.startsWith("start.") || key.startsWith("end.")
+      //大于小于
+      || key.startsWith("lt.") || key.startsWith("gt.");
+  }
+
   /**
    * 添加where添加,判断and是否存在
+   *
    * @param sql
    * @param field
    * @param operator
    */
   public void addWhereField(StringBuffer sql, String field, String operator) {
-    if (!sql.toString().endsWith("where")) {
+    if (!sql.toString().endsWith("where ")) {
       sql.append(" and ");
     }
 

@@ -30,6 +30,7 @@ public class DbJsonService {
 
   /**
    * 分页查询
+   *
    * @param tableName
    * @param pageRequest
    * @param quereyParams
@@ -47,11 +48,11 @@ public class DbJsonService {
 
     StringBuffer sqlExceptSelect = new StringBuffer();
     List<Object> paramList = dbDataService.sqlExceptSelect(tableName, pageNo, pageSize, orderBy, isAsc, quereyParams,
-        sqlExceptSelect);
+      sqlExceptSelect);
     Page<Record> listPage = Db.paginate(pageNo, pageSize, "select " + columns, sqlExceptSelect.toString(),
-        paramList.toArray());
-
+      paramList.toArray());
     return new DbJsonBean<>(listPage);
+
 
   }
 
@@ -73,7 +74,19 @@ public class DbJsonService {
     return new DbJsonBean<Record>(record);
   }
 
-  public DbJsonBean<Integer> delById(String tableName, Kv kv) {
+  public DbJsonBean<Boolean> delById(String tableName, Object id) {
+    return new DbJsonBean<Boolean>(Db.deleteById(tableName, id));
+  }
+
+  public DbJsonBean<Integer> updateFlagById(String tableName, Object id, String delColumn, int flag) {
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    String upateTemplate = "update %s set %s=%s where %s =?";
+    int update = Db.update(String.format(upateTemplate, tableName, delColumn, flag, primaryKey), id);
+    DbJsonBean<Integer> dataJsonBean = new DbJsonBean<>(update);
+    return dataJsonBean;
+  }
+
+  public DbJsonBean<Integer> updateIsDelFlagById(String tableName, Object id) {
     // 判断is_del是否存在,如果不存在则创建
     String delFlagColumn = DbDataConfig.getDelColName();
     boolean isExists = tableColumnService.isExists(delFlagColumn, tableName);
@@ -82,7 +95,7 @@ public class DbJsonService {
     }
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set is_del=1 where  %s =?";
-    int update = Db.update(String.format(upateTemplate, tableName, primaryKey), kv.get("id"));
+    int update = Db.update(String.format(upateTemplate, tableName, primaryKey), id);
     DbJsonBean<Integer> dataJsonBean = new DbJsonBean<>(update);
     return dataJsonBean;
   }
@@ -143,6 +156,7 @@ public class DbJsonService {
 
   /**
    * 判断是否为数字
+   *
    * @param str
    * @return
    */
@@ -156,7 +170,8 @@ public class DbJsonService {
   }
 
   /**
-   * 将kv中的键为is_开头的值为true转为1 
+   * 将kv中的键为is_开头的值为true转为1
+   *
    * @param kv
    */
   @SuppressWarnings("unchecked")
@@ -182,9 +197,6 @@ public class DbJsonService {
     true21(kv);
     Record record = new Record();
     record.setColumns(kv);
-    if (tableColumnService.isExists(DbDataConfig.getUpdateTimeCol(), tableName)) {
-      record.set("update_time", LocalDate.now());
-    }
 
     String primarykeyName = primaryKeyService.getPrimaryKeyName(tableName);
     if (kv.containsKey(primarykeyName) && !StrKit.isBlank(kv.getStr(primarykeyName))) { // 更新
@@ -193,9 +205,6 @@ public class DbJsonService {
       return dataJsonBean;
 
     } else { // 保存
-      if (tableColumnService.isExists("create_time", tableName)) {
-        record.set(DbDataConfig.getCreateTimeCol(), LocalDate.now());
-      }
       // 如果主键是varchar类型,插入uuid类型
       String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
       if (primaryKeyColumnType.startsWith("varchar")) {
