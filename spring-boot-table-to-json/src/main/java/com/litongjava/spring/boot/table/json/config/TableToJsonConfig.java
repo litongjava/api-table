@@ -14,7 +14,7 @@ import com.jfinal.template.source.ClassPathSourceFactory;
 import com.litongjava.data.services.DbJsonService;
 
 @Configuration
-public class JFinalDbConfig {
+public class TableToJsonConfig{
   @Autowired
   private DataSource ds;
 

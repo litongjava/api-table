@@ -1,5 +1,6 @@
 package com.litongjava.data.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -9,8 +10,12 @@ import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.model.DbJsonBean;
+
+import lombok.extern.slf4j.Slf4j;
+
 import com.litongjava.data.model.DataPageRequest;
 
+@Slf4j
 public class DbJsonServiceTest {
 
   DbJsonService dbJsonService = new DbJsonService();
@@ -101,6 +106,7 @@ public class DbJsonServiceTest {
   /**
    * 增加数据
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void add() {
     //不存在Id,增加数据
@@ -142,4 +148,33 @@ public class DbJsonServiceTest {
     DbJsonBean<Integer> deleted = dbJsonService.updateFlagById(tableName, "1532708", "deleted", 2);
     System.out.println(deleted);
   }
+  
+  private DbDataService dbDataService = new DbDataService();
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testGetById() {
+    String tableName = "cf_alarm_ai";
+    Kv queryParam = new Kv();
+    // 删除
+    queryParam.put("deleted", 0);
+    queryParam.put("id", 1);
+    queryParam.put("tenant_id", 3);
+
+    // 拼接sql语句
+    StringBuffer sql = new StringBuffer();
+    List<Object> paramList = new ArrayList<Object>();
+
+    String sqlTemplate = "select * from %s where %s";
+    String format = String.format(sqlTemplate, tableName, dbDataService.getRequireCondition(tableName, paramList));
+    sql.append(format);
+
+    // 添加其他查询条件
+    paramList = dbDataService.getListWhere(tableName, queryParam, sql);
+
+    // 添加操作表
+    log.info("sql:{}", sql);
+    log.info("paramList:{}", paramList);
+  }
+
 }

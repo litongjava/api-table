@@ -66,7 +66,7 @@ public class DbDataService {
     sqlExceptSelect.append("from " + tableName);
     StringBuffer where = new StringBuffer();
     where.append(" where 1=1");
-    // 获取查询插件
+    // 获取查询条件
     List<Object> paramList = getListWhere(tableName, kv, where);
 
     // 拼接查询条件

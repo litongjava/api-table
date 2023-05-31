@@ -48,7 +48,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.litognjava</groupId>
+      <groupId>com.litongjava</groupId>
       <artifactId>table-to-json</artifactId>
       <version>1.0.0</version>
     </dependency>

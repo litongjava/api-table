@@ -43,7 +43,6 @@ public class KvUtils {
    */
   @SuppressWarnings("unchecked")
   public static Kv camelToUnderscore(Map<String, Object> map) {
-    map.remove("tableName");
     Kv kv = new Kv();
     // map.replaceAll((key, value) -> CamelNameUtils.convertCamelToUnderscore(key));
 
@@ -59,9 +58,12 @@ public class KvUtils {
     return kv;
   }
 
-  public static List<Kv> tecordToKv(List<Record> list) {
+  public static List<Kv> recordsToKv(List<Record> list) {
     return list.stream().map(record -> record.toMap()).map(map -> KvUtils.underscoreToCamel(map))
         .collect(Collectors.toList());
   }
 
+  public static Kv recordToKv(Record record) {
+    return KvUtils.underscoreToCamel(record.toMap());
+  }
 }

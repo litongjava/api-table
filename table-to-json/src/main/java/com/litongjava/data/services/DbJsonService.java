@@ -1,6 +1,5 @@
 package com.litongjava.data.services;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,9 +12,10 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.config.DbDataConfig;
-import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.model.DataPageRequest;
+import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.utils.KvUtils;
+import com.litongjava.data.utils.SnowflakeIdGenerator;
 import com.litongjava.data.utils.UUIDUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,30 +48,48 @@ public class DbJsonService {
 
     StringBuffer sqlExceptSelect = new StringBuffer();
     List<Object> paramList = dbDataService.sqlExceptSelect(tableName, pageNo, pageSize, orderBy, isAsc, quereyParams,
-      sqlExceptSelect);
+        sqlExceptSelect);
     Page<Record> listPage = Db.paginate(pageNo, pageSize, "select " + columns, sqlExceptSelect.toString(),
-      paramList.toArray());
+        paramList.toArray());
     return new DbJsonBean<>(listPage);
-
 
   }
 
+  public DbJsonBean<Page<Record>> page(Kv kv) {
+    String tableName = (String) kv.remove("table_name");
+    DataPageRequest dataPageRequest = new DataPageRequest(kv);
+    return page(tableName, dataPageRequest, kv);
+  }
+
+  public DbJsonBean<Page<Record>> page(String tableName, Kv kv) {
+    DataPageRequest dataPageRequest = new DataPageRequest(kv);
+    return page(tableName, dataPageRequest, kv);
+  }
+
   public DbJsonBean<Record> getById(String tableName, Kv queryParam) {
-    // 获取主键名称
-    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+
     // 拼接sql语句
     StringBuffer sql = new StringBuffer();
     List<Object> paramList = new ArrayList<Object>();
+
     String sqlTemplate = "select * from %s where %s";
     String format = String.format(sqlTemplate, tableName, dbDataService.getRequireCondition(tableName, paramList));
     sql.append(format);
-    dbDataService.addWhereField(sql, primaryKey, "=");
-    Object idValue = queryParam.get("id");
-    paramList.add(idValue);
+
+    // 添加其他查询条件
+    paramList = dbDataService.getListWhere(tableName, queryParam, sql);
 
     // 添加操作表
     Record record = Db.findFirst(sql.toString(), paramList.toArray());
     return new DbJsonBean<Record>(record);
+  }
+
+  @SuppressWarnings("unchecked")
+  public DbJsonBean<Record> getById(String tableName, Object idValue, Kv kv) {
+    // 获取主键名称
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    kv.put(primaryKey, idValue);
+    return getById(tableName, kv);
   }
 
   public DbJsonBean<Boolean> delById(String tableName, Object id) {
@@ -210,10 +228,18 @@ public class DbJsonService {
       if (primaryKeyColumnType.startsWith("varchar")) {
         record.set(primarykeyName, UUIDUtils.random());
       }
+      // 如果主键是bigint (20)类型,插入雪花Id
+      if ("bigint(20)".equals(primaryKeyColumnType)) {
+        record.set(primarykeyName, new SnowflakeIdGenerator(0, 0).generateId());
+      }
       boolean save = Db.save(tableName, record);
       DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(save);
       return dataJsonBean;
     }
   }
 
+  public DbJsonBean<Boolean> saveOrUpdate(Kv kv) {
+    String tableName = (String) kv.remove("table_name");
+    return this.saveOrUpdate(tableName, kv);
+  }
 }

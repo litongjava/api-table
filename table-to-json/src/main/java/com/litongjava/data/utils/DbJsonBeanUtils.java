@@ -14,13 +14,17 @@ public class DbJsonBeanUtils {
     
     int totalRow = pageResponse.getData().getTotalRow();
     List<Record> list = pageResponse.getData().getList();
-    List<Kv> newList = KvUtils.tecordToKv(list);
+    List<Kv> newList = KvUtils.recordsToKv(list);
     
     DbPage<Kv> pageData = new DbPage<Kv>();
     pageData.setTotal(totalRow);
     pageData.setList(newList);
 
     return new DbJsonBean<DbPage<Kv>>(pageResponse.getCode(), pageResponse.getMsg(), pageData);
+  }
+
+  public static DbJsonBean<Kv> recordToKv(DbJsonBean<Record> response) {
+    return new DbJsonBean<Kv>(response.getCode(), response.getMsg(),KvUtils.recordToKv(response.getData()));
   }
 
 }
