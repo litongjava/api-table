@@ -7,8 +7,6 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.model.DbTableStruct;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * @author bill robot
  * @date 2020年8月27日_下午2:55:52 

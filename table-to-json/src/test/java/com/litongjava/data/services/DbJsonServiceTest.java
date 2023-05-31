@@ -148,7 +148,7 @@ public class DbJsonServiceTest {
     System.out.println(deleted);
   }
 
-  private DbDataService dbDataService = new DbDataService();
+  private DbSqlService dbDataService = new DbSqlService();
 
   @SuppressWarnings("unchecked")
   @Test
@@ -164,8 +164,8 @@ public class DbJsonServiceTest {
     StringBuffer sql = new StringBuffer();
     List<Object> paramList = new ArrayList<Object>();
 
-    String sqlTemplate = "select * from %s where %s";
-    String format = String.format(sqlTemplate, tableName, dbDataService.getRequireCondition(tableName, paramList));
+    String sqlTemplate = "select * from %s where ";
+    String format = String.format(sqlTemplate, tableName);
     sql.append(format);
 
     // 添加其他查询条件

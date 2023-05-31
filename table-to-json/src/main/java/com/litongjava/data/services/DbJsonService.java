@@ -18,7 +18,7 @@ import com.litongjava.data.utils.SnowflakeIdGenerator;
 import com.litongjava.data.utils.UUIDUtils;
 
 public class DbJsonService {
-  private DbDataService dbDataService = new DbDataService();
+  private DbSqlService dbSqlService = new DbSqlService();
 
   private PrimaryKeyService primaryKeyService = new PrimaryKeyService();
 
@@ -43,8 +43,10 @@ public class DbJsonService {
     }
 
     StringBuffer sqlExceptSelect = new StringBuffer();
-    List<Object> paramList = dbDataService.sqlExceptSelect(tableName, pageNo, pageSize, orderBy, isAsc, quereyParams,
+    List<Object> paramList = dbSqlService.sqlExceptSelect(tableName, pageNo, pageSize, orderBy, isAsc, quereyParams,
         sqlExceptSelect);
+    System.out.println("sql:" + "select " + columns + " " + sqlExceptSelect.toString());
+    System.out.println(paramList.toString());
     Page<Record> listPage = Db.paginate(pageNo, pageSize, "select " + columns, sqlExceptSelect.toString(),
         paramList.toArray());
     return new DbJsonBean<>(listPage);
@@ -68,12 +70,15 @@ public class DbJsonService {
     StringBuffer sql = new StringBuffer();
     List<Object> paramList = new ArrayList<Object>();
 
-    String sqlTemplate = "select * from %s where %s";
-    String format = String.format(sqlTemplate, tableName, dbDataService.getRequireCondition(tableName, paramList));
+    String sqlTemplate = "select * from %s where ";
+    String format = String.format(sqlTemplate, tableName);
     sql.append(format);
 
     // 添加其他查询条件
-    paramList = dbDataService.getListWhere(tableName, queryParam, sql);
+    paramList = dbSqlService.getListWhere(tableName, queryParam, sql);
+
+    System.out.println("sql:" + sql.toString());
+    System.out.println(paramList.toString());
 
     // 添加操作表
     Record record = Db.findFirst(sql.toString(), paramList.toArray());
@@ -95,9 +100,12 @@ public class DbJsonService {
   public DbJsonBean<Integer> updateFlagById(String tableName, Object id, String delColumn, int flag) {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set %s=%s where %s =?";
-    int update = Db.update(String.format(upateTemplate, tableName, delColumn, flag, primaryKey), id);
-    DbJsonBean<Integer> dataJsonBean = new DbJsonBean<>(update);
-    return dataJsonBean;
+    String sql = String.format(upateTemplate, tableName, delColumn, flag, primaryKey);
+
+    System.out.println("sql:" + sql.toString());
+    System.out.println(id);
+
+    return new DbJsonBean<>(Db.update(sql, id));
   }
 
   public DbJsonBean<Integer> updateIsDelFlagById(String tableName, Object id) {
@@ -109,9 +117,12 @@ public class DbJsonService {
     }
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set is_del=1 where  %s =?";
-    int update = Db.update(String.format(upateTemplate, tableName, primaryKey), id);
-    DbJsonBean<Integer> dataJsonBean = new DbJsonBean<>(update);
-    return dataJsonBean;
+    String sql = String.format(upateTemplate, tableName, primaryKey);
+
+    System.out.println("sql:" + sql.toString());
+    System.out.println(id);
+
+    return new DbJsonBean<>(Db.update(sql, id));
   }
 
   public DbJsonBean<Integer> removeByIds(String tableName, Kv kv) {
@@ -158,9 +169,11 @@ public class DbJsonService {
     }
     String sql = "update %s set is_del=1 where " + where.toString();
     sql = String.format(sql, tableName);
-    int update = Db.update(sql, idValues);
-    DbJsonBean<Integer> jsonBean = new DbJsonBean<>(update);
-    return jsonBean;
+
+    System.out.println("sql:" + sql.toString());
+    System.out.println(idValues);
+    
+    return new DbJsonBean<>(Db.update(sql, idValues));
   }
 
   private String[] getParaValues(String key) {
@@ -214,6 +227,7 @@ public class DbJsonService {
 
     String primarykeyName = primaryKeyService.getPrimaryKeyName(tableName);
     if (kv.containsKey(primarykeyName) && !StrKit.isBlank(kv.getStr(primarykeyName))) { // 更新
+      
       boolean update = Db.update(tableName, record);
       DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(update);
       return dataJsonBean;
@@ -250,12 +264,15 @@ public class DbJsonService {
     StringBuffer sql = new StringBuffer();
     List<Object> paramList = new ArrayList<Object>();
 
-    String sqlTemplate = "select * from %s where %s";
-    String format = String.format(sqlTemplate, tableName, dbDataService.getRequireCondition(tableName, paramList));
+    String sqlTemplate = "select * from %s where ";
+    String format = String.format(sqlTemplate, tableName);
     sql.append(format);
 
     // 添加其他查询条件
-    paramList = dbDataService.getListWhere(tableName, queryParam, sql);
+    paramList = dbSqlService.getListWhere(tableName, queryParam, sql);
+    System.out.println("sql:" + sql.toString());
+    System.out.println(paramList);
+    
     // 添加操作表
     return new DbJsonBean<>(Db.find(sql.toString(), paramList.toArray()));
 

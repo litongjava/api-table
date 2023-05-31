@@ -25,6 +25,8 @@ import com.litongjava.data.services.DbJsonService;
 import com.litongjava.data.utils.DbJsonBeanUtils;
 import com.litongjava.data.utils.EasyExcelUtils;
 import com.litongjava.data.utils.KvUtils;
+import com.litongjava.data.utils.RequestMapUtils;
+import com.litongjava.spring.boot.table.json.model.DateTimeReqVo;
 import com.litongjava.spring.boot.table.json.vo.AlarmAiExcelVO;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -45,11 +47,12 @@ public class TableJsonController {
 
   @SuppressWarnings("unchecked")
   @RequestMapping("page")
-  public DbJsonBean<DbPage<Kv>> page(@RequestParam Map<String, Object> map) {
-    log.info("map:{}", map);
+  public DbJsonBean<DbPage<Kv>> page(@RequestParam Map<String, Object> map, DateTimeReqVo reqVo) {
+    RequestMapUtils.putEntityToMap(map, reqVo);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
     kv.put("deleted", 0);
+    log.info("kv:{}", kv);
     return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(kv));
   }
 
@@ -114,8 +117,6 @@ public class TableJsonController {
     EasyExcelUtils.write(response.getOutputStream(), filename, tableName, AlarmAiExcelVO.class, exportDatas);
     response.setContentType("application/vnd.ms-excel;charset=UTF-8");
   }
-
-
 
   @SuppressWarnings("unchecked")
   @RequestMapping("pageDeleted")
