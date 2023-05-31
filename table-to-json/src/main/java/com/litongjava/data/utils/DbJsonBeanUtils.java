@@ -10,21 +10,25 @@ import com.litongjava.data.model.DbPage;
 
 public class DbJsonBeanUtils {
 
-  public static DbJsonBean<DbPage<Kv>> pageToDbPage(DbJsonBean<Page<Record>> pageResponse) {
-    
-    int totalRow = pageResponse.getData().getTotalRow();
-    List<Record> list = pageResponse.getData().getList();
+  public static DbJsonBean<DbPage<Kv>> pageToDbPage(DbJsonBean<Page<Record>> jsonBean) {
+
+    int totalRow = jsonBean.getData().getTotalRow();
+    List<Record> list = jsonBean.getData().getList();
     List<Kv> newList = KvUtils.recordsToKv(list);
-    
+
     DbPage<Kv> pageData = new DbPage<Kv>();
     pageData.setTotal(totalRow);
     pageData.setList(newList);
 
-    return new DbJsonBean<DbPage<Kv>>(pageResponse.getCode(), pageResponse.getMsg(), pageData);
+    return new DbJsonBean<>(jsonBean.getCode(), jsonBean.getMsg(), pageData);
   }
 
-  public static DbJsonBean<Kv> recordToKv(DbJsonBean<Record> response) {
-    return new DbJsonBean<Kv>(response.getCode(), response.getMsg(),KvUtils.recordToKv(response.getData()));
+  public static DbJsonBean<Kv> recordToKv(DbJsonBean<Record> jsonBean) {
+    return new DbJsonBean<>(jsonBean.getCode(), jsonBean.getMsg(), KvUtils.recordToKv(jsonBean.getData()));
+  }
+
+  public static DbJsonBean<List<Kv>> recordsToKv(DbJsonBean<List<Record>> jsonBean) {
+    return new DbJsonBean<>(jsonBean.getCode(), jsonBean.getMsg(), KvUtils.recordsToKv(jsonBean.getData()));
   }
 
 }

@@ -66,4 +66,8 @@ public class KvUtils {
   public static Kv recordToKv(Record record) {
     return KvUtils.underscoreToCamel(record.toMap());
   }
+
+  public static List<Map<String, Object>> recordsToMap(List<Record> records) {
+    return records.stream().map(record -> record.toMap()).collect(Collectors.toList());
+  }
 }

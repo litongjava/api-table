@@ -1,7 +1,6 @@
 package com.litongjava.data.services;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,8 +16,6 @@ import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.utils.KvUtils;
 import com.litongjava.data.utils.SnowflakeIdGenerator;
 import com.litongjava.data.utils.UUIDUtils;
-
-import lombok.extern.slf4j.Slf4j;
 
 public class DbJsonService {
   private DbDataService dbDataService = new DbDataService();
@@ -241,4 +238,27 @@ public class DbJsonService {
     String tableName = (String) kv.remove("table_name");
     return this.saveOrUpdate(tableName, kv);
   }
+
+  public DbJsonBean<List<Record>> list(Kv kv) {
+    String tableName = (String) kv.remove("table_name");
+    return list(tableName, kv);
+  }
+
+  public DbJsonBean<List<Record>> list(String tableName, Kv queryParam) {
+
+    // 拼接sql语句
+    StringBuffer sql = new StringBuffer();
+    List<Object> paramList = new ArrayList<Object>();
+
+    String sqlTemplate = "select * from %s where %s";
+    String format = String.format(sqlTemplate, tableName, dbDataService.getRequireCondition(tableName, paramList));
+    sql.append(format);
+
+    // 添加其他查询条件
+    paramList = dbDataService.getListWhere(tableName, queryParam, sql);
+    // 添加操作表
+    return new DbJsonBean<>(Db.find(sql.toString(), paramList.toArray()));
+
+  }
+
 }
