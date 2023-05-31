@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
  * @version 1.0 
  * @desc
  */
-@Slf4j
 public class DbService {
 
   public List<DbTableStruct> getPrimaryKey(String tableName) {
@@ -77,7 +76,6 @@ public class DbService {
   public void addColumn(String tableName, String field, String type, String comment) {
     String sql = "ALTER TABLE %s ADD COLUMN `%s` %s comment '%s';";
     sql = String.format(sql, tableName, field, type, comment);
-    int update = Db.update(sql);
-    log.info("execute sql:{},return code:{}", sql, update);
+    Db.update(sql);
   }
 }

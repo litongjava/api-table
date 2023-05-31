@@ -20,7 +20,6 @@ import com.litongjava.data.utils.UUIDUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class DbJsonService {
   private DbDataService dbDataService = new DbDataService();
 
@@ -135,7 +134,7 @@ public class DbJsonService {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
 
     String[] ids = getParaValues(key);
-    log.info("paraValues : " + Arrays.toString(ids));
+
     // 是否为int值
     boolean isNumeric = isNumeric(ids[0]);
     // 根据int和string,组成不同类型的ids

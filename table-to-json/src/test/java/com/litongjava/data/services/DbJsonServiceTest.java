@@ -109,7 +109,7 @@ public class DbJsonServiceTest {
   @SuppressWarnings("unchecked")
   @Test
   public void add() {
-    //不存在Id,增加数据
+    // 不存在Id,增加数据
     String tableName = "cf_alarm";
     DataPageRequest dataPageRequest = new DataPageRequest();
     Kv kv = new Kv();
@@ -127,7 +127,6 @@ public class DbJsonServiceTest {
 //    kv.put("update_time", LocalDate.now());
     kv.put("deleted", 0);
     kv.put("tenant_id", 1);
-
 
     System.out.println(dataPageRequest);
     DbJsonBean<Boolean> booleanDbJsonBean = dbJsonService.saveOrUpdate(tableName, kv);
@@ -148,7 +147,7 @@ public class DbJsonServiceTest {
     DbJsonBean<Integer> deleted = dbJsonService.updateFlagById(tableName, "1532708", "deleted", 2);
     System.out.println(deleted);
   }
-  
+
   private DbDataService dbDataService = new DbDataService();
 
   @SuppressWarnings("unchecked")
