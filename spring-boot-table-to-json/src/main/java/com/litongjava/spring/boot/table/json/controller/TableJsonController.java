@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,9 @@ import com.litongjava.data.services.DbJsonService;
 import com.litongjava.data.utils.DbJsonBeanUtils;
 import com.litongjava.data.utils.EasyExcelUtils;
 import com.litongjava.data.utils.KvUtils;
+import com.litongjava.spring.boot.table.json.vo.AlarmAiExcelVO;
 
+import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -97,42 +99,23 @@ public class TableJsonController {
   @RequestMapping("/export-excel")
   public void exportExcel(@RequestParam Map<String, Object> map, HttpServletResponse response) throws IOException {
     Kv kv = KvUtils.camelToUnderscore(map);
-    // 删除
     kv.put("deleted", 0);
     log.info("kv:{}", kv);
     String tableName = kv.getStr("table_name");
 
+    // 获取数据
     List<Record> records = dbJsonService.list(kv).getData();
-    List<Kv> kvs = KvUtils.recordsToKv(records);
+    List<Map<String, Object>> collect = records.stream().map(e -> e.toMap()).collect(Collectors.toList());
+    List<AlarmAiExcelVO> exportDatas = BeanUtil.copyToList(collect, AlarmAiExcelVO.class);
 
-    // 导出Excel
+    // 导出 Excel
     String filename = tableName + "_export.xls";
+    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+    EasyExcelUtils.write(response.getOutputStream(), filename, tableName, AlarmAiExcelVO.class, exportDatas);
     response.setContentType("application/vnd.ms-excel;charset=UTF-8");
-    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    EasyExcelUtils.write(response.getOutputStream(), filename, "tableName", null, kvs);
-    // EasyExcelUtils.write(response, "水位配置.xls", "数据", WaterLevelSettingsExcelVO.class, kvs);
   }
 
-  @SuppressWarnings("unchecked")
-  @RequestMapping("/download-excel")
-  public void downloadExcel(@RequestParam Map<String, Object> map, HttpServletResponse response) throws IOException {
-    Kv kv = KvUtils.camelToUnderscore(map);
-    // 删除
-    kv.put("deleted", 0);
-    log.info("kv:{}", kv);
-    String tableName = kv.getStr("table_name");
 
-    List<Record> records = dbJsonService.list(kv).getData();
-    List<Map<String,Object>> kvs = KvUtils.recordsToMap(records);
-    log.info("size:{}", kvs.size());
-    // 导出Excel
-    String filename = tableName + "_export.xls";
-    response.setContentType("application/octet-stream;charset=UTF-8");
-    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    ServletOutputStream outputStream = response.getOutputStream();
-    EasyExcelUtils.write(outputStream, filename, "tableName", null, kvs);
-    // EasyExcelUtils.write(response, "水位配置.xls", "数据", WaterLevelSettingsExcelVO.class, kvs);
-  }
 
   @SuppressWarnings("unchecked")
   @RequestMapping("pageDeleted")
