@@ -1,6 +1,5 @@
 package com.litongjava.data.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +12,7 @@ import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.config.DbDataConfig;
 import com.litongjava.data.model.DataPageRequest;
 import com.litongjava.data.model.DbJsonBean;
+import com.litongjava.data.model.Sql;
 import com.litongjava.data.utils.KvUtils;
 import com.litongjava.data.utils.SnowflakeIdGenerator;
 import com.litongjava.data.utils.UUIDUtils;
@@ -24,32 +24,69 @@ public class DbJsonService {
 
   private TableColumnService tableColumnService = new TableColumnService();
 
+  @SuppressWarnings("unchecked")
+  public DbJsonBean<Boolean> saveOrUpdate(String tableName, Kv kv) {
+    KvUtils.removeEmptyValue(kv);
+    true21(kv);
+    Record record = new Record();
+    record.setColumns(kv);
+
+    String primarykeyName = primaryKeyService.getPrimaryKeyName(tableName);
+    if (kv.containsKey(primarykeyName) && !StrKit.isBlank(kv.getStr(primarykeyName))) { // 更新
+
+      boolean update = Db.update(tableName, record);
+      DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(update);
+      return dataJsonBean;
+
+    } else { // 保存
+      // 如果主键是varchar类型,插入uuid类型
+      String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
+      if (primaryKeyColumnType.startsWith("varchar")) {
+        record.set(primarykeyName, UUIDUtils.random());
+      }
+      // 如果主键是bigint (20)类型,插入雪花Id
+      if ("bigint(20)".equals(primaryKeyColumnType)) {
+        record.set(primarykeyName, new SnowflakeIdGenerator(0, 0).generateId());
+      }
+      boolean save = Db.save(tableName, record);
+      DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(save);
+      return dataJsonBean;
+    }
+  }
+
+  public DbJsonBean<Boolean> saveOrUpdate(Kv kv) {
+    String tableName = (String) kv.remove("table_name");
+    return this.saveOrUpdate(tableName, kv);
+  }
+
   /**
-   * 分页查询
+   * 无任何条件过滤,包含所有数据
    *
-   * @param tableName
-   * @param pageRequest
-   * @param quereyParams
+   * @param kv
    * @return
    */
-  public DbJsonBean<Page<Record>> page(String tableName, DataPageRequest pageRequest, Kv quereyParams) {
-    String columns = pageRequest.getColumns();
-    Integer pageNo = pageRequest.getPageNo();
-    Integer pageSize = pageRequest.getPageSize();
-    String orderBy = pageRequest.getOrderBy();
-    Boolean isAsc = pageRequest.getIsAsc();
-    if (StrKit.isBlank(columns)) {
-      columns = "*";
-    }
+  public DbJsonBean<List<Record>> listAll(String tableName) {
+    return new DbJsonBean<List<Record>>(Db.find("select * from " + tableName));
+  }
 
-    StringBuffer sqlExceptSelect = new StringBuffer();
-    List<Object> paramList = dbSqlService.sqlExceptSelect(tableName, pageNo, pageSize, orderBy, isAsc, quereyParams,
-        sqlExceptSelect);
-    System.out.println("sql:" + "select " + columns + " " + sqlExceptSelect.toString());
-    System.out.println(paramList.toString());
-    Page<Record> listPage = Db.paginate(pageNo, pageSize, "select " + columns, sqlExceptSelect.toString(),
-        paramList.toArray());
-    return new DbJsonBean<>(listPage);
+  public DbJsonBean<List<Record>> list(Kv kv) {
+    String tableName = (String) kv.remove("table_name");
+    return list(tableName, kv);
+  }
+
+  public DbJsonBean<List<Record>> list(String tableName, Kv queryParam) {
+    String columns = queryParam.getStr("cloumns");
+
+    // 添加其他查询条件
+    Sql sql = dbSqlService.getWhereQueryClause(queryParam);
+    sql.setColumns(columns);
+    sql.setTableName(tableName);
+
+    System.out.println("sql:" + sql.getsql());
+    System.out.println(sql.getParams());
+
+    // 添加操作表
+    return new DbJsonBean<>(Db.find(sql.getsql(), sql.getParams()));
 
   }
 
@@ -64,24 +101,62 @@ public class DbJsonService {
     return page(tableName, dataPageRequest, kv);
   }
 
+  /**
+   * 分页查询
+   *
+   * @param tableName
+   * @param pageRequest
+   * @param queryParam
+   * @return
+   */
+  public DbJsonBean<Page<Record>> page(String tableName, DataPageRequest pageRequest, Kv queryParam) {
+    String columns = queryParam.getStr("cloumns");
+    Integer pageNo = pageRequest.getPageNo();
+    Integer pageSize = pageRequest.getPageSize();
+
+    String orderBy = pageRequest.getOrderBy();
+    String groupBy = pageRequest.getGroupBy();
+    Boolean isAsc = pageRequest.getIsAsc();
+
+    Sql sql = dbSqlService.getWhereClause(orderBy, isAsc, groupBy, queryParam);
+    sql.setTableName(tableName);
+    sql.setColumns(columns);
+
+    System.out.println("sql:" + sql.getsql());
+    List<Object> params = sql.getParams();
+    System.out.println(params);
+    System.out.println(pageNo + " " + pageSize);
+
+    String sqlExceptSelect = sql.getSqlExceptSelect();
+    Page<Record> listPage = null;
+    if (params == null) {
+      listPage = Db.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect);
+    } else {
+      listPage = Db.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, params.toArray());
+    }
+    return new DbJsonBean<>(listPage);
+
+  }
+
+  /**
+   * 因为 需要需要获取Id,是否删除,租户id等.所以使用了queryParam
+   * @param tableName
+   * @param queryParam
+   * @return
+   */
   public DbJsonBean<Record> getById(String tableName, Kv queryParam) {
-
-    // 拼接sql语句
-    StringBuffer sql = new StringBuffer();
-    List<Object> paramList = new ArrayList<Object>();
-
-    String sqlTemplate = "select * from %s where ";
-    String format = String.format(sqlTemplate, tableName);
-    sql.append(format);
+    String columns = queryParam.getStr("cloumns");
 
     // 添加其他查询条件
-    paramList = dbSqlService.getListWhere(tableName, queryParam, sql);
+    Sql sql = dbSqlService.getWhereQueryClause(queryParam);
+    sql.setColumns(columns);
+    sql.setTableName(tableName);
 
-    System.out.println("sql:" + sql.toString());
-    System.out.println(paramList.toString());
+    System.out.println("sql:" + sql.getsql());
+    System.out.println(sql.getParams());
 
     // 添加操作表
-    Record record = Db.findFirst(sql.toString(), paramList.toArray());
+    Record record = Db.findFirst(sql.getsql(), sql.getParams());
     return new DbJsonBean<Record>(record);
   }
 
@@ -172,7 +247,7 @@ public class DbJsonService {
 
     System.out.println("sql:" + sql.toString());
     System.out.println(idValues);
-    
+
     return new DbJsonBean<>(Db.update(sql, idValues));
   }
 
@@ -216,66 +291,6 @@ public class DbJsonService {
         }
       }
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  public DbJsonBean<Boolean> saveOrUpdate(String tableName, Kv kv) {
-    KvUtils.removeEmptyValue(kv);
-    true21(kv);
-    Record record = new Record();
-    record.setColumns(kv);
-
-    String primarykeyName = primaryKeyService.getPrimaryKeyName(tableName);
-    if (kv.containsKey(primarykeyName) && !StrKit.isBlank(kv.getStr(primarykeyName))) { // 更新
-      
-      boolean update = Db.update(tableName, record);
-      DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(update);
-      return dataJsonBean;
-
-    } else { // 保存
-      // 如果主键是varchar类型,插入uuid类型
-      String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
-      if (primaryKeyColumnType.startsWith("varchar")) {
-        record.set(primarykeyName, UUIDUtils.random());
-      }
-      // 如果主键是bigint (20)类型,插入雪花Id
-      if ("bigint(20)".equals(primaryKeyColumnType)) {
-        record.set(primarykeyName, new SnowflakeIdGenerator(0, 0).generateId());
-      }
-      boolean save = Db.save(tableName, record);
-      DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(save);
-      return dataJsonBean;
-    }
-  }
-
-  public DbJsonBean<Boolean> saveOrUpdate(Kv kv) {
-    String tableName = (String) kv.remove("table_name");
-    return this.saveOrUpdate(tableName, kv);
-  }
-
-  public DbJsonBean<List<Record>> list(Kv kv) {
-    String tableName = (String) kv.remove("table_name");
-    return list(tableName, kv);
-  }
-
-  public DbJsonBean<List<Record>> list(String tableName, Kv queryParam) {
-
-    // 拼接sql语句
-    StringBuffer sql = new StringBuffer();
-    List<Object> paramList = new ArrayList<Object>();
-
-    String sqlTemplate = "select * from %s where ";
-    String format = String.format(sqlTemplate, tableName);
-    sql.append(format);
-
-    // 添加其他查询条件
-    paramList = dbSqlService.getListWhere(tableName, queryParam, sql);
-    System.out.println("sql:" + sql.toString());
-    System.out.println(paramList);
-    
-    // 添加操作表
-    return new DbJsonBean<>(Db.find(sql.toString(), paramList.toArray()));
-
   }
 
 }

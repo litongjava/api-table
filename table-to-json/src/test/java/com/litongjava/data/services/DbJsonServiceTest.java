@@ -1,6 +1,5 @@
 package com.litongjava.data.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -9,11 +8,11 @@ import org.junit.Test;
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import com.litongjava.data.constants.OperatorConstants;
+import com.litongjava.data.model.DataPageRequest;
 import com.litongjava.data.model.DbJsonBean;
 
 import lombok.extern.slf4j.Slf4j;
-
-import com.litongjava.data.model.DataPageRequest;
 
 @Slf4j
 public class DbJsonServiceTest {
@@ -25,17 +24,41 @@ public class DbJsonServiceTest {
     DbInit.init();
   }
 
+  @Test
+  public void test_listAll() {
+    String tableName = "cf_alarm";
+    DbJsonBean<List<Record>> bean = dbJsonService.listAll(tableName);
+    System.err.println(bean);
+  }
+
   /**
    * 分页查询
    */
+  @SuppressWarnings("unchecked")
   @Test
-  public void test() {
+  public void test_page() {
     String tableName = "cf_alarm";
-    DataPageRequest dataPageRequest = new DataPageRequest();
     Kv kv = new Kv();
+    kv.put("table_name", tableName);
 
-    System.out.println(dataPageRequest);
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(tableName, dataPageRequest, kv);
+    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(kv);
+
+    System.out.println(jsonBean);
+    Page<Record> page = jsonBean.getData();
+    List<Record> list = page.getList();
+    System.out.println(list);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void test_pageWithParams() {
+    String tableName = "cf_alarm";
+    Kv kv = new Kv();
+    kv.put("table_name", tableName);
+    kv.put("config_id", 17);
+    kv.put("order_by", "create_date");
+
+    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -52,10 +75,12 @@ public class DbJsonServiceTest {
     String tableName = "cf_alarm";
     DataPageRequest dataPageRequest = new DataPageRequest();
     Kv kv = new Kv();
-    kv.put("like.ship_name", "救助");
+    kv.put("table_name", tableName);
+    kv.put("ship_name", "救助");
+    kv.put("ship_name_op", "ew");
 
     System.out.println(dataPageRequest);
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(tableName, dataPageRequest, kv);
+    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -66,16 +91,18 @@ public class DbJsonServiceTest {
   /**
    * 闭区间查询
    */
+  @SuppressWarnings("unchecked")
   @Test
   public void queryStartAndEnd() {
     String tableName = "cf_alarm";
-    DataPageRequest dataPageRequest = new DataPageRequest();
     Kv kv = new Kv();
-    kv.put("start.create_date", "2021-10-27 00:00:00");
-    kv.put("end.create_date", "2021-10-27 23:59:59");
+    kv.put("table_name", tableName);
+    // LocalDateTime[] createDateArray = { LocalDateTime.MIN, LocalDateTime.MAX };
+    String[] createDateArray = { "2020-10-27 14:47:42", "2021-10-27 14:47:42" };
+    kv.put("create_date", createDateArray);
+    kv.put("create_date_op", OperatorConstants.BT);
 
-    System.out.println(dataPageRequest);
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(tableName, dataPageRequest, kv);
+    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -86,16 +113,31 @@ public class DbJsonServiceTest {
   /**
    * 闭区间查询
    */
+  @SuppressWarnings("unchecked")
   @Test
-  public void queryGtAndLt() {
+  public void queryGt() {
     String tableName = "cf_alarm";
-    DataPageRequest dataPageRequest = new DataPageRequest();
     Kv kv = new Kv();
-    kv.put("gt.longitude", "64000000");
-    kv.put("lt.longitude", "64999999");
+    kv.put("longitude", "64000000");
+    kv.put("longitude_op", OperatorConstants.GT);
 
-    System.out.println(dataPageRequest);
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(tableName, dataPageRequest, kv);
+    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(tableName, kv);
+
+    System.out.println(jsonBean);
+    Page<Record> page = jsonBean.getData();
+    List<Record> list = page.getList();
+    System.out.println(list);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testQueryLt() {
+    String tableName = "cf_alarm";
+    Kv kv = new Kv();
+    kv.put("longitude", "64999999");
+    kv.put("longitude_op", OperatorConstants.LT);
+
+    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(tableName, kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -147,33 +189,4 @@ public class DbJsonServiceTest {
     DbJsonBean<Integer> deleted = dbJsonService.updateFlagById(tableName, "1532708", "deleted", 2);
     System.out.println(deleted);
   }
-
-  private DbSqlService dbDataService = new DbSqlService();
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void testGetById() {
-    String tableName = "cf_alarm_ai";
-    Kv queryParam = new Kv();
-    // 删除
-    queryParam.put("deleted", 0);
-    queryParam.put("id", 1);
-    queryParam.put("tenant_id", 3);
-
-    // 拼接sql语句
-    StringBuffer sql = new StringBuffer();
-    List<Object> paramList = new ArrayList<Object>();
-
-    String sqlTemplate = "select * from %s where ";
-    String format = String.format(sqlTemplate, tableName);
-    sql.append(format);
-
-    // 添加其他查询条件
-    paramList = dbDataService.getListWhere(tableName, queryParam, sql);
-
-    // 添加操作表
-    log.info("sql:{}", sql);
-    log.info("paramList:{}", paramList);
-  }
-
 }

@@ -1,17 +1,16 @@
 package com.litongjava.data.services;
 
-import java.util.List;
-
 import org.junit.Test;
 
 import com.jfinal.kit.Kv;
+import com.litongjava.data.model.Sql;
+
+import ch.qos.logback.core.encoder.EncoderBase;
 
 public class DbSqlServiceTest {
 
   @SuppressWarnings("unchecked")
-  @Test
-  public void testGetListWhere() {
-    String tableName = "alarm_ai";
+  private Kv getKey() {
     Kv kv = Kv.create();
     kv.put("key1", "value1");
     kv.put("key2", "value2");
@@ -20,12 +19,30 @@ public class DbSqlServiceTest {
 
     kv.put("key3_op", "bt");
     kv.put("key4_op", "bt");
+    return kv;
+  }
 
-    StringBuffer where = new StringBuffer();
+  @Test
+  public void test_getWhereQueryClause() {
+    Kv kv = getKey();
 
-    List<Object> paramList = new DbSqlService().getListWhere(tableName, kv, where);
-    System.out.println(where);
-    System.out.println(paramList);
+    Sql whereQueryClause = new DbSqlService().getWhereQueryClause(kv);
+
+    System.out.println(whereQueryClause.getWhere().toString());
+    System.out.println(whereQueryClause.getParams());
+  }
+
+  @Test
+  public void test_getWhereClause() {
+    Kv kv = getKey();
+
+    String orderBy = "create_time";
+    Boolean isAsc = true;
+    String groupyBy = "user_id";
+    Sql whereQueryClause = new DbSqlService().getWhereClause(orderBy, isAsc, groupyBy, kv);
+
+    System.out.println(whereQueryClause.getWhere().toString());
+    System.out.println(whereQueryClause.getParams());
   }
 
 }

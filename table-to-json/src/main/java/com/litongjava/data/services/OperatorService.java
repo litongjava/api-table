@@ -3,31 +3,33 @@ package com.litongjava.data.services;
 import java.util.Collections;
 import java.util.List;
 
+import com.litongjava.data.constants.OperatorConstants;
+
 public class OperatorService {
   public void addOperator(StringBuffer where, List<Object> paramList, String fieldName, Object value, String operator) {
-    if ("eq".equals(operator)) {
+    if (OperatorConstants.EQ.equals(operator)) {
       addWhereField(where, fieldName, "=");
       paramList.add(value);
-    } else if ("ne".equals(operator)) {
+    } else if (OperatorConstants.NE.equals(operator)) {
       addWhereField(where, fieldName, "!=");
       paramList.add(value);
 
-    } else if ("gt".equals(operator)) {
+    } else if (OperatorConstants.GT.equals(operator)) {
       addWhereField(where, fieldName, ">");
       paramList.add(value);
 
-    } else if ("ge".equals(operator)) {
+    } else if (OperatorConstants.GE.equals(operator)) {
       addWhereField(where, fieldName, ">=");
       paramList.add(value);
 
-    } else if ("lt".equals(operator)) {
+    } else if (OperatorConstants.LT.equals(operator)) {
       addWhereField(where, fieldName, "<");
       paramList.add(value);
-    } else if ("le".equals(operator)) {
+    } else if (OperatorConstants.LE.equals(operator)) {
       addWhereField(where, fieldName, "<=");
       paramList.add(value);
 
-    } else if ("bt".equals(operator)) {
+    } else if (OperatorConstants.BT.equals(operator)) {
       if (value instanceof Object[]) {
         addWhereField(where, fieldName, "between", "and");
         Object[] valueArray = (Object[]) value;
@@ -35,7 +37,7 @@ public class OperatorService {
         paramList.add(valueArray[1]);
       }
 
-    } else if ("nb".equals(operator)) {
+    } else if (OperatorConstants.NB.equals(operator)) {
       if (value instanceof Object[]) {
         addWhereField(where, fieldName, "not between", "and");
         Object[] valueArray = (Object[]) value;
@@ -43,20 +45,20 @@ public class OperatorService {
         paramList.add(valueArray[1]);
       }
 
-    } else if ("ct".equals(operator)) {
+    } else if (OperatorConstants.CT.equals(operator)) {
       addWhereField(where, fieldName, "like");
       paramList.add("%" + value + "%");
       paramList.add(value);
 
-    } else if ("sw".equals(operator)) {
+    } else if (OperatorConstants.SW.equals(operator)) {
       addWhereField(where, fieldName, "like");
       paramList.add("%" + value);
 
-    } else if ("ew".equals(operator)) { // EndWith
+    } else if (OperatorConstants.EW.equals(operator)) { // EndWith
       addWhereField(where, fieldName, "like");
       paramList.add(value + "%");
 
-    } else if ("ol".equals(operator)) {
+    } else if (OperatorConstants.OL.equals(operator)) {
       if (value instanceof Object[]) {
         Object[] valueArray = (Object[]) value;
         addWhereOrField(where, fieldName, "like", valueArray);
@@ -65,11 +67,11 @@ public class OperatorService {
         }
       }
 
-    } else if ("nk".equals(operator)) {
+    } else if (OperatorConstants.NK.equals(operator)) {
       addWhereField(where, fieldName, "not like");
       paramList.add(value);
 
-    } else if ("il".equals(operator)) {
+    } else if (OperatorConstants.IL.equals(operator)) {
       if (value instanceof Object[]) {
         Object[] valueArray = (Object[]) value;
         addWhereInField(where, fieldName, "in", valueArray);
@@ -78,7 +80,7 @@ public class OperatorService {
         }
       }
 
-    } else if ("ni".equals(operator)) {
+    } else if (OperatorConstants.NI.equals(operator)) {
       if (value instanceof Object[]) {
         Object[] valueArray = (Object[]) value;
         addWhereInField(where, fieldName, "not in", valueArray);
@@ -87,15 +89,15 @@ public class OperatorService {
         }
       }
 
-    } else if ("nl".equals(operator)) {
+    } else if (OperatorConstants.NL.equals(operator)) {
       addWhereField(where, fieldName, "is null");
     } else if ("nn".equals(operator)) {
       addWhereField(where, fieldName, "is not null");
 
-    } else if ("ey".equals(operator)) {
+    } else if (OperatorConstants.EY.equals(operator)) {
       addWhereEmpytField(where, fieldName);
 
-    } else if ("ny".equals(operator)) {
+    } else if (OperatorConstants.NY.equals(operator)) {
       addWhereNotEmpytField(where, fieldName);
     }
 
@@ -140,7 +142,7 @@ public class OperatorService {
    * 添加where添加,判断and是否存在
    *
    * @param sql
-   * @param field
+   * @param fieldName
    * @param operator
    */
   public void addWhereField(StringBuffer sql, String fieldName, String operator) {

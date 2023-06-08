@@ -1,4 +1,4 @@
-package com.litongjava.spring.boot.table.json.model;
+package com.litongjava.spring.boot.table.json.vo;
 import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
