@@ -1,6 +1,7 @@
 package com.litongjava.spring.boot.table.json.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +27,8 @@ import com.litongjava.data.utils.DbJsonBeanUtils;
 import com.litongjava.data.utils.EasyExcelUtils;
 import com.litongjava.data.utils.KvUtils;
 import com.litongjava.data.utils.RequestMapUtils;
-import com.litongjava.spring.boot.table.json.vo.AlarmAiExcelVO;
-import com.litongjava.spring.boot.table.json.vo.DateTimeReqVo;
+import com.litongjava.data.vo.AlarmAiExcelVO;
+import com.litongjava.data.vo.DateTimeReqVo;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -52,13 +53,11 @@ public class TableJsonController {
     return dbJsonService.saveOrUpdate(kv);
   }
 
-  @SuppressWarnings("unchecked")
   @RequestMapping("/list")
   public DbJsonBean<List<Kv>> list(@RequestParam Map<String, Object> map) {
     log.info("map:{}", map);
     Kv kv = KvUtils.camelToUnderscore(map);
-    // 删除
-    kv.put("deleted", 0);
+    // kv.put("deleted", 0);
     return DbJsonBeanUtils.recordsToKv(dbJsonService.list(kv));
   }
 
@@ -68,24 +67,22 @@ public class TableJsonController {
     return DbJsonBeanUtils.recordsToKv(dbJsonService.listAll(tableName));
   }
 
-  @SuppressWarnings("unchecked")
   @RequestMapping("page")
   public DbJsonBean<DbPage<Kv>> page(@RequestParam Map<String, Object> map, DateTimeReqVo reqVo) {
     RequestMapUtils.putEntityToMap(map, reqVo);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
-    kv.put("deleted", 0);
+    // kv.put("deleted", 0);
     log.info("kv:{}", kv);
     return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(kv));
   }
 
-  @SuppressWarnings("unchecked")
   @RequestMapping("/get")
   public DbJsonBean<Kv> get(String tableName, String id) {
     log.info("tableName:{},id:{}", tableName, id);
     Kv kv = new Kv();
     // 删除标记
-    kv.put("deleted", 0);
+    // kv.put("deleted", 0);
     log.info("kv:{}", kv);
 
     return DbJsonBeanUtils.recordToKv(dbJsonService.getById(tableName, id, kv));
@@ -104,13 +101,12 @@ public class TableJsonController {
     return dbJsonService.updateFlagById(tableName, id, "deleted", 1);
   }
 
-  @SuppressWarnings("unchecked")
   @RequestMapping("pageDeleted")
   public DbJsonBean<DbPage<Kv>> pageDeleted(@RequestParam Map<String, Object> map) {
     log.info("map:{}", map);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
-    kv.put("deleted", 1);
+    // kv.put("deleted", 1);
     return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(kv));
   }
 
@@ -120,23 +116,38 @@ public class TableJsonController {
     return dbJsonService.updateFlagById(tableName, id, "deleted", 0);
   }
 
-  @SuppressWarnings("unchecked")
   @RequestMapping("/export-excel")
   public void exportExcel(@RequestParam Map<String, Object> map, HttpServletResponse response) throws IOException {
     Kv kv = KvUtils.camelToUnderscore(map);
-    kv.put("deleted", 0);
+    // kv.put("deleted", 0);
     log.info("kv:{}", kv);
     String tableName = kv.getStr("table_name");
+    String filename = tableName + "_export.xls";
 
     // 获取数据
     List<Record> records = dbJsonService.list(kv).getData();
-    List<Map<String, Object>> collect = records.stream().map(e -> e.toMap()).collect(Collectors.toList());
-    List<AlarmAiExcelVO> exportDatas = BeanUtil.copyToList(collect, AlarmAiExcelVO.class);
+    export(tableName, response, filename, records, AlarmAiExcelVO.class);
+  }
 
+  @RequestMapping("/export-all-excel")
+  public void exporAlltExcel(String tableName, HttpServletResponse response) throws IOException {
     // 导出 Excel
-    String filename = tableName + "_export.xls";
+    String filename = tableName + "all_export.xls";
+
+    // 获取数据
+    List<Record> records = dbJsonService.listAll(tableName).getData();
+
+    export(tableName, response, filename, records, AlarmAiExcelVO.class);
+  }
+
+  public static <T> void export(String sheetName, HttpServletResponse response, String filename, List<Record> records,
+      Class<T> clazz) throws UnsupportedEncodingException, IOException {
+    List<Map<String, Object>> collect = records.stream().map(e -> e.toMap()).collect(Collectors.toList());
+    List<T> exportDatas = BeanUtil.copyToList(collect, clazz);
+
     response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    EasyExcelUtils.write(response.getOutputStream(), filename, tableName, AlarmAiExcelVO.class, exportDatas);
+    EasyExcelUtils.write(response.getOutputStream(), filename, sheetName, clazz, exportDatas);
     response.setContentType("application/vnd.ms-excel;charset=UTF-8");
   }
+
 }

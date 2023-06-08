@@ -2,7 +2,11 @@ package com.litongjava.data.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
@@ -25,8 +29,8 @@ public class EasyExcelUtils {
    * @param <T> 泛型，保证 head 和 data 类型的一致性
    * @throws IOException 写入失败的情况
    */
-  public static <T> void write(OutputStream ouputStream, String filename, String sheetName, Class<T> head,
-      List<T> data) throws IOException {
+  public static <T> void write(OutputStream ouputStream, String filename, String sheetName, Class<T> head, List<T> data)
+      throws IOException {
     // 输出 Excel
     if (head != null) {
       EasyExcel.write(ouputStream, head)
@@ -40,6 +44,5 @@ public class EasyExcelUtils {
       EasyExcel.write(ouputStream).autoCloseStream(false)
           .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).sheet(sheetName).doWrite(data);
     }
-
   }
 }
