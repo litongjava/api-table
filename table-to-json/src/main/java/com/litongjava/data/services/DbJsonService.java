@@ -11,6 +11,7 @@ import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.config.DbDataConfig;
 import com.litongjava.data.model.DataPageRequest;
+import com.litongjava.data.model.DataQueryRequest;
 import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.model.Sql;
 import com.litongjava.data.utils.KvUtils;
@@ -75,11 +76,10 @@ public class DbJsonService {
   }
 
   public DbJsonBean<List<Record>> list(String tableName, Kv queryParam) {
-    String columns = queryParam.getStr("cloumns");
-
+    DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereQueryClause(queryParam);
-    sql.setColumns(columns);
+    Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
+    sql.setColumns(queryRequest.getColumns());
     sql.setTableName(tableName);
 
     System.out.println("sql:" + sql.getsql());
@@ -110,17 +110,14 @@ public class DbJsonService {
    * @return
    */
   public DbJsonBean<Page<Record>> page(String tableName, DataPageRequest pageRequest, Kv queryParam) {
-    String columns = queryParam.getStr("cloumns");
     Integer pageNo = pageRequest.getPageNo();
     Integer pageSize = pageRequest.getPageSize();
 
-    String orderBy = pageRequest.getOrderBy();
-    String groupBy = pageRequest.getGroupBy();
-    Boolean isAsc = pageRequest.getIsAsc();
+    DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
 
-    Sql sql = dbSqlService.getWhereClause(orderBy, isAsc, groupBy, queryParam);
+    Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
     sql.setTableName(tableName);
-    sql.setColumns(columns);
+    sql.setColumns(queryRequest.getColumns());
 
     System.out.println("sql:" + sql.getsql());
     List<Object> params = sql.getParams();

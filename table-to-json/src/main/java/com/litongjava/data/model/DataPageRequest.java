@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DataPageRequest {
   private Integer pageNo, pageSize;
-  private String orderBy, groupBy;
-  private Boolean isAsc;
+  
 
   public DataPageRequest(Kv kv) {
     Object pageNo = kv.remove("page_no");
@@ -22,9 +21,6 @@ public class DataPageRequest {
 
     Object pageSize = kv.remove("page_size");
     this.pageSize = pageSize == null ? 10 : Integer.parseInt((String) pageSize);
-
-    this.orderBy = (String) kv.remove("order_by");
-    this.isAsc = (Boolean) kv.remove("is_asc");
 
   }
 }

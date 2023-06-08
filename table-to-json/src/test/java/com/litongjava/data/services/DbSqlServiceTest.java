@@ -3,9 +3,8 @@ package com.litongjava.data.services;
 import org.junit.Test;
 
 import com.jfinal.kit.Kv;
+import com.litongjava.data.model.DataQueryRequest;
 import com.litongjava.data.model.Sql;
-
-import ch.qos.logback.core.encoder.EncoderBase;
 
 public class DbSqlServiceTest {
 
@@ -39,7 +38,13 @@ public class DbSqlServiceTest {
     String orderBy = "create_time";
     Boolean isAsc = true;
     String groupyBy = "user_id";
-    Sql whereQueryClause = new DbSqlService().getWhereClause(orderBy, isAsc, groupyBy, kv);
+
+    DataQueryRequest queryRequest = new DataQueryRequest();
+    queryRequest.setOrderBy(orderBy);
+    queryRequest.setIsAsc(isAsc);
+    queryRequest.setGroupBy(groupyBy);
+
+    Sql whereQueryClause = new DbSqlService().getWhereClause(queryRequest, kv);
 
     System.out.println(whereQueryClause.getWhere().toString());
     System.out.println(whereQueryClause.getParams());

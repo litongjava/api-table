@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.jfinal.kit.Kv;
+import com.litongjava.data.model.DataQueryRequest;
 import com.litongjava.data.model.Operator;
 import com.litongjava.data.model.Sql;
 
@@ -37,13 +38,17 @@ public class DbSqlService {
     kv.remove("columns");
   }
 
-  public Sql getWhereClause(String orderBy, Boolean isAsc, String groupBy, Kv kv) {
+  public Sql getWhereClause(DataQueryRequest queryRequest, Kv kv) {
     // 移除kv中的值
     // pageNo,pageSize,tableName,orderBy,orderBy,isAsc
     removeKv(kv);
     // 获取查询条件
     Sql whereClause = getWhereQueryClause(kv);
     StringBuffer where = whereClause.getWhere();
+
+    String orderBy = queryRequest.getOrderBy();
+    Boolean isAsc = queryRequest.getIsAsc();
+    String groupBy = queryRequest.getGroupBy();
 
     if (orderBy != null) {
       where.append(" order by " + orderBy);
