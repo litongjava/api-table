@@ -82,12 +82,18 @@ public class DbJsonService {
     sql.setColumns(queryRequest.getColumns());
     sql.setTableName(tableName);
 
+    List<Object> params = sql.getParams();
+
     System.out.println("sql:" + sql.getsql());
-    System.out.println(sql.getParams());
-
+    System.out.println(params);
     // 添加操作表
-    return new DbJsonBean<>(Db.find(sql.getsql(), sql.getParams()));
-
+    List<Record> list = null;
+    if (params == null) {
+      list = Db.find(sql.getsql());
+    } else {
+      list = Db.find(sql.getsql(), sql.getParams());
+    }
+    return new DbJsonBean<>(list);
   }
 
   public DbJsonBean<Page<Record>> page(Kv kv) {

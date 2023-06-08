@@ -1,4 +1,4 @@
-package com.litongjava.spring.boot.table.json.vo;
+package com.litongjava.data.vo;
 
 import java.time.LocalDateTime;
 
@@ -17,5 +17,5 @@ public class DateTimeReqVo {
   private LocalDateTime[] createTime;
 
   @DateTimeFormat(pattern = DateConstants.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-  private LocalDateTime[] createDate  ;
+  private LocalDateTime[] createDate;
 }

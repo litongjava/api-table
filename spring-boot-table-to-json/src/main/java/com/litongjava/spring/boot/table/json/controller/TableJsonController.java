@@ -45,6 +45,29 @@ public class TableJsonController {
     return "index";
   }
 
+  @PostMapping("/create")
+  public DbJsonBean<Boolean> create(@RequestBody Map<String, Object> map) {
+    Kv kv = KvUtils.camelToUnderscore(map);
+    log.info("map:{}", map);
+    return dbJsonService.saveOrUpdate(kv);
+  }
+
+  @SuppressWarnings("unchecked")
+  @RequestMapping("/list")
+  public DbJsonBean<List<Kv>> list(@RequestParam Map<String, Object> map) {
+    log.info("map:{}", map);
+    Kv kv = KvUtils.camelToUnderscore(map);
+    // 删除
+    kv.put("deleted", 0);
+    return DbJsonBeanUtils.recordsToKv(dbJsonService.list(kv));
+  }
+
+  @RequestMapping("/listAll")
+  public DbJsonBean<List<Kv>> listAll(String tableName) {
+    log.info("tableName:{}", tableName);
+    return DbJsonBeanUtils.recordsToKv(dbJsonService.listAll(tableName));
+  }
+
   @SuppressWarnings("unchecked")
   @RequestMapping("page")
   public DbJsonBean<DbPage<Kv>> page(@RequestParam Map<String, Object> map, DateTimeReqVo reqVo) {
@@ -54,13 +77,6 @@ public class TableJsonController {
     kv.put("deleted", 0);
     log.info("kv:{}", kv);
     return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(kv));
-  }
-
-  @PostMapping("/create")
-  public DbJsonBean<Boolean> create(@RequestBody Map<String, Object> map) {
-    Kv kv = KvUtils.camelToUnderscore(map);
-    log.info("map:{}", map);
-    return dbJsonService.saveOrUpdate(kv);
   }
 
   @SuppressWarnings("unchecked")
@@ -75,12 +91,6 @@ public class TableJsonController {
     return DbJsonBeanUtils.recordToKv(dbJsonService.getById(tableName, id, kv));
   }
 
-  @DeleteMapping("/delete")
-  public DbJsonBean<Integer> delete(String tableName, String id) {
-    log.info("tableName:{},id:{}", tableName, id);
-    return dbJsonService.updateFlagById(tableName, id, "deleted", 1);
-  }
-
   @PutMapping("/update")
   public DbJsonBean<Boolean> update(@RequestBody Map<String, Object> map) {
     Kv kv = KvUtils.camelToUnderscore(map);
@@ -88,14 +98,26 @@ public class TableJsonController {
     return dbJsonService.saveOrUpdate(kv);
   }
 
+  @DeleteMapping("/delete")
+  public DbJsonBean<Integer> delete(String tableName, String id) {
+    log.info("tableName:{},id:{}", tableName, id);
+    return dbJsonService.updateFlagById(tableName, id, "deleted", 1);
+  }
+
   @SuppressWarnings("unchecked")
-  @RequestMapping("/list")
-  public DbJsonBean<List<Kv>> list(@RequestParam Map<String, Object> map) {
+  @RequestMapping("pageDeleted")
+  public DbJsonBean<DbPage<Kv>> pageDeleted(@RequestParam Map<String, Object> map) {
     log.info("map:{}", map);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
-    kv.put("deleted", 0);
-    return DbJsonBeanUtils.recordsToKv(dbJsonService.list(kv));
+    kv.put("deleted", 1);
+    return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(kv));
+  }
+
+  @RequestMapping("/recover")
+  public DbJsonBean<Integer> recover(String tableName, String id) {
+    log.info("tableName:{},id:{}", tableName, id);
+    return dbJsonService.updateFlagById(tableName, id, "deleted", 0);
   }
 
   @SuppressWarnings("unchecked")
@@ -116,21 +138,5 @@ public class TableJsonController {
     response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
     EasyExcelUtils.write(response.getOutputStream(), filename, tableName, AlarmAiExcelVO.class, exportDatas);
     response.setContentType("application/vnd.ms-excel;charset=UTF-8");
-  }
-
-  @SuppressWarnings("unchecked")
-  @RequestMapping("pageDeleted")
-  public DbJsonBean<DbPage<Kv>> pageDeleted(@RequestParam Map<String, Object> map) {
-    log.info("map:{}", map);
-    Kv kv = KvUtils.camelToUnderscore(map);
-    // 删除
-    kv.put("deleted", 1);
-    return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(kv));
-  }
-
-  @RequestMapping("/recover")
-  public DbJsonBean<Integer> recover(String tableName, String id) {
-    log.info("tableName:{},id:{}", tableName, id);
-    return dbJsonService.updateFlagById(tableName, id, "deleted", 0);
   }
 }

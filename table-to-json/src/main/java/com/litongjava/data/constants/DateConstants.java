@@ -1,6 +1,7 @@
-package com.litongjava.spring.boot.table.json.constants;
+package com.litongjava.data.constants;
+
 /**
- * 时间枚举类
+ * 时间工具类
  *
  * @author litongjava
  */
