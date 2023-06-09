@@ -20,7 +20,7 @@ public class DataQueryRequest {
     this.columns = (String) kv.remove("columns");
     this.orderBy = (String) kv.remove("order_by");
     this.isAsc = (Boolean) kv.remove("is_asc");
-    this.groupBy = (String) kv.remove("order_by");
+    this.groupBy = (String) kv.remove("group_by");
   }
 
 }

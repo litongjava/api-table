@@ -91,7 +91,7 @@ public class DbJsonService {
     if (params == null) {
       list = Db.find(sql.getsql());
     } else {
-      list = Db.find(sql.getsql(), sql.getParams());
+      list = Db.find(sql.getsql(), sql.getParams().toArray());
     }
     return new DbJsonBean<>(list);
   }
@@ -159,7 +159,7 @@ public class DbJsonService {
     System.out.println(sql.getParams());
 
     // 添加操作表
-    Record record = Db.findFirst(sql.getsql(), sql.getParams());
+    Record record = Db.findFirst(sql.getsql(), sql.getParams().toArray());
     return new DbJsonBean<Record>(record);
   }
 
