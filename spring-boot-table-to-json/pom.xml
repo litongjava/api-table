@@ -10,7 +10,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spring-boot.version>2.5.6</spring-boot.version>
-    <main.class>com.xxx.ServiceTestApplication</main.class>
+    <assembly>full</assembly>
+    <!-- <assembly>full</assembly> -->
+    <main.class>com.litongjava.spring.boot.table.json.TableToJsonApplicaton</main.class>
   </properties>
 
   <dependencies>
@@ -76,17 +78,80 @@
 
   <build>
     <plugins>
-      <!-- Spring Boot -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>${spring-boot.version}</version>
         <configuration>
-          <includeSystemScope>true</includeSystemScope>
           <!--使该插件支持热启动 -->
           <fork>true</fork>
+          <!-- main 入口 -->
           <mainClass>${main.class}</mainClass>
+          <!-- 设置为ZIP，此模式下spring-boot-maven-plugin会将Manifest.MF文件中的Main-Class设置为org.springframework.boot.loader.PropertiesLauncher -->
+          <layout>ZIP</layout>
+          <includes>
+            <include>
+              <groupId>org.psyduck</groupId>
+              <artifactId>psyduck-admin</artifactId>
+            </include>
+          </includes>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal><!--可以把依赖的包都打包到生成的Jar包中 -->
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!--maven-dependency-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <!-- 第三方依赖的存放目录，最终生成到target/lib -->
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <!-- 需要排除的jar的 groupId -->
+              <excludeGroupIds>
+                org.psyduck
+              </excludeGroupIds>
+              <!-- 默认为test，会复制所有依赖，只需要复制runtime的依赖 -->
+              <includeScope>
+                runtime
+              </includeScope>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- 组装文件并压缩zip插件 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <!-- not append assembly id in release file name -->
+          <appendAssemblyId>false</appendAssemblyId>
+          <descriptors>
+            <descriptor>assembly-${assembly}.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
