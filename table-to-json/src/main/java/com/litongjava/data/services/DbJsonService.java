@@ -47,7 +47,7 @@ public class DbJsonService {
       }
       // 如果主键是bigint (20)类型,插入雪花Id
       if ("bigint(20)".equals(primaryKeyColumnType)) {
-        record.set(primarykeyName, new SnowflakeIdGenerator(0, 0).generateId());
+        record.set(primarykeyName, new SnowflakeIdGenerator(Thread.currentThread().getId(), 0).generateId());
       }
       boolean save = Db.save(tableName, record);
       DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(save);
