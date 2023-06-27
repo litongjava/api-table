@@ -25,20 +25,29 @@ public class DbJsonService {
 
   private TableColumnService tableColumnService = new TableColumnService();
 
+  private DbTableService dbTableService = new DbTableService();
+
+  private DbService dbService = new DbService();
+
   @SuppressWarnings("unchecked")
   public DbJsonBean<Boolean> saveOrUpdate(String tableName, Kv kv) {
+
     KvUtils.removeEmptyValue(kv);
     true21(kv);
     Record record = new Record();
     record.setColumns(kv);
 
     String primarykeyName = primaryKeyService.getPrimaryKeyName(tableName);
-    if (kv.containsKey(primarykeyName) && !StrKit.isBlank(kv.getStr(primarykeyName))) { // 更新
-
-      boolean update = Db.update(tableName, record);
-      DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(update);
-      return dataJsonBean;
-
+    if (kv.containsKey(primarykeyName)) { // 更新
+      String idValue = kv.getStr(primarykeyName);
+      if (!StrKit.isBlank(idValue)) {
+        boolean update = Db.update(tableName, record);
+        System.out.println("update result:" + update);
+        DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(update);
+        return dataJsonBean;
+      } else {
+        return new DbJsonBean<>(-1, "id value can't be null");
+      }
     } else { // 保存
       // 如果主键是varchar类型,插入uuid类型
       String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
@@ -47,7 +56,7 @@ public class DbJsonService {
       }
       // 如果主键是bigint (20)类型,插入雪花Id
       if (!StrKit.isBlank(primaryKeyColumnType)) {
-        if (primaryKeyColumnType.startsWith("bigint(2)")) {
+        if (primaryKeyColumnType.startsWith("bigint")) {
           long threadId = Thread.currentThread().getId();
           if (threadId > 31) {
             threadId = threadId % 31;
@@ -60,7 +69,9 @@ public class DbJsonService {
         }
       }
 
-      return new DbJsonBean<>(Db.save(tableName, record));
+      boolean save = Db.save(tableName, record);
+      System.out.println("save result:" + save);
+      return new DbJsonBean<>(save);
     }
   }
 
@@ -303,6 +314,25 @@ public class DbJsonService {
         }
       }
     }
+  }
+
+  /**
+   * 获取所有表
+   * @return
+   */
+  public String[] getAllTableNames() {
+    return dbTableService.getAllTableNames();
+  }
+
+
+  public DbJsonBean<String[]> tableNames() {
+    String[] allTableNames = dbTableService.getAllTableNames();
+    DbJsonBean<String[]> dbJsonBean = new DbJsonBean<>();
+    dbJsonBean.setData(allTableNames);
+    return dbJsonBean;
+  }
+  public DbJsonBean<List<Record>> tables() {
+    return new DbJsonBean<>(dbService.tables());
   }
 
 }
