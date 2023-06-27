@@ -46,12 +46,21 @@ public class DbJsonService {
         record.set(primarykeyName, UUIDUtils.random());
       }
       // 如果主键是bigint (20)类型,插入雪花Id
-      if ("bigint(20)".equals(primaryKeyColumnType)) {
-        record.set(primarykeyName, new SnowflakeIdGenerator(Thread.currentThread().getId(), 0).generateId());
+      if (!StrKit.isBlank(primaryKeyColumnType)) {
+        if (primaryKeyColumnType.startsWith("bigint(2)")) {
+          long threadId = Thread.currentThread().getId();
+          if (threadId > 31) {
+            threadId = threadId % 31;
+          }
+          if (threadId < 0) {
+            threadId = 0;
+          }
+          long generateId = new SnowflakeIdGenerator(threadId, 0).generateId();
+          record.set(primarykeyName, generateId);
+        }
       }
-      boolean save = Db.save(tableName, record);
-      DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(save);
-      return dataJsonBean;
+
+      return new DbJsonBean<>(Db.save(tableName, record));
     }
   }
 
