@@ -19,8 +19,16 @@ public class DataQueryRequest {
   public DataQueryRequest(Kv kv) {
     this.columns = (String) kv.remove("columns");
     this.orderBy = (String) kv.remove("order_by");
-    this.isAsc = Boolean.parseBoolean((String) kv.remove("is_asc"));
+
     this.groupBy = (String) kv.remove("group_by");
+
+    Object remove = kv.remove("is_asc");
+    if (remove == null) {
+      this.isAsc = null;
+    } else {
+      this.isAsc = Boolean.parseBoolean((String) remove);
+    }
+
   }
 
 }
