@@ -41,7 +41,7 @@ public class DbJsonService {
     if (kv.containsKey(primarykeyName)) { // 更新
       String idValue = kv.getStr(primarykeyName);
       if (!StrKit.isBlank(idValue)) {
-        boolean update = Db.update(tableName, record);
+        boolean update = Db.update(tableName, primarykeyName, record);
         System.out.println("update result:" + update);
         DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(update);
         return dataJsonBean;
@@ -114,6 +114,11 @@ public class DbJsonService {
       list = Db.find(sql.getsql(), sql.getParams().toArray());
     }
     return new DbJsonBean<>(list);
+  }
+
+  public DbJsonBean<List<Record>> query(String sql) {
+    List<Record> find = Db.find(sql);
+    return new DbJsonBean<>(find);
   }
 
   public DbJsonBean<Page<Record>> page(Kv kv) {
@@ -335,9 +340,11 @@ public class DbJsonService {
     return new DbJsonBean<>(dbService.tables());
   }
 
-
-  public DbJsonBean<Map<String,Object>> tableConfig(String tableName, String lang) {
-    return new DbJsonBean<>(dbTableService.getTableConfig(tableName,lang));
+  public DbJsonBean<Map<String, Object>> tableConfig(String tableName, String lang) {
+    if (StrKit.isBlank(tableName)) {
+      return new DbJsonBean<>(-1,"tableName can't be empty");
+    }
+    return new DbJsonBean<>(dbTableService.getTableConfig(tableName, lang));
   }
 
 }

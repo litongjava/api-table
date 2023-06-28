@@ -61,24 +61,23 @@ public class KvUtils {
 
   public static List<Kv> recordsToKv(List<Record> list) {
     return list.stream().map(record -> {
-      Map<String, Object> map = record.toMap();
-      // 将Long转为String
-      for (Map.Entry<String, Object> entry : map.entrySet()) {
-        if (entry.getValue() instanceof Long) {
-          map.put(entry.getKey(), Long.toString((Long) entry.getValue()));
-        }
-
-        if (entry.getValue() instanceof BigInteger) {
-          map.put(entry.getKey(), entry.getValue().toString());
-        }
-      }
-
-      return map;
-    }).map(map -> KvUtils.underscoreToCamel(map)).collect(Collectors.toList());
+      return recordToKv(record);
+    }).collect(Collectors.toList());
   }
 
   public static Kv recordToKv(Record record) {
-    return KvUtils.underscoreToCamel(record.toMap());
+    Map<String, Object> map = record.toMap();
+    // 将Long转为String
+    for (Map.Entry<String, Object> entry : map.entrySet()) {
+      if (entry.getValue() instanceof Long) {
+        map.put(entry.getKey(), Long.toString((Long) entry.getValue()));
+      }
+
+      if (entry.getValue() instanceof BigInteger) {
+        map.put(entry.getKey(), entry.getValue().toString());
+      }
+    }
+    return KvUtils.underscoreToCamel(map);
   }
 
   public static List<Map<String, Object>> recordsToMap(List<Record> records) {

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
   <artifactId>table-to-json</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.2</version>
   <packaging>jar</packaging>
   <name>table-to-json</name>
   <description>自动化操作后端数据表</description>
@@ -117,7 +117,7 @@
     <dependency>
       <groupId>com.jfinal</groupId>
       <artifactId>activerecord</artifactId>
-      <version>5.0.3</version>
+      <version>5.1.1</version>
     </dependency>
 
     <dependency>

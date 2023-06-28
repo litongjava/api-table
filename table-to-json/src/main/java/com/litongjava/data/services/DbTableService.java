@@ -38,6 +38,7 @@ public class DbTableService {
     List<Record> cloumns = dbService.cloumns(tableName);
     List<Map<String, Object>> queryItems = new ArrayList<>(cloumns.size());
     List<Map<String, Object>> tableItems = new ArrayList<>(cloumns.size());
+    List<Map<String, Object>> formItems = new ArrayList<>(cloumns.size());
     Map<String, String> operator = new LinkedHashMap<>();
 
     for (Record record : cloumns) {
@@ -62,20 +63,30 @@ public class DbTableService {
       tableItem.put("align", "center");
       tableItem.put("show", true);
 
+      Map<String, Object> formItem = new LinkedHashMap<>();
+      formItem.put("name", name);
+      formItem.put("key", key);
+      formItem.put("type", type);
+      formItem.put("show", true);
+
       if ("date".equals(type)) {
         operator.put(key + "Op", "bt");
-        queryItem.put("prop", getDateProp(lang));
+        queryItem.put("prop", getQueryItemDateProp(lang));
+        formItem.put("prop", getFormItemDateProp(lang));
       } else {
         queryItem.put("placeholder", getPlaceholder(name, lang));
+        formItem.put("placeholder", getPlaceholder(name, lang));
         if (fieldType.startsWith("varchar")) {
           operator.put(key + "Op", "sw");
         }
       }
       queryItems.add(queryItem);
       tableItems.add(tableItem);
+      formItems.add(formItem);
     }
 
     LinkedHashMap<String, Object> query = new LinkedHashMap<String, Object>();
+    query.put("show", false);
     query.put("items", queryItems);
     query.put("operator", operator);
     query.put("button", getButton(lang));
@@ -95,13 +106,46 @@ public class DbTableService {
     table.put("items", tableItems);
     table.put("operation", getOperation(lang));
 
+    LinkedHashMap<String, Object> form = new LinkedHashMap<String, Object>();
+    form.put("width", "1000px");
+    form.put("labelWidth", "150px");
+    form.put("items", formItems);
+    form.put("button", getFormButton(lang));
+
     Map<String, Object> config = new LinkedHashMap<>();
     config.put("tableName", tableName);
     config.put("tableAlias", getName(tableName));
     config.put("query", query);
     config.put("toolBar", toolBar);
     config.put("table", table);
+    config.put("form", form);
     return config;
+  }
+
+  private Map<String, String> getButton(String lang) {
+    HashMap<String, String> hashMap = new LinkedHashMap<String, String>();
+    if ("zh-CN".equals(lang)) {
+      hashMap.put("queryButtonName", "查询");
+      hashMap.put("resetButtonName", "重置");
+    } else {
+      hashMap.put("queryButtonName", "Query");
+      hashMap.put("resetButtonName", "Reset");
+    }
+
+    return hashMap;
+  }
+
+  private Object getFormButton(String lang) {
+    HashMap<String, String> hashMap = new LinkedHashMap<String, String>();
+    if ("zh-CN".equals(lang)) {
+      hashMap.put("confimButtonName", "确认");
+      hashMap.put("cancelButtonName", "取消");
+    } else {
+      hashMap.put("confimButtonName", "Comfirm");
+      hashMap.put("cancelButtonName", "Cancel");
+    }
+
+    return hashMap;
   }
 
   /**
@@ -146,7 +190,7 @@ public class DbTableService {
     }
   }
 
-  private Map<String, Object> getDateProp(String lang) {
+  private Map<String, Object> getQueryItemDateProp(String lang) {
     Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
     hashMap.put("type", "daterange");
     hashMap.put("rangeSeparator", "-");
@@ -164,18 +208,14 @@ public class DbTableService {
     return hashMap;
 
   }
-
-  private Map<String, String> getButton(String lang) {
-    HashMap<String, String> hashMap = new LinkedHashMap<String, String>();
-    if ("zh-CN".equals(lang)) {
-      hashMap.put("queryButtonName", "查询");
-      hashMap.put("resetButtonName", "重置");
-    } else {
-      hashMap.put("queryButtonName", "Query");
-      hashMap.put("resetButtonName", "Reset");
-    }
+  
+  private Map<String, Object> getFormItemDateProp(String lang) {
+    Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
+    hashMap.put("type", "datetime");
+    hashMap.put("valueFormat", "yyyy-MM-dd HH:mm:ss");
 
     return hashMap;
+
   }
 
   private Map<String, Object> getOperation(String lang) {
