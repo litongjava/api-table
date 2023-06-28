@@ -10,6 +10,7 @@ import com.jfinal.kit.Kv;
 import com.litongjava.data.model.DataQueryRequest;
 import com.litongjava.data.model.Operator;
 import com.litongjava.data.model.Sql;
+import com.litongjava.data.utils.ObjectUtils;
 
 /**
  * @author Ping E Lee
@@ -106,8 +107,12 @@ public class DbSqlService {
     Iterator<Map.Entry<String, Object>> iterator2 = kv.entrySet().iterator();
     while (iterator2.hasNext()) {
       Map.Entry<String, Object> entry = iterator2.next();
-      operatorService.addWhereField(sql, entry.getKey(), "=");
-      paramList.add(entry.getValue());
+      Object value = entry.getValue();
+      if(!ObjectUtils.isEmpyt(value)) {
+        operatorService.addWhereField(sql, entry.getKey(), "=");
+        paramList.add(value);  
+      }
+      
     }
 
     operators.forEach(it -> {

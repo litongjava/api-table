@@ -324,15 +324,20 @@ public class DbJsonService {
     return dbTableService.getAllTableNames();
   }
 
-
   public DbJsonBean<String[]> tableNames() {
     String[] allTableNames = dbTableService.getAllTableNames();
     DbJsonBean<String[]> dbJsonBean = new DbJsonBean<>();
     dbJsonBean.setData(allTableNames);
     return dbJsonBean;
   }
+
   public DbJsonBean<List<Record>> tables() {
     return new DbJsonBean<>(dbService.tables());
+  }
+
+
+  public DbJsonBean<Map<String,Object>> tableConfig(String tableName, String lang) {
+    return new DbJsonBean<>(dbTableService.getTableConfig(tableName,lang));
   }
 
 }

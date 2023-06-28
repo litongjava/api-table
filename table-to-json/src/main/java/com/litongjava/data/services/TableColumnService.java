@@ -3,7 +3,7 @@ package com.litongjava.data.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.jfinal.plugin.activerecord.Record;
 
@@ -20,7 +20,7 @@ public class TableColumnService {
   /**
    * 存放表名和字段名
    */
-  private Map<String, List<String>> tableColumns = new ConcurrentHashMap<>();
+  private Map<String, List<String>> tableColumns = new ConcurrentSkipListMap<>();
 
   /**
    * 判断字段在表格中是否存在
@@ -50,9 +50,6 @@ public class TableColumnService {
    */
   private boolean getColumnsToMap(String tableName, String cloumn) {
     boolean ret = false;
-    /*
-     * { "Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra": "auto_increment", "Default": null, "Key": "PRI" },
-     */
     List<Record> listRecord = dbService.cloumns(tableName);
     List<String> cloumns = new ArrayList<>();
     for (Record record : listRecord) {

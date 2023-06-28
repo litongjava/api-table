@@ -3,42 +3,62 @@ package com.litongjava.data.services;
 import java.util.Collections;
 import java.util.List;
 
+import com.jfinal.kit.StrKit;
 import com.litongjava.data.constants.OperatorConstants;
+import com.litongjava.data.utils.ObjectUtils;
 
 public class OperatorService {
   public void addOperator(StringBuffer where, List<Object> paramList, String fieldName, Object value, String operator) {
     if (OperatorConstants.EQ.equals(operator)) {
-      addWhereField(where, fieldName, "=");
-      paramList.add(value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, "=");
+        paramList.add(value);
+      }
+
     } else if (OperatorConstants.NE.equals(operator)) {
-      addWhereField(where, fieldName, "!=");
-      paramList.add(value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, "!=");
+        paramList.add(value);
+      }
 
     } else if (OperatorConstants.GT.equals(operator)) {
-      addWhereField(where, fieldName, ">");
-      paramList.add(value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, ">");
+        paramList.add(value);
+      }
 
     } else if (OperatorConstants.GE.equals(operator)) {
-      addWhereField(where, fieldName, ">=");
-      paramList.add(value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, ">=");
+        paramList.add(value);
+      }
 
     } else if (OperatorConstants.LT.equals(operator)) {
-      addWhereField(where, fieldName, "<");
-      paramList.add(value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, "<");
+        paramList.add(value);
+
+      }
     } else if (OperatorConstants.LE.equals(operator)) {
-      addWhereField(where, fieldName, "<=");
-      paramList.add(value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, "<=");
+        paramList.add(value);
+
+      }
 
     } else if (OperatorConstants.BT.equals(operator)) {
-      if (value instanceof Object[]) {
-        addWhereField(where, fieldName, "between", "and");
+      if (!ObjectUtils.isEmpyt(value)) {
         Object[] valueArray = (Object[]) value;
-        paramList.add(valueArray[0]);
-        paramList.add(valueArray[1]);
+        if (valueArray.length > 1) {
+          addWhereField(where, fieldName, "between", "and");
+          paramList.add(valueArray[0]);
+          paramList.add(valueArray[1]);
+        }
+
       }
 
     } else if (OperatorConstants.NB.equals(operator)) {
-      if (value instanceof Object[]) {
+      if (!ObjectUtils.isEmpyt(value)) {
         addWhereField(where, fieldName, "not between", "and");
         Object[] valueArray = (Object[]) value;
         paramList.add(valueArray[0]);
@@ -46,46 +66,63 @@ public class OperatorService {
       }
 
     } else if (OperatorConstants.CT.equals(operator)) {
-      addWhereField(where, fieldName, "like");
-      paramList.add("%" + value + "%");
-      paramList.add(value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, "like");
+        paramList.add("%" + value + "%");
+        paramList.add(value);
+      }
 
     } else if (OperatorConstants.SW.equals(operator)) {
-      addWhereField(where, fieldName, "like");
-      paramList.add("%" + value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        if (StrKit.notNull(value)) {
+          addWhereField(where, fieldName, "like");
+          paramList.add("%" + value);
+        }
+
+      }
 
     } else if (OperatorConstants.EW.equals(operator)) { // EndWith
-      addWhereField(where, fieldName, "like");
-      paramList.add(value + "%");
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, "like");
+        paramList.add(value + "%");
+      }
 
     } else if (OperatorConstants.OL.equals(operator)) {
-      if (value instanceof Object[]) {
-        Object[] valueArray = (Object[]) value;
-        addWhereOrField(where, fieldName, "like", valueArray);
-        for (int i = 0; i < valueArray.length; i++) {
-          paramList.add(valueArray[i]);
+      if (!ObjectUtils.isEmpyt(value)) {
+        if (value instanceof Object[]) {
+          Object[] valueArray = (Object[]) value;
+          addWhereOrField(where, fieldName, "like", valueArray);
+          for (int i = 0; i < valueArray.length; i++) {
+            paramList.add(valueArray[i]);
+          }
         }
       }
 
     } else if (OperatorConstants.NK.equals(operator)) {
-      addWhereField(where, fieldName, "not like");
-      paramList.add(value);
+      if (!ObjectUtils.isEmpyt(value)) {
+        addWhereField(where, fieldName, "not like");
+        paramList.add(value);
+      }
 
     } else if (OperatorConstants.IL.equals(operator)) {
-      if (value instanceof Object[]) {
-        Object[] valueArray = (Object[]) value;
-        addWhereInField(where, fieldName, "in", valueArray);
-        for (int i = 0; i < valueArray.length; i++) {
-          paramList.add(valueArray[i]);
+      if (!ObjectUtils.isEmpyt(value)) {
+        if (value instanceof Object[]) {
+          Object[] valueArray = (Object[]) value;
+          addWhereInField(where, fieldName, "in", valueArray);
+          for (int i = 0; i < valueArray.length; i++) {
+            paramList.add(valueArray[i]);
+          }
         }
       }
 
     } else if (OperatorConstants.NI.equals(operator)) {
-      if (value instanceof Object[]) {
-        Object[] valueArray = (Object[]) value;
-        addWhereInField(where, fieldName, "not in", valueArray);
-        for (int i = 0; i < valueArray.length; i++) {
-          paramList.add(valueArray[i]);
+      if (!ObjectUtils.isEmpyt(value)) {
+        if (value instanceof Object[]) {
+          Object[] valueArray = (Object[]) value;
+          addWhereInField(where, fieldName, "not in", valueArray);
+          for (int i = 0; i < valueArray.length; i++) {
+            paramList.add(valueArray[i]);
+          }
         }
       }
 
@@ -100,7 +137,6 @@ public class OperatorService {
     } else if (OperatorConstants.NY.equals(operator)) {
       addWhereNotEmpytField(where, fieldName);
     }
-
   }
 
   /**

@@ -57,6 +57,7 @@ public class DbService {
    * 查询表字段
    * @param tableName
    * @return
+     {"Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra": "auto_increment", "Default": null, "Key": "PRI" },
    */
   public List<Record> cloumns(String tableName) {
     String sql = "show columns from " + tableName;
