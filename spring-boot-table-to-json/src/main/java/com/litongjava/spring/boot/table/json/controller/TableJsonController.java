@@ -1,43 +1,35 @@
 package com.litongjava.spring.boot.table.json.controller;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.model.DbPage;
 import com.litongjava.data.services.DbJsonService;
 import com.litongjava.data.utils.DbJsonBeanUtils;
-import com.litongjava.data.utils.EasyExcelUtils;
 import com.litongjava.data.utils.KvUtils;
 import com.litongjava.data.utils.RequestMapUtils;
 import com.litongjava.data.vo.DateTimeReqVo;
+import com.litongjava.spring.boot.table.json.utils.EesyExcelResponseUtils;
+import com.litongjava.spring.boot.table.json.utils.RequestParamUtils;
 
-import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -57,7 +49,7 @@ public class TableJsonController {
 
   @PostMapping("/create")
   public DbJsonBean<Boolean> create(HttpServletRequest request) {
-    Map<String, Object> map = getRequestMap(request);
+    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     log.info("map:{}", map);
     Kv kv = KvUtils.camelToUnderscore(map);
     return dbJsonService.saveOrUpdate(kv);
@@ -65,7 +57,7 @@ public class TableJsonController {
 
   @RequestMapping("/list")
   public DbJsonBean<List<Kv>> list(HttpServletRequest request) {
-    Map<String, Object> map = getRequestMap(request);
+    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     log.info("map:{}", map);
     Kv kv = KvUtils.camelToUnderscore(map);
     kv.put("deleted", 0);
@@ -106,7 +98,8 @@ public class TableJsonController {
   }
 
   @PutMapping("/update")
-  public DbJsonBean<Boolean> update(@RequestBody Map<String, Object> map) {
+  public DbJsonBean<Boolean> update(HttpServletRequest request) {
+    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     Kv kv = KvUtils.camelToUnderscore(map);
     log.info("map:{}", map);
     return dbJsonService.saveOrUpdate(kv);
@@ -119,7 +112,8 @@ public class TableJsonController {
   }
 
   @RequestMapping("pageDeleted")
-  public DbJsonBean<DbPage<Kv>> pageDeleted(@RequestParam Map<String, Object> map) {
+  public DbJsonBean<DbPage<Kv>> pageDeleted(HttpServletRequest request) {
+    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     log.info("map:{}", map);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
@@ -134,7 +128,8 @@ public class TableJsonController {
   }
 
   @RequestMapping("/export-excel")
-  public void exportExcel(@RequestParam Map<String, Object> map, HttpServletResponse response) throws IOException {
+  public void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     Kv kv = KvUtils.camelToUnderscore(map);
     kv.put("deleted", 0);
     log.info("kv:{}", kv);
@@ -143,7 +138,7 @@ public class TableJsonController {
 
     // 获取数据
     List<Record> records = dbJsonService.list(kv).getData();
-    exportRecords(response, filename, tableName, records);
+    EesyExcelResponseUtils.exportRecords(response, filename, tableName, records);
   }
 
   @RequestMapping("/export-table-excel")
@@ -155,7 +150,7 @@ public class TableJsonController {
     // 获取数据
     List<Record> records = dbJsonService.listAll(tableName).getData();
 
-    exportRecords(response, filename, tableName, records);
+    EesyExcelResponseUtils.exportRecords(response, filename, tableName, records);
     log.info("finished");
   }
 
@@ -171,7 +166,7 @@ public class TableJsonController {
       List<Record> records = dbJsonService.listAll(tables[i]).getData();
       allTableData.put(tables[i], records);
     }
-    exportAllTableRecords(response, filename, allTableData);
+    EesyExcelResponseUtils.exportAllTableRecords(response, filename, allTableData);
     log.info("finished");
   }
 
@@ -189,54 +184,5 @@ public class TableJsonController {
   public DbJsonBean<Map<String, Object>> queryItems(String tableName, String lang) {
     return dbJsonService.tableConfig(tableName, lang);
 
-  }
-
-  private void exportRecords(HttpServletResponse response, String filename, String sheetName, List<Record> records)
-      throws IOException {
-    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    EasyExcelUtils.write(response.getOutputStream(), sheetName, records);
-    response.setContentType("application/vnd.ms-excel;charset=UTF-8");
-  }
-
-  private void exportAllTableRecords(HttpServletResponse response, String filename,
-      LinkedHashMap<String, List<Record>> allTableData) throws IOException {
-    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    EasyExcelUtils.write(response.getOutputStream(), allTableData);
-    response.setContentType("application/vnd.ms-excel;charset=UTF-8");
-  }
-
-  /**
-   * 自定义导出
-   */
-  public static <T> void export(String sheetName, HttpServletResponse response, String filename, List<Record> records,
-      Class<T> clazz) throws UnsupportedEncodingException, IOException {
-    List<Map<String, Object>> collect = records.stream().map(e -> e.toMap()).collect(Collectors.toList());
-    List<T> exportDatas = BeanUtil.copyToList(collect, clazz);
-
-    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    EasyExcelUtils.write(response.getOutputStream(), filename, sheetName, clazz, exportDatas);
-    response.setContentType("application/vnd.ms-excel;charset=UTF-8");
-  }
-
-  private Map<String, Object> getRequestMap(HttpServletRequest request) {
-    Map<String, Object> map = new HashMap<>();
-    String contentType = request.getContentType();
-
-    if (contentType != null && contentType.contains(MediaType.APPLICATION_JSON_VALUE)) {
-      // JSON handling
-      try {
-        map = new ObjectMapper().readValue(request.getInputStream(), Map.class);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } else {
-      // Form data handling
-      Enumeration<String> parameterNames = request.getParameterNames();
-      while (parameterNames.hasMoreElements()) {
-        String paramName = parameterNames.nextElement();
-        map.put(paramName, request.getParameter(paramName));
-      }
-    }
-    return map;
   }
 }

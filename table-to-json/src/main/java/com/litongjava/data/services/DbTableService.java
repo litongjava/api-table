@@ -115,6 +115,15 @@ public class DbTableService {
     Map<String, Object> config = new LinkedHashMap<>();
     config.put("tableName", tableName);
     config.put("tableAlias", getName(tableName));
+    
+    config.put("pageUri", "/table/json/page");
+    config.put("getUri", "/table/json/get");
+    config.put("createUri", "/table/json/create");
+    config.put("updateUri", "/table/json/update");
+    config.put("deleteUri", "/table/json/delete");
+    config.put("exportExcelUri", "/table/json/export-excel");
+    config.put("exportTableExcelUri", "/table/json/export-table-excel");
+    
     config.put("query", query);
     config.put("toolBar", toolBar);
     config.put("table", table);

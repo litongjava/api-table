@@ -17,6 +17,7 @@ import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.jfinal.plugin.activerecord.Record;
+import com.litongjava.data.convert.LocalDateTimeConverter;
 
 /**
  * Excel 工具类
@@ -36,20 +37,15 @@ public class EasyExcelUtils {
    * @param <T> 泛型，保证 head 和 data 类型的一致性
    * @throws IOException 写入失败的情况
    */
-  public static <T> void write(OutputStream ouputStream, String filename, String sheetName, Class<T> head, List<T> data)
+  public static <T> void write(OutputStream outputStream, String filename, String sheetName, Class<T> head, List<T> data)
       throws IOException {
     // 输出 Excel
     if (head != null) {
-      EasyExcel.write(ouputStream, head)
-          // 不要自动关闭，交给 Servlet 自己处理
-          .autoCloseStream(false)
-          // 基于 column 长度，自动适配。最大 255 宽度
-          .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
+      getExcelWriteBuilder(outputStream)
           // 写入数据到sheet
-          .sheet(sheetName).doWrite(data);
+          .sheet(sheetName).head(head).doWrite(data);
     } else {
-      EasyExcel.write(ouputStream).autoCloseStream(false)
-          .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).sheet(sheetName).doWrite(data);
+      getExcelWriteBuilder(outputStream).sheet(sheetName).doWrite(data);
     }
   }
 
@@ -68,12 +64,7 @@ public class EasyExcelUtils {
     // 获取body
     List<List<Object>> columnValues = getListData(records, size);
 
-    // 写入
-    EasyExcel.write(outputStream)
-        //
-        .autoCloseStream(false)
-        //
-        .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
+    getExcelWriteBuilder(outputStream)
         //
         .sheet(sheetName)
         //
@@ -90,11 +81,8 @@ public class EasyExcelUtils {
    */
   public static void write(ServletOutputStream outputStream, Map<String, List<Record>> allTableData) {
     // 写入
-    ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(outputStream)
-        //
-        .autoCloseStream(false)
-        //
-        .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy());
+    ExcelWriterBuilder excelWriterBuilder = getExcelWriteBuilder(outputStream);
+
     ExcelWriter excelWriter = excelWriterBuilder.build();
 
     Set<String> sheetNames = allTableData.keySet();
@@ -122,6 +110,17 @@ public class EasyExcelUtils {
     }
     excelWriter.finish();
 
+  }
+
+  private static ExcelWriterBuilder getExcelWriteBuilder(OutputStream outputStream) {
+    ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(outputStream)
+        // 不要自动关闭，交给 Servlet 自己处理
+        .autoCloseStream(false)
+        // 基于 column 长度，自动适配。最大 255 宽度
+        .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
+        // 日期格式转换
+        .registerConverter(new LocalDateTimeConverter());
+    return excelWriterBuilder;
   }
 
   /**
