@@ -13,14 +13,26 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DataPageRequest {
   private Integer pageNo, pageSize;
-  
 
   public DataPageRequest(Kv kv) {
     Object pageNo = kv.remove("page_no");
-    this.pageNo = pageNo == null ? 1 : Integer.parseInt((String) pageNo);
+    this.pageNo = getIntegerValue(pageNo);
 
     Object pageSize = kv.remove("page_size");
-    this.pageSize = pageSize == null ? 10 : Integer.parseInt((String) pageSize);
+    this.pageSize = getIntegerValue(pageSize);
+
+  }
+
+  private Integer getIntegerValue(Object v) {
+    if (v == null) {
+      return 1;
+    } else {
+      if (v instanceof Integer) {
+        return (Integer) v;
+      } else {
+        return Integer.parseInt((String) v);
+      }
+    }
 
   }
 }
