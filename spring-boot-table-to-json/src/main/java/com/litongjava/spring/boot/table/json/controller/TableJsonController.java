@@ -72,8 +72,9 @@ public class TableJsonController {
   }
 
   @RequestMapping("page")
-  public DbJsonBean<DbPage<Kv>> page(@RequestParam Map<String, Object> map, DateTimeReqVo reqVo) {
-    RequestMapUtils.putEntityToMap(map, reqVo);
+  public DbJsonBean<DbPage<Kv>> page(HttpServletRequest request) {
+    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
+//    RequestMapUtils.putEntityToMap(map, reqVo);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
     kv.put("deleted", 0);
