@@ -64,11 +64,6 @@ public class TableJsonController {
     return DbJsonBeanUtils.recordsToKv(dbJsonService.list(kv));
   }
 
-  @RequestMapping("/query")
-  public DbJsonBean<List<Kv>> query(String sql) {
-    log.info("sql:{}", sql);
-    return DbJsonBeanUtils.recordsToKv(dbJsonService.query(sql));
-  }
 
   @RequestMapping("/listAll")
   public DbJsonBean<List<Kv>> listAll(String tableName) {
@@ -184,5 +179,15 @@ public class TableJsonController {
   public DbJsonBean<Map<String, Object>> queryItems(String tableName, String lang) {
     return dbJsonService.tableConfig(tableName, lang);
 
+  }
+  
+  @RequestMapping("/query")
+  public List<Kv> query(HttpServletRequest request) {
+    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
+    String sql = (String) map.get("sql");
+    Object paras = map.get("paras");
+    log.info("sql:{}", sql);
+    log.info("paras:{}", paras);
+    return DbJsonBeanUtils.recordsToKv(dbJsonService.query(sql,paras)).getData();
   }
 }

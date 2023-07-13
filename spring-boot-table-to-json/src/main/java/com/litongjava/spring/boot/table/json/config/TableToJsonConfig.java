@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
+import com.jfinal.plugin.activerecord.OrderedFieldContainerFactory;
 import com.jfinal.template.Engine;
 import com.jfinal.template.source.ClassPathSourceFactory;
 import com.litongjava.data.services.DbJsonService;
@@ -26,6 +27,7 @@ public class TableToJsonConfig{
   public ActiveRecordPlugin activeRecordPlugin() throws Exception {
     String property = environment.getProperty("spring.profiles.active");
     ActiveRecordPlugin arp = new ActiveRecordPlugin(ds);
+    arp.setContainerFactory(new OrderedFieldContainerFactory());
     if ("dev".equals(property)) {
       arp.setDevMode(true);
     }

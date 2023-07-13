@@ -115,7 +115,7 @@ public class DbTableService {
     Map<String, Object> config = new LinkedHashMap<>();
     config.put("tableName", tableName);
     config.put("tableAlias", getName(tableName));
-    
+
     config.put("pageUri", "/table/json/page");
     config.put("getUri", "/table/json/get");
     config.put("createUri", "/table/json/create");
@@ -123,7 +123,7 @@ public class DbTableService {
     config.put("deleteUri", "/table/json/delete");
     config.put("exportExcelUri", "/table/json/export-excel");
     config.put("exportTableExcelUri", "/table/json/export-table-excel");
-    
+
     config.put("query", query);
     config.put("toolBar", toolBar);
     config.put("table", table);
@@ -202,6 +202,7 @@ public class DbTableService {
   private Map<String, Object> getQueryItemDateProp(String lang) {
     Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
     hashMap.put("type", "daterange");
+    hashMap.put("valueFormat", "yyyy-MM-dd HH:mm:ss");
     hashMap.put("rangeSeparator", "-");
 
     if ("zh-CN".equals(lang)) {
@@ -212,12 +213,14 @@ public class DbTableService {
       hashMap.put("endPlaceholder", "End Date");
     }
 
-    hashMap.put("defaultTime", "['00:00:00', '23:59:59']");
+    hashMap.put("defaultTime", new String[] { "00:00:00", "23:59:59" });
+    
+    
 
     return hashMap;
 
   }
-  
+
   private Map<String, Object> getFormItemDateProp(String lang) {
     Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
     hashMap.put("type", "datetime");

@@ -189,4 +189,12 @@ public class DbJsonServiceTest {
     DbJsonBean<Integer> deleted = dbJsonService.updateFlagById(tableName, "1532708", "deleted", 2);
     System.out.println(deleted);
   }
+
+  @Test
+  public void query() {
+    String sql = "select ship_name from cf_alarm where id =?";
+    String id = "1532708";
+    DbJsonBean<List<Record>> result = dbJsonService.query(sql, id);
+    System.out.println(result);
+  }
 }

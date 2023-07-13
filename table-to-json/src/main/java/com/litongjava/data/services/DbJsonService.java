@@ -116,11 +116,6 @@ public class DbJsonService {
     return new DbJsonBean<>(list);
   }
 
-  public DbJsonBean<List<Record>> query(String sql) {
-    List<Record> find = Db.find(sql);
-    return new DbJsonBean<>(find);
-  }
-
   public DbJsonBean<Page<Record>> page(Kv kv) {
     String tableName = (String) kv.remove("table_name");
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
@@ -342,9 +337,24 @@ public class DbJsonService {
 
   public DbJsonBean<Map<String, Object>> tableConfig(String tableName, String lang) {
     if (StrKit.isBlank(tableName)) {
-      return new DbJsonBean<>(-1,"tableName can't be empty");
+      return new DbJsonBean<>(-1, "tableName can't be empty");
     }
     return new DbJsonBean<>(dbTableService.getTableConfig(tableName, lang));
+  }
+
+  public DbJsonBean<List<Record>> query(String sql) {
+    List<Record> find = Db.find(sql);
+    return new DbJsonBean<>(find);
+  }
+
+  public DbJsonBean<List<Record>> query(String sql, Object... paras) {
+    List<Record> find = null;
+    if (paras == null || paras.length < 1) {
+      find = Db.find(sql);
+    } else {
+      find = Db.find(sql, paras);
+    }
+    return new DbJsonBean<>(find);
   }
 
 }
