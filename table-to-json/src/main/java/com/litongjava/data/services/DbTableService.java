@@ -32,9 +32,10 @@ public class DbTableService {
    *
    * @param tableName
    * @param lang
+   * @param lang2 
    * @return
    */
-  public Map<String, Object> getTableConfig(String tableName, String lang) {
+  public Map<String, Object> getTableConfig(String f, String tableName, String lang) {
     List<Record> cloumns = dbService.cloumns(tableName);
     List<Map<String, Object>> queryItems = new ArrayList<>(cloumns.size());
     List<Map<String, Object>> tableItems = new ArrayList<>(cloumns.size());
@@ -113,16 +114,16 @@ public class DbTableService {
     form.put("button", getFormButton(lang));
 
     Map<String, Object> config = new LinkedHashMap<>();
-    config.put("tableName", tableName);
+    config.put("f", f);
     config.put("tableAlias", getName(tableName));
 
-    config.put("pageUri", "/table/json/page");
-    config.put("getUri", "/table/json/get");
-    config.put("createUri", "/table/json/create");
-    config.put("updateUri", "/table/json/update");
-    config.put("deleteUri", "/table/json/delete");
-    config.put("exportExcelUri", "/table/json/export-excel");
-    config.put("exportTableExcelUri", "/table/json/export-table-excel");
+    config.put("pageUri", "/table/json/" + f + "/page");
+    config.put("getUri", "/table/json/" + f + "/get");
+    config.put("createUri", "/table/json/" + f + "/create");
+    config.put("updateUri", "/table/json/" + f + "/update");
+    config.put("deleteUri", "/table/json/" + f + "/delete");
+    config.put("exportExcelUri", "/table/json/" + f + "/export-excel");
+    config.put("exportTableExcelUri", "/table/json/" + f + "/export-table-excel");
 
     config.put("query", query);
     config.put("toolBar", toolBar);
@@ -194,6 +195,8 @@ public class DbTableService {
   private String getType(String type) {
     if (type.startsWith("date") || type.startsWith("timestamp") || type.startsWith("datetime")) {
       return "date";
+    } else if ("tinyint(1)".equals(type)) {
+      return "bool";
     } else {
       return "varchar";
     }
@@ -214,8 +217,6 @@ public class DbTableService {
     }
 
     hashMap.put("defaultTime", new String[] { "00:00:00", "23:59:59" });
-    
-    
 
     return hashMap;
 

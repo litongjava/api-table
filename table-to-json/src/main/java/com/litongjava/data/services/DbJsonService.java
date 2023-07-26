@@ -335,11 +335,11 @@ public class DbJsonService {
     return new DbJsonBean<>(dbService.tables());
   }
 
-  public DbJsonBean<Map<String, Object>> tableConfig(String tableName, String lang) {
+  public DbJsonBean<Map<String, Object>> tableConfig(String f, String tableName, String lang) {
     if (StrKit.isBlank(tableName)) {
       return new DbJsonBean<>(-1, "tableName can't be empty");
     }
-    return new DbJsonBean<>(dbTableService.getTableConfig(tableName, lang));
+    return new DbJsonBean<>(dbTableService.getTableConfig(f,tableName, lang));
   }
 
   public DbJsonBean<List<Record>> query(String sql) {

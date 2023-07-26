@@ -11,6 +11,6 @@ table-to-json 是自动化的Java CRUD框架
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>table-to-json</artifactId>
-      <version>1.1.4</version>
+      <version>1.1.6</version>
     </dependency>
 ```

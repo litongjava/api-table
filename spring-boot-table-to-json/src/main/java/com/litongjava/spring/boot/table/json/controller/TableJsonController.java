@@ -12,10 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jfinal.kit.Kv;
@@ -25,10 +25,9 @@ import com.litongjava.data.model.DbPage;
 import com.litongjava.data.services.DbJsonService;
 import com.litongjava.data.utils.DbJsonBeanUtils;
 import com.litongjava.data.utils.KvUtils;
-import com.litongjava.data.utils.RequestMapUtils;
-import com.litongjava.data.vo.DateTimeReqVo;
+import com.litongjava.data.utils.RequestParamUtils;
+import com.litongjava.spring.boot.table.json.constants.TableNames;
 import com.litongjava.spring.boot.table.json.utils.EesyExcelResponseUtils;
-import com.litongjava.spring.boot.table.json.utils.RequestParamUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/table/json")
 @Slf4j
 @CrossOrigin
-@SuppressWarnings("unchecked")
 public class TableJsonController {
 
   @Autowired
@@ -47,99 +45,125 @@ public class TableJsonController {
     return "index";
   }
 
-  @PostMapping("/create")
-  public DbJsonBean<Boolean> create(HttpServletRequest request) {
+  @PostMapping("/{f}/create")
+  public DbJsonBean<Boolean> create(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
-    log.info("map:{}", map);
+    String tableName = TableNames.getTableName(f);
+    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
-    return dbJsonService.saveOrUpdate(kv);
+    return dbJsonService.saveOrUpdate(tableName, kv);
   }
 
-  @RequestMapping("/list")
-  public DbJsonBean<List<Kv>> list(HttpServletRequest request) {
+  @RequestMapping("/{f}/list")
+  public DbJsonBean<List<Kv>> list(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
-    log.info("map:{}", map);
+    String tableName = TableNames.getTableName(f);
+    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
-    kv.put("deleted", 0);
-    return DbJsonBeanUtils.recordsToKv(dbJsonService.list(kv));
+//    kv.put("deleted", 0);
+    return DbJsonBeanUtils.recordsToKv(dbJsonService.list(tableName, kv));
   }
 
-
-  @RequestMapping("/listAll")
-  public DbJsonBean<List<Kv>> listAll(String tableName) {
+  @RequestMapping("/{f}/listAll")
+  public DbJsonBean<List<Kv>> listAll(@PathVariable String f) {
+    String tableName = TableNames.getTableName(f);
     log.info("tableName:{}", tableName);
     return DbJsonBeanUtils.recordsToKv(dbJsonService.listAll(tableName));
   }
 
-  @RequestMapping("page")
-  public DbJsonBean<DbPage<Kv>> page(HttpServletRequest request) {
+  @RequestMapping("/{f}/page")
+  public DbJsonBean<DbPage<Kv>> page(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
-//    RequestMapUtils.putEntityToMap(map, reqVo);
+    String tableName = TableNames.getTableName(f);
+    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
-    kv.put("deleted", 0);
+//    kv.put("deleted", 0);
     log.info("kv:{}", kv);
-    return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(kv));
+    return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(tableName, kv));
   }
 
-  @RequestMapping("/get")
-  public DbJsonBean<Kv> get(String tableName, String id) {
+  @RequestMapping("/{f}/get")
+  public DbJsonBean<Kv> get(@PathVariable String f, String id) {
+    String tableName = TableNames.getTableName(f);
     log.info("tableName:{},id:{}", tableName, id);
     Kv kv = new Kv();
     // 删除标记
-    kv.put("deleted", 0);
-    log.info("kv:{}", kv);
+//    kv.put("deleted", 0);
+//    log.info("kv:{}", kv);
 
     return DbJsonBeanUtils.recordToKv(dbJsonService.getById(tableName, id, kv));
   }
 
-  @PutMapping("/update")
-  public DbJsonBean<Boolean> update(HttpServletRequest request) {
+  @PutMapping("/{f}/update")
+  public DbJsonBean<Boolean> update(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
+    String tableName = TableNames.getTableName(f);
+    log.info("tableName:{},map:{}", tableName, map);
+
     Kv kv = KvUtils.camelToUnderscore(map);
-    log.info("map:{}", map);
-    return dbJsonService.saveOrUpdate(kv);
+    return dbJsonService.saveOrUpdate(tableName, kv);
   }
 
-  @DeleteMapping("/delete")
-  public DbJsonBean<Integer> delete(String tableName, String id) {
+  @DeleteMapping("/{f}/delete")
+  public DbJsonBean<Integer> delete(@PathVariable String f, String id) {
+    String tableName = TableNames.getTableName(f);
     log.info("tableName:{},id:{}", tableName, id);
     return dbJsonService.updateFlagById(tableName, id, "deleted", 1);
   }
 
-  @RequestMapping("pageDeleted")
-  public DbJsonBean<DbPage<Kv>> pageDeleted(HttpServletRequest request) {
+  @RequestMapping("/{f}/pageDeleted")
+  public DbJsonBean<DbPage<Kv>> pageDeleted(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
-    log.info("map:{}", map);
+    String tableName = TableNames.getTableName(f);
+    log.info("tableName:{},map:{}", tableName, map);
+
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
-    kv.put("deleted", 1);
-    return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(kv));
+//    kv.put("deleted", 1);
+    return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(tableName, kv));
   }
 
-  @RequestMapping("/recover")
-  public DbJsonBean<Integer> recover(String tableName, String id) {
+  @RequestMapping("/{f}/recover")
+  public DbJsonBean<Integer> recover(@PathVariable String f, String id) {
+    String tableName = TableNames.getTableName(f);
     log.info("tableName:{},id:{}", tableName, id);
     return dbJsonService.updateFlagById(tableName, id, "deleted", 0);
   }
 
-  @RequestMapping("/export-excel")
-  public void exportExcel(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  /**
+   * 导出当前数据
+   * @param request
+   * @param response
+   * @throws IOException
+   */
+  @RequestMapping("/{f}/export-excel")
+  public void exportExcel(@PathVariable String f, HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
+    String tableName = TableNames.getTableName(f);
+    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
-    kv.put("deleted", 0);
-    log.info("kv:{}", kv);
-    String tableName = kv.getStr("table_name");
+//    kv.put("deleted", 0);
+//    log.info("kv:{}", kv);
     String filename = tableName + "_export.xls";
 
     // 获取数据
-    List<Record> records = dbJsonService.list(kv).getData();
+    List<Record> records = dbJsonService.list(tableName,kv).getData();
     EesyExcelResponseUtils.exportRecords(response, filename, tableName, records);
   }
 
-  @RequestMapping("/export-table-excel")
-  public void exporAllExcel(String tableName, HttpServletResponse response) throws IOException, SQLException {
-
+  /**
+   * 导出所有数据
+   * @param tableName
+   * @param response
+   * @throws IOException
+   * @throws SQLException
+   */
+  @RequestMapping("/{f}/export-table-excel")
+  public void exporAllExcel(@PathVariable String f, HttpServletResponse response) throws IOException, SQLException {
+    String tableName = TableNames.getTableName(f);
+    log.info("tableName:{}", tableName);
     // 导出 Excel
     String filename = tableName + "-all.xlsx";
 
@@ -148,6 +172,19 @@ public class TableJsonController {
 
     EesyExcelResponseUtils.exportRecords(response, filename, tableName, records);
     log.info("finished");
+  }
+
+  @RequestMapping("/{f}/f-config")
+  public DbJsonBean<Map<String, Object>> queryItems(@PathVariable String f, String lang) {
+    String tableName = TableNames.getTableName(f);
+    log.info("tableName:{}", tableName);
+    return dbJsonService.tableConfig(f,tableName, lang);
+
+  }
+
+  @RequestMapping("/f-names")
+  public DbJsonBean<String[]> tableNames() throws IOException, SQLException {
+    return new DbJsonBean<String[]>(TableNames.getF());
   }
 
   @RequestMapping("/export-all-table-excel")
@@ -164,31 +201,5 @@ public class TableJsonController {
     }
     EesyExcelResponseUtils.exportAllTableRecords(response, filename, allTableData);
     log.info("finished");
-  }
-
-  @RequestMapping("/tables")
-  public DbJsonBean<List<Record>> tables() throws IOException, SQLException {
-    return dbJsonService.tables();
-  }
-
-  @RequestMapping("/table-names")
-  public DbJsonBean<String[]> tableNames() throws IOException, SQLException {
-    return dbJsonService.tableNames();
-  }
-
-  @RequestMapping("/table-config")
-  public DbJsonBean<Map<String, Object>> queryItems(String tableName, String lang) {
-    return dbJsonService.tableConfig(tableName, lang);
-
-  }
-  
-  @RequestMapping("/query")
-  public List<Kv> query(HttpServletRequest request) {
-    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
-    String sql = (String) map.get("sql");
-    Object paras = map.get("paras");
-    log.info("sql:{}", sql);
-    log.info("paras:{}", paras);
-    return DbJsonBeanUtils.recordsToKv(dbJsonService.query(sql,paras)).getData();
   }
 }
