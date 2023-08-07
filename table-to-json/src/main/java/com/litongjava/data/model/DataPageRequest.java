@@ -16,16 +16,14 @@ public class DataPageRequest {
 
   public DataPageRequest(Kv kv) {
     Object pageNo = kv.remove("page_no");
-    this.pageNo = getIntegerValue(pageNo);
-
+    this.pageNo = getIntegerValue(pageNo, 1);
     Object pageSize = kv.remove("page_size");
-    this.pageSize = getIntegerValue(pageSize);
-
+    this.pageSize = getIntegerValue(pageSize, 10);
   }
 
-  private Integer getIntegerValue(Object v) {
+  private Integer getIntegerValue(Object v, Integer defaultValue) {
     if (v == null) {
-      return 1;
+      return defaultValue;
     } else {
       if (v instanceof Integer) {
         return (Integer) v;

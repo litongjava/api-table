@@ -1,5 +1,6 @@
 package com.litongjava.spring.boot.table.json.controller;
 
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
@@ -139,7 +140,7 @@ public class TableJsonController {
    */
   @RequestMapping("/{f}/export-excel")
   public void exportExcel(@PathVariable String f, HttpServletRequest request, HttpServletResponse response)
-      throws IOException {
+    throws IOException {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
     log.info("tableName:{},map:{}", tableName, map);
@@ -149,13 +150,13 @@ public class TableJsonController {
     String filename = tableName + "_export.xls";
 
     // 获取数据
-    List<Record> records = dbJsonService.list(tableName,kv).getData();
+    List<Record> records = dbJsonService.list(tableName, kv).getData();
     EesyExcelResponseUtils.exportRecords(response, filename, tableName, records);
   }
 
   /**
    * 导出所有数据
-   * @param tableName
+   * @param f
    * @param response
    * @throws IOException
    * @throws SQLException
@@ -175,10 +176,10 @@ public class TableJsonController {
   }
 
   @RequestMapping("/{f}/f-config")
-  public DbJsonBean<Map<String, Object>> queryItems(@PathVariable String f, String lang) {
+  public DbJsonBean<Map<String, Object>> fConfig(@PathVariable String f, String lang) {
     String tableName = TableNames.getTableName(f);
     log.info("tableName:{}", tableName);
-    return dbJsonService.tableConfig(f,tableName, lang);
+    return dbJsonService.tableConfig(f, tableName, lang);
 
   }
 
