@@ -69,7 +69,6 @@ public class OperatorService {
       if (!ObjectUtils.isEmpyt(value)) {
         addWhereField(where, fieldName, "like");
         paramList.add("%" + value + "%");
-        paramList.add(value);
       }
 
     } else if (OperatorConstants.SW.equals(operator)) {

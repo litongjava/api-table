@@ -78,7 +78,7 @@ public class DbTableService {
         queryItem.put("placeholder", getPlaceholder(name, lang));
         formItem.put("placeholder", getPlaceholder(name, lang));
         if (fieldType.startsWith("varchar")) {
-          operator.put(key + "Op", "sw");
+          operator.put(key + "Op", "ew");
         }
       }
       queryItems.add(queryItem);
