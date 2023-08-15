@@ -85,15 +85,16 @@ public class TableJsonController {
   }
 
   @RequestMapping("/{f}/get")
-  public DbJsonBean<Kv> get(@PathVariable String f, String id) {
+  public DbJsonBean<Kv> get(@PathVariable String f, HttpServletRequest request) {
+    Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
-    log.info("tableName:{},id:{}", tableName, id);
-    Kv kv = new Kv();
+    log.info("tableName:{},map:{}", tableName, map);
+    Kv kv = KvUtils.camelToUnderscore(map);
     // 删除标记
 //    kv.put("deleted", 0);
 //    log.info("kv:{}", kv);
+    return DbJsonBeanUtils.recordToKv(dbJsonService.get(tableName,kv));
 
-    return DbJsonBeanUtils.recordToKv(dbJsonService.getById(tableName, id, kv));
   }
 
   @PutMapping("/{f}/update")

@@ -167,9 +167,10 @@ public class DbJsonService {
    * @param queryParam
    * @return
    */
-  public DbJsonBean<Record> getById(String tableName, Kv queryParam) {
-    String columns = queryParam.getStr("cloumns");
+  public DbJsonBean<Record> get(String tableName, Kv queryParam) {
+//    String columns = queryParam.getStr("cloumns");
 
+    String columns = (String) queryParam.remove("columns");
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereQueryClause(queryParam);
     sql.setColumns(columns);
@@ -188,7 +189,7 @@ public class DbJsonService {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     kv.put(primaryKey, idValue);
-    return getById(tableName, kv);
+    return get(tableName, kv);
   }
 
   public DbJsonBean<Boolean> delById(String tableName, Object id) {
@@ -356,5 +357,6 @@ public class DbJsonService {
     }
     return new DbJsonBean<>(find);
   }
+
 
 }
