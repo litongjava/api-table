@@ -66,6 +66,9 @@ public class KvUtils {
   }
 
   public static Kv recordToKv(Record record) {
+    if(record==null) {
+      return null;
+    }
     Map<String, Object> map = record.toMap();
     // 将Long转为String
     for (Map.Entry<String, Object> entry : map.entrySet()) {

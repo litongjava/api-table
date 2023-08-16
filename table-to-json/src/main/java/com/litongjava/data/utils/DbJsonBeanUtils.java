@@ -24,7 +24,13 @@ public class DbJsonBeanUtils {
   }
 
   public static DbJsonBean<Kv> recordToKv(DbJsonBean<Record> jsonBean) {
-    return new DbJsonBean<>(jsonBean.getCode(), jsonBean.getMsg(), KvUtils.recordToKv(jsonBean.getData()));
+    Record data = jsonBean.getData();
+    if(data==null) {
+      return new DbJsonBean<>(jsonBean.getCode(), jsonBean.getMsg());
+    }else {
+      return new DbJsonBean<>(jsonBean.getCode(), jsonBean.getMsg(), KvUtils.recordToKv(data));
+    }
+    
   }
 
   public static DbJsonBean<List<Kv>> recordsToKv(DbJsonBean<List<Record>> jsonBean) {

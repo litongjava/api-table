@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
   <artifactId>table-to-json</artifactId>
-  <version>1.1.9</version>
+  <version>1.2.0</version>
   <packaging>jar</packaging>
   <name>table-to-json</name>
   <description>自动化操作后端数据表</description>
