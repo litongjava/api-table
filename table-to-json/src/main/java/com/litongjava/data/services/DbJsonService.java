@@ -42,7 +42,6 @@ public class DbJsonService {
       String idValue = kv.getStr(primarykeyName);
       if (!StrKit.isBlank(idValue)) {
         boolean update = Db.update(tableName, primarykeyName, record);
-        System.out.println("update result:" + update);
         DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(update);
         return dataJsonBean;
       } else {
@@ -70,7 +69,6 @@ public class DbJsonService {
       }
 
       boolean save = Db.save(tableName, record);
-      System.out.println("save result:" + save);
       return new DbJsonBean<>(save);
     }
   }
@@ -83,7 +81,7 @@ public class DbJsonService {
   /**
    * 无任何条件过滤,包含所有数据
    *
-   * @param kv
+   * @param tableName table name
    * @return
    */
   public DbJsonBean<List<Record>> listAll(String tableName) {
@@ -104,8 +102,6 @@ public class DbJsonService {
 
     List<Object> params = sql.getParams();
 
-    System.out.println("sql:" + sql.getsql());
-    System.out.println(params);
     // 添加操作表
     List<Record> list = null;
     if (params == null) {
@@ -145,10 +141,7 @@ public class DbJsonService {
     sql.setTableName(tableName);
     sql.setColumns(queryRequest.getColumns());
 
-    System.out.println("sql:" + sql.getsql());
     List<Object> params = sql.getParams();
-    System.out.println(params);
-    System.out.println(pageNo + " " + pageSize);
 
     String sqlExceptSelect = sql.getSqlExceptSelect();
     Page<Record> listPage = null;
@@ -163,6 +156,7 @@ public class DbJsonService {
 
   /**
    * 因为 需要需要获取Id,是否删除,租户id等.所以使用了queryParam
+   *
    * @param tableName
    * @param queryParam
    * @return
@@ -176,8 +170,6 @@ public class DbJsonService {
     sql.setColumns(columns);
     sql.setTableName(tableName);
 
-    System.out.println("sql:" + sql.getsql());
-    System.out.println(sql.getParams());
 
     // 添加操作表
     Record record = Db.findFirst(sql.getsql(), sql.getParams().toArray());
@@ -200,10 +192,6 @@ public class DbJsonService {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set %s=%s where %s =?";
     String sql = String.format(upateTemplate, tableName, delColumn, flag, primaryKey);
-
-    System.out.println("sql:" + sql.toString());
-    System.out.println(id);
-
     return new DbJsonBean<>(Db.update(sql, id));
   }
 
@@ -217,10 +205,6 @@ public class DbJsonService {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set is_del=1 where  %s =?";
     String sql = String.format(upateTemplate, tableName, primaryKey);
-
-    System.out.println("sql:" + sql.toString());
-    System.out.println(id);
-
     return new DbJsonBean<>(Db.update(sql, id));
   }
 
@@ -268,15 +252,10 @@ public class DbJsonService {
     }
     String sql = "update %s set is_del=1 where " + where.toString();
     sql = String.format(sql, tableName);
-
-    System.out.println("sql:" + sql.toString());
-    System.out.println(idValues);
-
     return new DbJsonBean<>(Db.update(sql, idValues));
   }
 
   private String[] getParaValues(String key) {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -319,6 +298,7 @@ public class DbJsonService {
 
   /**
    * 获取所有表
+   *
    * @return
    */
   public String[] getAllTableNames() {
@@ -336,11 +316,17 @@ public class DbJsonService {
     return new DbJsonBean<>(dbService.tables());
   }
 
+  /**
+   * @param f         from
+   * @param tableName table name
+   * @param lang      language
+   * @return
+   */
   public DbJsonBean<Map<String, Object>> tableConfig(String f, String tableName, String lang) {
     if (StrKit.isBlank(tableName)) {
       return new DbJsonBean<>(-1, "tableName can't be empty");
     }
-    return new DbJsonBean<>(dbTableService.getTableConfig(f,tableName, lang));
+    return new DbJsonBean<>(dbTableService.getTableConfig(f, tableName, lang));
   }
 
   public DbJsonBean<List<Record>> query(String sql) {

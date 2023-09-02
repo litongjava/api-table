@@ -9,10 +9,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.jfinal.plugin.activerecord.Record;
+import com.litongjava.data.model.DbTableStruct;
 
 public class DbTableService {
 
   private DbService dbService = new DbService();
+  private PrimaryKeyService primaryKeyService = new PrimaryKeyService();
 
   /**
    * @return
@@ -32,19 +34,18 @@ public class DbTableService {
    *
    * @param tableName
    * @param lang
-   * @param lang2 
    * @return
    */
   public Map<String, Object> getTableConfig(String f, String tableName, String lang) {
-    List<Record> cloumns = dbService.cloumns(tableName);
-    List<Map<String, Object>> queryItems = new ArrayList<>(cloumns.size());
-    List<Map<String, Object>> tableItems = new ArrayList<>(cloumns.size());
-    List<Map<String, Object>> formItems = new ArrayList<>(cloumns.size());
+    List<DbTableStruct> columns = dbService.columns(tableName);
+    List<Map<String, Object>> queryItems = new ArrayList<>(columns.size());
+    List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
+    List<Map<String, Object>> formItems = new ArrayList<>(columns.size());
     Map<String, String> operator = new LinkedHashMap<>();
 
-    for (Record record : cloumns) {
-      String field = record.getStr("Field");
-      String fieldType = record.getStr("Type");
+    for (DbTableStruct record : columns) {
+      String field = record.getField();
+      String fieldType = record.getType();
 
       // {name: 'Name', key: 'name', type: 'el-input', placeholder: '请输入 Name'},
       String name = getName(field);
@@ -86,6 +87,9 @@ public class DbTableService {
       formItems.add(formItem);
     }
 
+    String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
+    String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
+
     LinkedHashMap<String, Object> query = new LinkedHashMap<String, Object>();
     query.put("show", false);
     query.put("items", queryItems);
@@ -115,6 +119,8 @@ public class DbTableService {
 
     Map<String, Object> config = new LinkedHashMap<>();
     config.put("f", f);
+    config.put("idName", primaryKeyName);
+    config.put("idType", primaryKeyColumnType);
     config.put("tableAlias", getName(tableName));
 
     config.put("pageUri", "/table/json/" + f + "/page");
@@ -166,7 +172,7 @@ public class DbTableService {
    */
   private String getName(String field) {
     return Arrays.stream(field.split("_")).map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
-        .collect(Collectors.joining(" "));
+      .collect(Collectors.joining(" "));
   }
 
   /**
@@ -216,7 +222,7 @@ public class DbTableService {
       hashMap.put("endPlaceholder", "End Date");
     }
 
-    hashMap.put("defaultTime", new String[] { "00:00:00", "23:59:59" });
+    hashMap.put("defaultTime", new String[]{"00:00:00", "23:59:59"});
 
     return hashMap;
 

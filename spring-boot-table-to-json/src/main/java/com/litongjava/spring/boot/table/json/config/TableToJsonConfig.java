@@ -2,6 +2,8 @@ package com.litongjava.spring.boot.table.json.config;
 
 import javax.sql.DataSource;
 
+import com.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +17,8 @@ import com.jfinal.template.source.ClassPathSourceFactory;
 import com.litongjava.data.services.DbJsonService;
 
 @Configuration
-public class TableToJsonConfig{
+@Slf4j
+public class TableToJsonConfig {
   @Autowired
   private DataSource ds;
 
@@ -29,7 +32,9 @@ public class TableToJsonConfig{
     ActiveRecordPlugin arp = new ActiveRecordPlugin(ds);
     arp.setContainerFactory(new OrderedFieldContainerFactory());
     if ("dev".equals(property)) {
+      log.info("mode: dev");
       arp.setDevMode(true);
+      arp.setShowSql(true);
     }
 
     Engine engine = arp.getEngine();
@@ -37,9 +42,10 @@ public class TableToJsonConfig{
     engine.setCompressorOn(' ');
     engine.setCompressorOn('\n');
     arp.addSqlTemplate("/sql/all_sqls.sql");
+    arp.setDialect(new PostgreSqlDialect());
     return arp;
   }
-  
+
   @Bean
   public DbJsonService dbJsonService() {
     return new DbJsonService();

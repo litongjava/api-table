@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import com.jfinal.plugin.activerecord.Record;
+import com.litongjava.data.model.DbTableStruct;
 
 /**
  * @author bill robot
- * @date 2020年8月31日_下午10:42:02 
- * @version 1.0 
+ * @version 1.0
+ * @date 2020年8月31日_下午10:42:02
  * @desc
  */
 public class TableColumnService {
@@ -24,6 +24,7 @@ public class TableColumnService {
 
   /**
    * 判断字段在表格中是否存在
+   *
    * @param cloumn
    * @param tableName
    * @return
@@ -44,18 +45,19 @@ public class TableColumnService {
 
   /**
    * 从数据库中获取自动名存放到map中
+   *
    * @param tableName
-   * @param cloumn
+   * @param column
    * @return
    */
-  private boolean getColumnsToMap(String tableName, String cloumn) {
+  private boolean getColumnsToMap(String tableName, String column) {
     boolean ret = false;
-    List<Record> listRecord = dbService.cloumns(tableName);
-    List<String> cloumns = new ArrayList<>();
-    for (Record record : listRecord) {
-      String field = record.getStr("Field");
-      cloumns.add(field);
-      if (field.equals(cloumn)) {
+    List<DbTableStruct> listRecord = dbService.columns(tableName);
+    List<String> columns = new ArrayList<>();
+    for (DbTableStruct record : listRecord) {
+      String field = record.getField();
+      columns.add(field);
+      if (field.equals(column)) {
         ret = true;
       }
     }
@@ -63,7 +65,7 @@ public class TableColumnService {
     synchronized (dbService) {
       List<String> list = tableColumns.get(tableName);
       if (list == null || list.size() == 0) {
-        tableColumns.put(tableName, cloumns);
+        tableColumns.put(tableName, columns);
       }
     }
 
@@ -72,6 +74,7 @@ public class TableColumnService {
 
   /**
    * 清楚缓存
+   *
    * @param tableName
    */
   public boolean clear(String tableName) {
@@ -85,10 +88,9 @@ public class TableColumnService {
   }
 
   /**
-   * 
    * @param tableName
    * @param field
-   * @param type 不仅仅是type,eg,CHAR(1) NULL DEFAULT '0'
+   * @param type      不仅仅是type,eg,CHAR(1) NULL DEFAULT '0'
    * @param commons
    */
   public void addColumn(String tableName, String field, String type, String comment) {

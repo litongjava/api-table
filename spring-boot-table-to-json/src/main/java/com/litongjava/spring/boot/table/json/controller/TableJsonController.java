@@ -1,24 +1,6 @@
 package com.litongjava.spring.boot.table.json.controller;
 
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.jfinal.kit.Kv;
 import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.model.DbJsonBean;
@@ -29,8 +11,17 @@ import com.litongjava.data.utils.KvUtils;
 import com.litongjava.data.utils.RequestParamUtils;
 import com.litongjava.spring.boot.table.json.constants.TableNames;
 import com.litongjava.spring.boot.table.json.utils.EesyExcelResponseUtils;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/table/json")
@@ -50,8 +41,8 @@ public class TableJsonController {
   public DbJsonBean<Boolean> create(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
-    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
+    log.info("tableName:{},kv:{}", tableName, kv);
     return dbJsonService.saveOrUpdate(tableName, kv);
   }
 
@@ -59,9 +50,9 @@ public class TableJsonController {
   public DbJsonBean<List<Kv>> list(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
-    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
 //    kv.put("deleted", 0);
+    log.info("tableName:{},kv:{}", tableName, kv);
     return DbJsonBeanUtils.recordsToKv(dbJsonService.list(tableName, kv));
   }
 
@@ -76,11 +67,10 @@ public class TableJsonController {
   public DbJsonBean<DbPage<Kv>> page(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
-    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
 //    kv.put("deleted", 0);
-    log.info("kv:{}", kv);
+    log.info("tableName:{},kv:{}", tableName, kv);
     return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(tableName, kv));
   }
 
@@ -88,22 +78,23 @@ public class TableJsonController {
   public DbJsonBean<Kv> get(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
-    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除标记
 //    kv.put("deleted", 0);
 //    log.info("kv:{}", kv);
-    return DbJsonBeanUtils.recordToKv(dbJsonService.get(tableName,kv));
 
+    log.info("tableName:{},kv:{}", tableName, kv);
+    return DbJsonBeanUtils.recordToKv(dbJsonService.get(tableName, kv));
   }
 
   @PutMapping("/{f}/update")
   public DbJsonBean<Boolean> update(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
-    log.info("tableName:{},map:{}", tableName, map);
 
     Kv kv = KvUtils.camelToUnderscore(map);
+    log.info("tableName:{},kv:{}", tableName, kv);
+
     return dbJsonService.saveOrUpdate(tableName, kv);
   }
 
@@ -118,11 +109,11 @@ public class TableJsonController {
   public DbJsonBean<DbPage<Kv>> pageDeleted(@PathVariable String f, HttpServletRequest request) {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
-    log.info("tableName:{},map:{}", tableName, map);
 
     Kv kv = KvUtils.camelToUnderscore(map);
     // 删除
 //    kv.put("deleted", 1);
+    log.info("tableName:{},kv:{}", tableName, kv);
     return DbJsonBeanUtils.pageToDbPage(dbJsonService.page(tableName, kv));
   }
 
@@ -135,6 +126,7 @@ public class TableJsonController {
 
   /**
    * 导出当前数据
+   *
    * @param request
    * @param response
    * @throws IOException
@@ -144,10 +136,10 @@ public class TableJsonController {
     throws IOException {
     Map<String, Object> map = RequestParamUtils.getRequestMap(request);
     String tableName = TableNames.getTableName(f);
-    log.info("tableName:{},map:{}", tableName, map);
     Kv kv = KvUtils.camelToUnderscore(map);
 //    kv.put("deleted", 0);
 //    log.info("kv:{}", kv);
+    log.info("tableName:{},kv:{}", tableName, kv);
     String filename = tableName + "_export.xls";
 
     // 获取数据
@@ -157,7 +149,7 @@ public class TableJsonController {
 
   /**
    * 导出所有数据
-   * @param f
+   *
    * @param response
    * @throws IOException
    * @throws SQLException

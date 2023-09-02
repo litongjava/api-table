@@ -4,29 +4,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.DbKit;
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.dialect.Dialect;
+import com.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.data.model.DbTableStruct;
 
 /**
  * @author bill robot
- * @date 2020年8月27日_下午2:55:52 
- * @version 1.0 
+ * @version 1.0
+ * @date 2020年8月27日_下午2:55:52
  * @desc
  */
 public class DbService {
 
   public List<DbTableStruct> getPrimaryKey(String tableName) {
-    List<Record> cloumns = cloumns(tableName);
     List<DbTableStruct> ret = new ArrayList<>();
-    // 遍历出主键,添加到ret中
-    for (Record record : cloumns) {
-      String key = record.getStr("Key");
-      if ("PRI".equals(key)) {
-        DbTableStruct tableColumn = new DbTableStruct();
-        tableColumn.setField(record.getStr("Field"));
-        tableColumn.setType(record.getStr("Type"));
-        tableColumn.setKey(key);
-        ret.add(tableColumn);
+
+    Dialect dialect = DbKit.getConfig().getDialect();
+    if (dialect instanceof PostgreSqlDialect) {
+      DbTableStruct dbTableStruct = new DbTableStruct();
+      dbTableStruct.setField("id");
+      dbTableStruct.setType("long");
+      dbTableStruct.setKey("PRI");
+      ret.add(dbTableStruct);
+    } else {
+      List<DbTableStruct> columns = columns(tableName);
+
+      // 遍历出主键,添加到ret中
+      for (DbTableStruct record : columns) {
+        String key = record.getKey();
+        if ("PRI".equals(key)) {
+          DbTableStruct tableColumn = new DbTableStruct();
+          tableColumn.setField(record.getField());
+          tableColumn.setType(record.getType());
+          tableColumn.setKey(key);
+          ret.add(tableColumn);
+        }
       }
     }
 
@@ -45,28 +59,63 @@ public class DbService {
 
   /**
    * 查询表名
+   *
    * @return
    */
   public List<Record> tables() {
     String sql = "show tables";
-    List<Record> find = Db.find(sql);
-    return find;
+    return Db.find(sql);
   }
 
   /**
    * 查询表字段
+   *
    * @param tableName
-   * @return
-     {"Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra": "auto_increment", "Default": null, "Key": "PRI" },
+   * @return {"Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra": "auto_increment", "Default": null, "Key": "PRI" },
    */
-  public List<Record> cloumns(String tableName) {
-    String sql = "show columns from " + tableName;
-    List<Record> find = Db.find(sql);
-    return find;
+  public List<DbTableStruct> columns(String tableName) {
+    List<DbTableStruct> ret = new ArrayList<>();
+
+    String sql = null;
+    Dialect dialect = DbKit.getConfig().getDialect();
+    if (dialect instanceof PostgreSqlDialect) {
+      sql = "SELECT column_name as field, data_type as type, is_nullable, column_default FROM information_schema.columns " +
+        "WHERE table_name ='" + tableName + "';";
+      List<Record> columns = Db.find(sql);
+      // 即便将别名设置为大写,返回的依然是小写,气人
+
+      // 遍历出主键,添加到ret中
+      for (Record record : columns) {
+        DbTableStruct tableColumn = new DbTableStruct();
+        tableColumn.setField(record.getStr("field"));
+        tableColumn.setType(record.getStr("type"));
+        String key = record.getStr("key");
+        tableColumn.setKey(key);
+        ret.add(tableColumn);
+      }
+    } else {
+      sql = "show columns from " + tableName;
+      List<Record> columns = Db.find(sql);
+
+
+      // 遍历出主键,添加到ret中
+      for (Record record : columns) {
+        DbTableStruct tableColumn = new DbTableStruct();
+        tableColumn.setField(record.getStr("Field"));
+        tableColumn.setType(record.getStr("Type"));
+        String key = record.getStr("Key");
+        tableColumn.setKey(key);
+        ret.add(tableColumn);
+      }
+    }
+
+
+    return ret;
   }
 
   /**
    * 增加表字段
+   *
    * @param tableName
    * @param field
    * @param type
