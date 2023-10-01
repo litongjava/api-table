@@ -8,10 +8,11 @@ import com.litongjava.hotswap.wrapper.spring.boot.SpringApplicationWrapper;
 public class TableToJsonApplicaton {
 
   public static void main(String[] args) {
+
     long start = System.currentTimeMillis();
     SpringApplicationWrapper.run(TableToJsonApplicaton.class, args);
     long end = System.currentTimeMillis();
     System.out.println((end - start) + "(ms)");
-
+     
   }
 }
