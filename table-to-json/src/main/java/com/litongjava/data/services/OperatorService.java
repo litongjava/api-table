@@ -3,9 +3,9 @@ package com.litongjava.data.services;
 import java.util.Collections;
 import java.util.List;
 
-import com.jfinal.kit.StrKit;
 import com.litongjava.data.constants.OperatorConstants;
 import com.litongjava.data.utils.ObjectUtils;
+import com.litongjava.jfinal.plugin.kit.StrKit;
 
 public class OperatorService {
   public void addOperator(StringBuffer where, List<Object> paramList, String fieldName, Object value, String operator) {

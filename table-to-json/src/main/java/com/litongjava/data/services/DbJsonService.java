@@ -4,19 +4,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.jfinal.kit.Kv;
-import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Db;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.config.DbDataConfig;
 import com.litongjava.data.model.DataPageRequest;
 import com.litongjava.data.model.DataQueryRequest;
 import com.litongjava.data.model.DbJsonBean;
+import com.litongjava.data.model.DbTableStruct;
 import com.litongjava.data.model.Sql;
 import com.litongjava.data.utils.KvUtils;
 import com.litongjava.data.utils.SnowflakeIdGenerator;
 import com.litongjava.data.utils.UUIDUtils;
+import com.litongjava.jfinal.plugin.activerecord.Db;
+import com.litongjava.jfinal.plugin.activerecord.Page;
+import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.jfinal.plugin.kit.Kv;
+import com.litongjava.jfinal.plugin.kit.StrKit;
 
 public class DbJsonService {
   private DbSqlService dbSqlService = new DbSqlService();
@@ -85,7 +86,16 @@ public class DbJsonService {
    * @return
    */
   public DbJsonBean<List<Record>> listAll(String tableName) {
-    return new DbJsonBean<List<Record>>(Db.find("select * from " + tableName));
+    List<Record> records = Db.find("select * from " + tableName);
+    if (records.size() < 1) {
+      List<DbTableStruct> columns = dbService.columns(tableName);
+      Record record = new Record();
+      for (DbTableStruct struct : columns) {
+        record.set(struct.getField(), null);
+      }
+      records.add(record);
+    }
+    return new DbJsonBean<List<Record>>(records);
   }
 
   public DbJsonBean<List<Record>> list(Kv kv) {
@@ -169,7 +179,6 @@ public class DbJsonService {
     Sql sql = dbSqlService.getWhereQueryClause(queryParam);
     sql.setColumns(columns);
     sql.setTableName(tableName);
-
 
     // 添加操作表
     Record record = Db.findFirst(sql.getsql(), sql.getParams().toArray());
@@ -343,6 +352,5 @@ public class DbJsonService {
     }
     return new DbJsonBean<>(find);
   }
-
 
 }

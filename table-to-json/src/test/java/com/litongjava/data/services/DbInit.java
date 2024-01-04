@@ -1,7 +1,7 @@
 package com.litongjava.data.services;
 
-import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
-import com.jfinal.plugin.druid.DruidPlugin;
+import com.litongjava.jfinal.plugin.activerecord.ActiveRecordPlugin;
+import com.litongjava.jfinal.plugin.druid.DruidPlugin;
 
 public class DbInit {
 

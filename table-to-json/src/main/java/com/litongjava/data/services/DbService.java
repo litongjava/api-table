@@ -3,12 +3,12 @@ package com.litongjava.data.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jfinal.plugin.activerecord.Db;
-import com.jfinal.plugin.activerecord.DbKit;
-import com.jfinal.plugin.activerecord.Record;
-import com.jfinal.plugin.activerecord.dialect.Dialect;
-import com.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.data.model.DbTableStruct;
+import com.litongjava.jfinal.plugin.activerecord.Db;
+import com.litongjava.jfinal.plugin.activerecord.DbKit;
+import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.jfinal.plugin.activerecord.dialect.Dialect;
+import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
 
 /**
  * @author bill robot

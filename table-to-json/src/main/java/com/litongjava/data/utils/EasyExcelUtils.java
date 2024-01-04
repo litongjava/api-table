@@ -9,15 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletOutputStream;
-
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
-import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.convert.LocalDateTimeConverter;
+import com.litongjava.data.convert.TimestampStringConverter;
+import com.litongjava.jfinal.plugin.activerecord.Record;
 
 /**
  * Excel 工具类
@@ -49,7 +48,7 @@ public class EasyExcelUtils {
     }
   }
 
-  public static void write(ServletOutputStream outputStream, String sheetName, List<Record> records) {
+  public static void write(OutputStream outputStream, String sheetName, List<Record> records) {
     // 获取head
     String[] columnNames = null;
     int size = records.size();
@@ -79,7 +78,7 @@ public class EasyExcelUtils {
    * @param outputStream
    * @param allTableData
    */
-  public static void write(ServletOutputStream outputStream, Map<String, List<Record>> allTableData) {
+  public static void write(OutputStream outputStream, Map<String, List<Record>> allTableData) {
     // 写入
     ExcelWriterBuilder excelWriterBuilder = getExcelWriteBuilder(outputStream);
 
@@ -95,7 +94,7 @@ public class EasyExcelUtils {
         Record record = records.get(0);
         columnNames = record.getColumnNames();
       } else {
-        return;
+        continue;
       }
       List<List<String>> heads = head(columnNames);
 
@@ -119,7 +118,7 @@ public class EasyExcelUtils {
         // 基于 column 长度，自动适配。最大 255 宽度
         .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
         // 日期格式转换
-        .registerConverter(new LocalDateTimeConverter());
+        .registerConverter(new LocalDateTimeConverter()).registerConverter(new TimestampStringConverter());
     return excelWriterBuilder;
   }
 

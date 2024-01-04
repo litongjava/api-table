@@ -1,0 +1,8 @@
+undertow.devMode=true
+undertow.port=11023
+undertow.host=127.0.0.1
+#jdbc-postgresql
+jdbc.url=jdbc:postgresql://192.168.3.9/uh_courses
+jdbc.user=postgres
+jdbc.pswd=robot_123456#
+jdbc.showSql=true

@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.jfinal.kit.Kv;
-import com.jfinal.plugin.activerecord.Record;
+import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.jfinal.plugin.kit.Kv;
 
 /**
  * @author litong

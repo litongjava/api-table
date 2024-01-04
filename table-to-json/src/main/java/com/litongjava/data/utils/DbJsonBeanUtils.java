@@ -2,11 +2,11 @@ package com.litongjava.data.utils;
 
 import java.util.List;
 
-import com.jfinal.kit.Kv;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
 import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.model.DbPage;
+import com.litongjava.jfinal.plugin.activerecord.Page;
+import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.jfinal.plugin.kit.Kv;
 
 public class DbJsonBeanUtils {
 
