@@ -13,7 +13,7 @@
     <lombok-version>1.18.30</lombok-version>
     <hotswap-classloader.version>1.2.1</hotswap-classloader.version>
     <final.name>web-hello</final.name>
-    <main.class>com.litongjava.tio.web.hello.HelloApp</main.class>
+    <main.class>com.litongjava.tio.boot.table.to.json.TableToJsonApp</main.class>
   </properties>
   <dependencies>
     <dependency>
