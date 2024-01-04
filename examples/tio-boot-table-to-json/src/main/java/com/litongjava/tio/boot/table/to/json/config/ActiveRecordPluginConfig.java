@@ -1,5 +1,6 @@
 package com.litongjava.tio.boot.table.to.json.config;
 
+import com.litongjava.data.utils.TioRequestParamUtils;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.jfinal.aop.annotation.ABean;
 import com.litongjava.jfinal.aop.annotation.AConfiguration;
@@ -30,6 +31,9 @@ public class ActiveRecordPluginConfig {
     ActiveRecordPlugin arp = new ActiveRecordPlugin(druidPlugin);
     arp.setContainerFactory(new OrderedFieldContainerFactory());
     arp.setShowSql(showSql);
+
+    //add
+    TioRequestParamUtils.types.add("bigint");
     arp.start();
     return arp;
   }
