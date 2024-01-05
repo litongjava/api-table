@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.litongjava.jfinal.plugin.kit.Kv;
+import com.jfinal.kit.Kv;
 
 public class KvUtilsTest {
 

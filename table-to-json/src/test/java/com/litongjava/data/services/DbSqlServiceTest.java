@@ -2,9 +2,9 @@ package com.litongjava.data.services;
 
 import org.junit.Test;
 
+import com.jfinal.kit.Kv;
 import com.litongjava.data.model.DataQueryRequest;
 import com.litongjava.data.model.Sql;
-import com.litongjava.jfinal.plugin.kit.Kv;
 
 public class DbSqlServiceTest {
 

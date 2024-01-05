@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.litongjava.jfinal.plugin.kit.StrKit;
+import com.jfinal.kit.StrKit;
 import com.litongjava.tio.http.common.HttpRequest;
 
 public class TioRequestParamUtils {

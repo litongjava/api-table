@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
   <artifactId>table-to-json</artifactId>
-  <version>1.2.3</version>
+  <version>1.2.4</version>
   <packaging>jar</packaging>
   <name>table-to-json</name>
   <description>db table to json</description>
@@ -16,11 +16,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>cn.hutool</groupId>
-      <artifactId>hutool-all</artifactId>
-      <version>5.8.11</version>
-    </dependency>
     <!--
     <dependency>
       <groupId>com.jfinal</groupId>
@@ -31,7 +26,7 @@
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>jfinal-plugins</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.3</version>
     </dependency>
     <!--
     <dependency>

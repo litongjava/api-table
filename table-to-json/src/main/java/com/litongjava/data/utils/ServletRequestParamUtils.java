@@ -8,10 +8,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.litongjava.jfinal.plugin.kit.StrKit;
+import com.jfinal.kit.StrKit;
 import com.litongjava.tio.http.common.HttpRequest;
 
-public class RequestParamUtils {
+public class ServletRequestParamUtils {
   public static List<String> types = new ArrayList<>();
 
   static {

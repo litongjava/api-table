@@ -1,7 +1,5 @@
 package com.litongjava.data.model;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 public class DataPageRequestTest {

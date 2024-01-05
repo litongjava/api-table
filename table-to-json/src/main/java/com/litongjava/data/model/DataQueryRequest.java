@@ -1,6 +1,6 @@
 package com.litongjava.data.model;
 
-import com.litongjava.jfinal.plugin.kit.Kv;
+import com.jfinal.kit.Kv;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

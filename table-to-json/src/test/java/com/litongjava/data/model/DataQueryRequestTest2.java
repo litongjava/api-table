@@ -2,7 +2,7 @@ package com.litongjava.data.model;
 
 import org.junit.Test;
 
-import com.litongjava.jfinal.plugin.kit.Kv;
+import com.jfinal.kit.Kv;
 
 public class DataQueryRequestTest2 {
 

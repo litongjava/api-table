@@ -6,11 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.jfinal.kit.Kv;
 import com.litongjava.data.model.DataQueryRequest;
 import com.litongjava.data.model.Operator;
 import com.litongjava.data.model.Sql;
 import com.litongjava.data.utils.ObjectUtils;
-import com.litongjava.jfinal.plugin.kit.Kv;
 
 /**
  * @author Ping E Lee
