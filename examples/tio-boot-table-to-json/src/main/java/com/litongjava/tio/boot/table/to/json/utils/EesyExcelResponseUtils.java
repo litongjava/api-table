@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.litongjava.data.utils.EasyExcelUtils;
@@ -15,20 +14,19 @@ import com.litongjava.tio.http.common.HttpRequest;
 import com.litongjava.tio.http.common.HttpResponse;
 import com.litongjava.tio.http.server.util.Resps;
 
-import cn.hutool.core.bean.BeanUtil;
 import lombok.Cleanup;
 
 public class EesyExcelResponseUtils {
-  public static HttpResponse exportRecords(HttpRequest request,String filename, String sheetName,
-      List<Record> records) throws IOException {
-    
+  public static HttpResponse exportRecords(HttpRequest request, String filename, String sheetName, List<Record> records)
+      throws IOException {
+
     @Cleanup
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, sheetName, records);
 
     // 将输出流转换为字节数组
     byte[] bytes = outputStream.toByteArray();
-    
+
     // 使用 Resps 工具类创建一个包含二维码图片的响应
     HttpResponse response = Resps.bytesWithContentType(request, bytes, "application/vnd.ms-excel;charset=UTF-8");
     response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
@@ -51,9 +49,8 @@ public class EesyExcelResponseUtils {
    */
   public static <T> HttpResponse export(HttpRequest request, String filename, String sheetName, List<Record> records,
       Class<T> clazz) throws UnsupportedEncodingException, IOException {
-    List<Map<String, Object>> collect = records.stream().map(e -> e.toMap()).collect(Collectors.toList());
-    List<T> exportDatas = BeanUtil.copyToList(collect, clazz);
-    
+    List<T> exportDatas = records.stream().map(e -> e.toBean(clazz)).collect(Collectors.toList());
+
     @Cleanup
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, filename, sheetName, clazz, exportDatas);
