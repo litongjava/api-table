@@ -49,14 +49,15 @@ public class DbJsonService {
         return new DbJsonBean<>(-1, "id value can't be null");
       }
     } else { // 保存
+      String id = null;
       // 如果主键是varchar类型,插入uuid类型
       String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
-      if (primaryKeyColumnType.startsWith("varchar")) {
-        record.set(primarykeyName, UUIDUtils.random());
-      }
-      // 如果主键是bigint (20)类型,插入雪花Id
       if (!StrKit.isBlank(primaryKeyColumnType)) {
-        if (primaryKeyColumnType.startsWith("bigint")) {
+        if (primaryKeyColumnType.startsWith("varchar")) {
+          id = UUIDUtils.random();
+          record.set(primarykeyName, id);
+        } else if (primaryKeyColumnType.startsWith("bigint")) {
+          // 如果主键是bigint (20)类型,插入雪花Id
           long threadId = Thread.currentThread().getId();
           if (threadId > 31) {
             threadId = threadId % 31;
@@ -64,13 +65,20 @@ public class DbJsonService {
           if (threadId < 0) {
             threadId = 0;
           }
-          long generateId = new SnowflakeIdGenerator(threadId, 0).generateId();
-          record.set(primarykeyName, generateId);
+          id = new SnowflakeIdGenerator(threadId, 0).generateId() + "";
+          record.set(primarykeyName, id);
         }
       }
 
       boolean save = Db.save(tableName, record);
-      return new DbJsonBean<>(save);
+      DbJsonBean<Boolean> dbJsonBean;
+      if (id == null) {
+        dbJsonBean = new DbJsonBean<>(save);
+      } else {
+        dbJsonBean = new DbJsonBean<>(id);
+      }
+
+      return dbJsonBean;
     }
   }
 
