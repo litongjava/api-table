@@ -31,7 +31,7 @@ public class DbJsonService {
   private DbService dbService = new DbService();
 
   @SuppressWarnings("unchecked")
-  public DbJsonBean<Boolean> saveOrUpdate(String tableName, Kv kv) {
+  public DbJsonBean<String> saveOrUpdate(String tableName, Kv kv) {
 
     KvUtils.removeEmptyValue(kv);
     true21(kv);
@@ -43,8 +43,7 @@ public class DbJsonService {
       String idValue = kv.getStr(primarykeyName);
       if (!StrKit.isBlank(idValue)) {
         boolean update = Db.update(tableName, primarykeyName, record);
-        DbJsonBean<Boolean> dataJsonBean = new DbJsonBean<>(update);
-        return dataJsonBean;
+        return new DbJsonBean<>(update + "");
       } else {
         return new DbJsonBean<>(-1, "id value can't be null");
       }
@@ -71,18 +70,16 @@ public class DbJsonService {
       }
 
       boolean save = Db.save(tableName, record);
-      DbJsonBean<Boolean> dbJsonBean;
       if (id == null) {
-        dbJsonBean = new DbJsonBean<>(save);
+        return new DbJsonBean<>(save + "");
       } else {
-        dbJsonBean = new DbJsonBean<>(id);
+        return new DbJsonBean<>(id);
       }
 
-      return dbJsonBean;
     }
   }
 
-  public DbJsonBean<Boolean> saveOrUpdate(Kv kv) {
+  public DbJsonBean<?> saveOrUpdate(Kv kv) {
     String tableName = (String) kv.remove("table_name");
     return this.saveOrUpdate(tableName, kv);
   }
