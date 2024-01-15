@@ -194,14 +194,16 @@ public class DbJsonService {
   }
 
   public DbJsonBean<Boolean> delById(String tableName, Object id) {
-    return new DbJsonBean<Boolean>(Db.deleteById(tableName, id));
+    Db.deleteById(tableName, id);
+    return new DbJsonBean<Boolean>();
   }
 
   public DbJsonBean<Integer> updateFlagById(String tableName, Object id, String delColumn, int flag) {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set %s=%s where %s =?";
     String sql = String.format(upateTemplate, tableName, delColumn, flag, primaryKey);
-    return new DbJsonBean<>(Db.update(sql, id));
+    Db.update(sql, id);
+    return new DbJsonBean<>();
   }
 
   public DbJsonBean<Integer> updateIsDelFlagById(String tableName, Object id) {
@@ -214,7 +216,8 @@ public class DbJsonService {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set is_del=1 where  %s =?";
     String sql = String.format(upateTemplate, tableName, primaryKey);
-    return new DbJsonBean<>(Db.update(sql, id));
+    Db.update(sql, id);
+    return new DbJsonBean<>();
   }
 
   public DbJsonBean<Integer> removeByIds(String tableName, Kv kv) {
@@ -261,7 +264,8 @@ public class DbJsonService {
     }
     String sql = "update %s set is_del=1 where " + where.toString();
     sql = String.format(sql, tableName);
-    return new DbJsonBean<>(Db.update(sql, idValues));
+    Db.update(sql, idValues);
+    return new DbJsonBean<>();
   }
 
   private String[] getParaValues(String key) {
@@ -316,9 +320,7 @@ public class DbJsonService {
 
   public DbJsonBean<String[]> tableNames() {
     String[] allTableNames = dbTableService.getAllTableNames();
-    DbJsonBean<String[]> dbJsonBean = new DbJsonBean<>();
-    dbJsonBean.setData(allTableNames);
-    return dbJsonBean;
+    return new DbJsonBean<>(allTableNames);
   }
 
   public DbJsonBean<List<Record>> tables() {

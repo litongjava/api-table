@@ -32,4 +32,28 @@ public class DbJsonBean<T> {
     this.msg = msg;
   }
 
+  public static <T> DbJsonBean<T> fail() {
+    return new DbJsonBean<T>(-1, "fail");
+  }
+
+  public static <T> DbJsonBean<T> fail(int code) {
+    return new DbJsonBean<T>(code, "fail");
+  }
+
+  public static <T> DbJsonBean<T> fail(String message) {
+    return new DbJsonBean<T>(-1, message);
+  }
+
+  public static <T> DbJsonBean<T> fail(int code, String msg) {
+    return new DbJsonBean<T>(code, msg);
+  }
+
+  public static <T> DbJsonBean<T> ok() {
+    return new DbJsonBean<T>();
+  }
+
+  public static <T> DbJsonBean<T> ok(T kv) {
+    return new DbJsonBean<T>(kv);
+  }
+
 }

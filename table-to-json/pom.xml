@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
   <artifactId>table-to-json</artifactId>
-  <version>1.2.5</version>
+  <version>1.2.6</version>
   <packaging>jar</packaging>
   <name>table-to-json</name>
   <description>db table to json</description>
@@ -16,25 +16,11 @@
   </properties>
 
   <dependencies>
-    <!--
-    <dependency>
-      <groupId>com.jfinal</groupId>
-      <artifactId>jfinal</artifactId>
-      <version>5.0.8</version>
-    </dependency>
--->
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>jfinal-plugins</artifactId>
       <version>1.0.5</version>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>com.jfinal</groupId>
-      <artifactId>activerecord</artifactId>
-      <version>5.1.1</version>
-    </dependency>
-    -->
 
     <dependency>
       <groupId>mysql</groupId>
