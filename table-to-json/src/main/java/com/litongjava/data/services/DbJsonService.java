@@ -18,6 +18,7 @@ import com.litongjava.data.utils.UUIDUtils;
 import com.litongjava.jfinal.plugin.activerecord.Db;
 import com.litongjava.jfinal.plugin.activerecord.Page;
 import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.jfinal.plugin.json.Json;
 
 public class DbJsonService {
   private DbSqlService dbSqlService = new DbSqlService();
@@ -31,7 +32,7 @@ public class DbJsonService {
   private DbService dbService = new DbService();
 
   @SuppressWarnings("unchecked")
-  public DbJsonBean<String> saveOrUpdate(String tableName, Kv kv) {
+  public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv) {
 
     KvUtils.removeEmptyValue(kv);
     true21(kv);
@@ -42,8 +43,8 @@ public class DbJsonService {
     if (kv.containsKey(primarykeyName)) { // 更新
       String idValue = kv.getStr(primarykeyName);
       if (!StrKit.isBlank(idValue)) {
-        boolean update = Db.update(tableName, primarykeyName, record);
-        return new DbJsonBean<>(update + "");
+        Db.update(tableName, primarykeyName, record);
+        return new DbJsonBean<>(record.getStr(primarykeyName));
       } else {
         return new DbJsonBean<>(-1, "id value can't be null");
       }
@@ -70,16 +71,15 @@ public class DbJsonService {
       }
 
       boolean save = Db.save(tableName, record);
-      if (id == null) {
-        return new DbJsonBean<>(save + "");
+      if (save) {
+        return new DbJsonBean<>(record.toKv());
       } else {
-        return new DbJsonBean<>(id);
+        return DbJsonBean.fail("save fail");
       }
-
     }
   }
 
-  public DbJsonBean<?> saveOrUpdate(Kv kv) {
+  public DbJsonBean<Kv> saveOrUpdate(Kv kv) {
     String tableName = (String) kv.remove("table_name");
     return this.saveOrUpdate(tableName, kv);
   }
@@ -199,19 +199,28 @@ public class DbJsonService {
   }
 
   public DbJsonBean<Boolean> delById(String tableName, Object id) {
-    Db.deleteById(tableName, id);
-    return new DbJsonBean<Boolean>();
+    if (Db.deleteById(tableName, id)) {
+      return new DbJsonBean<Boolean>();
+    } else {
+      return DbJsonBean.fail();
+    }
+
   }
 
-  public DbJsonBean<Integer> updateFlagById(String tableName, Object id, String delColumn, int flag) {
+  public DbJsonBean<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag) {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set %s=%s where %s =?";
     String sql = String.format(upateTemplate, tableName, delColumn, flag, primaryKey);
-    Db.update(sql, id);
-    return new DbJsonBean<>();
+    int updateResult = Db.update(sql, id);
+    if (updateResult > 0) {
+      return new DbJsonBean<>();
+    } else {
+      return DbJsonBean.fail(-1, "update fail");
+    }
+
   }
 
-  public DbJsonBean<Integer> updateIsDelFlagById(String tableName, Object id) {
+  public DbJsonBean<Boolean> updateIsDelFlagById(String tableName, Object id) {
     // 判断is_del是否存在,如果不存在则创建
     String delFlagColumn = DbDataConfig.getDelColName();
     boolean isExists = tableColumnService.isExists(delFlagColumn, tableName);
@@ -221,8 +230,12 @@ public class DbJsonService {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set is_del=1 where  %s =?";
     String sql = String.format(upateTemplate, tableName, primaryKey);
-    Db.update(sql, id);
-    return new DbJsonBean<>();
+    int updateResult = Db.update(sql, id);
+    if (updateResult > 0) {
+      return new DbJsonBean<>();
+    } else {
+      return DbJsonBean.fail(-1, "update fail");
+    }
   }
 
   public DbJsonBean<Integer> removeByIds(String tableName, Kv kv) {
@@ -358,6 +371,14 @@ public class DbJsonService {
       find = Db.find(sql, paras);
     }
     return new DbJsonBean<>(find);
+  }
+
+  public DbJsonBean<Kv> saveOrUpdate(String sysPicInfo, Kv kv, String[] jsonFields) {
+    for (String f : jsonFields) {
+      Object object = kv.get(f);
+      kv.set(f, Json.getJson().toJson(object));
+    }
+    return saveOrUpdate(sysPicInfo, kv);
   }
 
 }

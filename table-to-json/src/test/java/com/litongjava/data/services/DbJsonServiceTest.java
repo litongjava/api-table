@@ -171,7 +171,7 @@ public class DbJsonServiceTest {
     kv.put("tenant_id", 1);
 
     System.out.println(dataPageRequest);
-    DbJsonBean<Boolean> booleanDbJsonBean = dbJsonService.saveOrUpdate(tableName, kv);
+    DbJsonBean<Kv> booleanDbJsonBean = dbJsonService.saveOrUpdate(tableName, kv);
 
     System.out.println(booleanDbJsonBean);
   }
@@ -186,7 +186,7 @@ public class DbJsonServiceTest {
   @Test
   public void logoicalDelete() {
     String tableName = "cf_alarm";
-    DbJsonBean<Integer> deleted = dbJsonService.updateFlagById(tableName, "1532708", "deleted", 2);
+    DbJsonBean<Boolean> deleted = dbJsonService.updateFlagById(tableName, "1532708", "deleted", 2);
     System.out.println(deleted);
   }
 

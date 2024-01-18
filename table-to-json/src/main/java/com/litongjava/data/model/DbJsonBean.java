@@ -11,7 +11,7 @@ public class DbJsonBean<T> {
 
   private int code = 0; // 状态码
 
-  private String msg = ""; // 状态说明
+  private String msg; // 状态说明
 
   private T data; // 数据内容
 
@@ -42,6 +42,10 @@ public class DbJsonBean<T> {
 
   public static <T> DbJsonBean<T> fail(String message) {
     return new DbJsonBean<T>(-1, message);
+  }
+
+  public static <T> DbJsonBean<T> fail(T data) {
+    return new DbJsonBean<T>(-1, "fail", data);
   }
 
   public static <T> DbJsonBean<T> fail(int code, String msg) {
