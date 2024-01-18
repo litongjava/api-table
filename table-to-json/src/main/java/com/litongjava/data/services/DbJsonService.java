@@ -18,7 +18,6 @@ import com.litongjava.data.utils.UUIDUtils;
 import com.litongjava.jfinal.plugin.activerecord.Db;
 import com.litongjava.jfinal.plugin.activerecord.Page;
 import com.litongjava.jfinal.plugin.activerecord.Record;
-import com.litongjava.jfinal.plugin.json.Json;
 
 public class DbJsonService {
   private DbSqlService dbSqlService = new DbSqlService();
@@ -31,9 +30,12 @@ public class DbJsonService {
 
   private DbService dbService = new DbService();
 
-  @SuppressWarnings("unchecked")
   public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv) {
+    return this.saveOrUpdate(tableName, kv, null);
+  }
 
+  @SuppressWarnings("unchecked")
+  public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv, String[] jsonFields) {
     KvUtils.removeEmptyValue(kv);
     true21(kv);
     Record record = new Record();
@@ -43,7 +45,7 @@ public class DbJsonService {
     if (kv.containsKey(primarykeyName)) { // 更新
       String idValue = kv.getStr(primarykeyName);
       if (!StrKit.isBlank(idValue)) {
-        Db.update(tableName, primarykeyName, record);
+        Db.update(tableName, primarykeyName, record, jsonFields);
         return new DbJsonBean<>(record.getStr(primarykeyName));
       } else {
         return new DbJsonBean<>(-1, "id value can't be null");
@@ -70,13 +72,14 @@ public class DbJsonService {
         }
       }
 
-      boolean save = Db.save(tableName, record);
+      boolean save = Db.save(tableName, record, jsonFields);
       if (save) {
         return new DbJsonBean<>(record.toKv());
       } else {
         return DbJsonBean.fail("save fail");
       }
     }
+
   }
 
   public DbJsonBean<Kv> saveOrUpdate(Kv kv) {
@@ -371,14 +374,6 @@ public class DbJsonService {
       find = Db.find(sql, paras);
     }
     return new DbJsonBean<>(find);
-  }
-
-  public DbJsonBean<Kv> saveOrUpdate(String sysPicInfo, Kv kv, String[] jsonFields) {
-    for (String f : jsonFields) {
-      Object object = kv.get(f);
-      kv.set(f, Json.getJson().toJson(object));
-    }
-    return saveOrUpdate(sysPicInfo, kv);
   }
 
 }
