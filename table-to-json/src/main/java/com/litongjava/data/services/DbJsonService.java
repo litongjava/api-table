@@ -34,6 +34,50 @@ public class DbJsonService {
     return this.saveOrUpdate(tableName, kv, null);
   }
 
+  public DbJsonBean<Kv> save(String tableName, Kv kv) {
+    return this.save(tableName, kv, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public DbJsonBean<Kv> save(String tableName, Kv kv, String[] jsonFields) {
+    KvUtils.removeEmptyValue(kv);
+    true21(kv);
+    Record record = new Record();
+    record.setColumns(kv);
+
+    String primarykeyName = primaryKeyService.getPrimaryKeyName(tableName);
+    if (kv.get(primarykeyName) == null) {
+      String id = null;
+      // 如果主键是varchar类型,插入uuid类型
+      String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
+      if (!StrKit.isBlank(primaryKeyColumnType)) {
+        if (primaryKeyColumnType.startsWith("varchar")) {
+          id = UUIDUtils.random();
+          record.set(primarykeyName, id);
+        } else if (primaryKeyColumnType.startsWith("bigint")) {
+          // 如果主键是bigint (20)类型,插入雪花Id
+          long threadId = Thread.currentThread().getId();
+          if (threadId > 31) {
+            threadId = threadId % 31;
+          }
+          if (threadId < 0) {
+            threadId = 0;
+          }
+          id = new SnowflakeIdGenerator(threadId, 0).generateId() + "";
+          record.set(primarykeyName, id);
+        }
+      }
+    }
+
+    boolean save = Db.save(tableName, record, jsonFields);
+    if (save) {
+      return new DbJsonBean<>(record.toKv());
+    } else {
+      return DbJsonBean.fail("save fail");
+    }
+
+  }
+
   @SuppressWarnings("unchecked")
   public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv, String[] jsonFields) {
     KvUtils.removeEmptyValue(kv);
@@ -46,7 +90,9 @@ public class DbJsonService {
       String idValue = kv.getStr(primarykeyName);
       if (!StrKit.isBlank(idValue)) {
         Db.update(tableName, primarykeyName, record, jsonFields);
-        return new DbJsonBean<>(record.getStr(primarykeyName));
+        DbJsonBean<Kv> dbJsonBean = new DbJsonBean<>();
+        dbJsonBean.setData(Kv.by(primarykeyName, idValue));
+        return dbJsonBean;
       } else {
         return new DbJsonBean<>(-1, "id value can't be null");
       }
