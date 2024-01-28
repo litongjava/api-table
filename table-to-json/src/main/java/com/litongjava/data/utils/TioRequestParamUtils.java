@@ -41,7 +41,7 @@ public class TioRequestParamUtils {
         }
         arrayParams.get(arrayName).add(paramValue);
       } else if (paramName.endsWith("Type") && types.contains(paramValue)) {
-        // 前端传递参数缺定数据类型
+        // 前端传递指定数缺定数据类型
         paramType.put(paramName, paramValue);
       } else {
         // This is a regular paramValue

@@ -16,6 +16,7 @@ import com.litongjava.data.utils.KvUtils;
 import com.litongjava.data.utils.SnowflakeIdGenerator;
 import com.litongjava.data.utils.UUIDUtils;
 import com.litongjava.jfinal.plugin.activerecord.Db;
+import com.litongjava.jfinal.plugin.activerecord.DbPro;
 import com.litongjava.jfinal.plugin.activerecord.Page;
 import com.litongjava.jfinal.plugin.activerecord.Record;
 
@@ -38,6 +39,13 @@ public class DbJsonService {
     return this.save(tableName, kv, null);
   }
 
+  /**
+   * 
+   * @param tableName
+   * @param kv
+   * @param jsonFields
+   * @return
+   */
   @SuppressWarnings("unchecked")
   public DbJsonBean<Kv> save(String tableName, Kv kv, String[] jsonFields) {
     KvUtils.removeEmptyValue(kv);
@@ -134,12 +142,21 @@ public class DbJsonService {
   }
 
   /**
-   * 无任何条件过滤,包含所有数据
-   *
-   * @param tableName table name
+   * 
+   * @param tableName
    * @return
    */
   public DbJsonBean<List<Record>> listAll(String tableName) {
+    return listAll(tableName);
+  }
+
+  /**
+   * 无任何条件过滤,包含所有数据
+   * @param dbPro
+   * @param tableName
+   * @return
+   */
+  public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName) {
     List<Record> records = Db.find("select * from " + tableName);
     if (records.size() < 1) {
       List<DbTableStruct> columns = dbService.columns(tableName);
@@ -157,7 +174,31 @@ public class DbJsonService {
     return list(tableName, kv);
   }
 
+  public DbJsonBean<List<Record>> list(DbPro dbPro, Kv kv) {
+    String tableName = (String) kv.remove("table_name");
+    return list(dbPro, tableName, kv);
+  }
+
+  /**
+   * @param tableName
+   * @param queryParam
+   * @return
+   */
   public DbJsonBean<List<Record>> list(String tableName, Kv queryParam) {
+    return list(null, tableName, queryParam);
+  }
+
+  /**
+   * 
+   * @param dbPro
+   * @param tableName
+   * @param queryParam
+   * @return
+   */
+  public DbJsonBean<List<Record>> list(DbPro dbPro, String tableName, Kv queryParam) {
+    if (dbPro == null) {
+      dbPro = Db.use();
+    }
     DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
@@ -169,33 +210,77 @@ public class DbJsonService {
     // 添加操作表
     List<Record> list = null;
     if (params == null) {
-      list = Db.find(sql.getsql());
+      list = dbPro.find(sql.getsql());
     } else {
-      list = Db.find(sql.getsql(), sql.getParams().toArray());
+      list = dbPro.find(sql.getsql(), sql.getParams().toArray());
     }
     return new DbJsonBean<>(list);
   }
 
+  /**
+   * @param kv
+   * @return
+   */
   public DbJsonBean<Page<Record>> page(Kv kv) {
     String tableName = (String) kv.remove("table_name");
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
   }
 
+  /**
+  * 
+  * @return
+  */
+  public DbJsonBean<Page<Record>> page(DbPro dbPro, Kv kv) {
+    String tableName = (String) kv.remove("table_name");
+    DataPageRequest dataPageRequest = new DataPageRequest(kv);
+    return page(dbPro, tableName, dataPageRequest, kv);
+  }
+
+  /**
+   * @param tableName
+   * @param kv
+   * @return
+   */
   public DbJsonBean<Page<Record>> page(String tableName, Kv kv) {
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
   }
 
   /**
+   * @param dbPro
+   * @param f
+   * @param kv
+   * @return
+   */
+  public DbJsonBean<Page<Record>> page(DbPro dbPro, String f, Kv kv) {
+    kv.remove("table_name");
+    DataPageRequest dataPageRequest = new DataPageRequest(kv);
+    return page(dbPro, f, dataPageRequest, kv);
+  }
+
+  /**
+   * @param tableName
+   * @param dataPageRequest
+   * @param kv
+   * @return
+   */
+  public DbJsonBean<Page<Record>> page(String tableName, DataPageRequest dataPageRequest, Kv kv) {
+    return page(null, tableName, dataPageRequest, kv);
+  }
+
+  /**
    * 分页查询
-   *
+   * @param dbPro 
    * @param tableName
    * @param pageRequest
    * @param queryParam
    * @return
    */
-  public DbJsonBean<Page<Record>> page(String tableName, DataPageRequest pageRequest, Kv queryParam) {
+  public DbJsonBean<Page<Record>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest, Kv queryParam) {
+    if (dbPro == null) {
+      dbPro = Db.use();
+    }
     Integer pageNo = pageRequest.getPageNo();
     Integer pageSize = pageRequest.getPageSize();
 
@@ -210,9 +295,10 @@ public class DbJsonService {
     String sqlExceptSelect = sql.getSqlExceptSelect();
     Page<Record> listPage = null;
     if (params == null) {
-      listPage = Db.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect);
+      listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect);
+
     } else {
-      listPage = Db.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, params.toArray());
+      listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, params.toArray());
     }
     return new DbJsonBean<>(listPage);
 
@@ -226,7 +312,20 @@ public class DbJsonService {
    * @return
    */
   public DbJsonBean<Record> get(String tableName, Kv queryParam) {
-//    String columns = queryParam.getStr("cloumns");
+    return findFirst(null, tableName, queryParam);
+  }
+
+  /**
+   * 
+   * @param dbPro
+   * @param tableName
+   * @param queryParam
+   * @return 
+   */
+  public DbJsonBean<Record> findFirst(DbPro dbPro, String tableName, Kv queryParam) {
+    if (dbPro == null) {
+      dbPro = Db.use();
+    }
 
     String columns = (String) queryParam.remove("columns");
     // 添加其他查询条件
@@ -235,8 +334,9 @@ public class DbJsonService {
     sql.setTableName(tableName);
 
     // 添加操作表
-    Record record = Db.findFirst(sql.getsql(), sql.getParams().toArray());
+    Record record = dbPro.findFirst(sql.getsql(), sql.getParams().toArray());
     return new DbJsonBean<Record>(record);
+
   }
 
   @SuppressWarnings("unchecked")

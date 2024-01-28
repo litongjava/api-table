@@ -5,14 +5,17 @@ import com.jfinal.kit.Kv;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class DataPageRequest {
   private Integer pageNo, pageSize;
+
+  public DataPageRequest() {
+    this.pageNo = 1;
+    this.pageSize = 10;
+  }
 
   public DataPageRequest(Kv kv) {
     Object pageNo = kv.remove("page_no");
