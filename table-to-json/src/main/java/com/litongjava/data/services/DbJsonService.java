@@ -147,7 +147,8 @@ public class DbJsonService {
    * @return
    */
   public DbJsonBean<List<Record>> listAll(String tableName) {
-    return listAll(tableName);
+    DbPro dbPro = Db.use();
+    return listAll(dbPro,tableName);
   }
 
   /**
@@ -157,7 +158,7 @@ public class DbJsonService {
    * @return
    */
   public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName) {
-    List<Record> records = Db.find("select * from " + tableName);
+    List<Record> records = dbPro.find("select * from " + tableName);
     if (records.size() < 1) {
       List<DbTableStruct> columns = dbService.columns(tableName);
       Record record = new Record();
