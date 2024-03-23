@@ -27,6 +27,7 @@
       <artifactId>fastjson2</artifactId>
       <version>2.0.12</version>
     </dependency>
+
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>tio-boot</artifactId>
@@ -38,6 +39,7 @@
       <artifactId>tio-utils</artifactId>
       <version>3.7.3.v20240401-RELEASE</version>
     </dependency>
+
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>table-to-json</artifactId>
@@ -50,6 +52,7 @@
       <artifactId>druid</artifactId>
       <version>1.1.10</version>
     </dependency>
+
     <!-- 数据库驱动 -->
     <dependency>
       <groupId>mysql</groupId>
@@ -62,7 +65,6 @@
       <artifactId>hotswap-classloader</artifactId>
       <version>${hotswap-classloader.version}</version>
     </dependency>
-
 
     <dependency>
       <groupId>junit</groupId>
@@ -84,13 +86,7 @@
       <optional>true</optional>
       <scope>provided</scope>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>com.litongjava</groupId>
-      <artifactId>hotswap-classloader</artifactId>
-      <version>${hotswap-classloader.version}</version>
-    </dependency>
-    -->
+
   </dependencies>
   <profiles>
     <!-- 开发环境 -->

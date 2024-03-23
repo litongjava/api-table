@@ -9,11 +9,14 @@ import lombok.NoArgsConstructor;
 @Data
 public class DbJsonBean<T> {
 
-  private int code = 0; // 状态码
+  // 状态码 1 success 0 fail
+  private int code = 1;
 
-  private String msg; // 状态说明
+  // 状态说明
+  private String msg;
 
-  private T data; // 数据内容
+  // 数据内容
+  private T data;
 
   public DbJsonBean(T data) {
     this.data = data;

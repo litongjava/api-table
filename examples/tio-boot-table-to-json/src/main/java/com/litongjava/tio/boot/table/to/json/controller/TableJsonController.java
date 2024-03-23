@@ -140,7 +140,7 @@ public class TableJsonController {
     kv.set("deleted", 0);
 
     log.info("tableName:{},kv:{}", f, kv);
-    String filename = f + "_export" + System.currentTimeMillis() + ".xlsx";
+    String filename = f + "_export_" + System.currentTimeMillis() + ".xlsx";
 
     // 获取数据
     List<Record> records = dbJsonService.list(f, kv).getData();
@@ -154,7 +154,7 @@ public class TableJsonController {
   public HttpResponse exporAllExcel(String f, HttpRequest request) throws IOException, SQLException {
     log.info("tableName:{}", f);
     // 导出 Excel
-    String filename = f + "-all" + System.currentTimeMillis() + ".xlsx";
+    String filename = f + "-all_" + System.currentTimeMillis() + ".xlsx";
 
     // 获取数据
     List<Record> records = dbJsonService.listAll(f).getData();
@@ -166,7 +166,7 @@ public class TableJsonController {
 
   @RequestPath("/export-all-table-excel")
   public HttpResponse exporAllTableExcel(HttpRequest request) throws IOException, SQLException {
-    String filename = "all-table" + System.currentTimeMillis() + ".xlsx";
+    String filename = "all-table_" + System.currentTimeMillis() + ".xlsx";
     String[] tables = dbJsonService.getAllTableNames();
     int length = tables.length;
     LinkedHashMap<String, List<Record>> allTableData = new LinkedHashMap<>();
@@ -205,6 +205,12 @@ public class TableJsonController {
     return respVo;
   }
 
+  @RequestPath("/f-names")
+  public RespVo tableNames() throws IOException, SQLException {
+    String[] data = dbJsonService.tableNames().getData();
+    return RespVo.ok(data);
+  }
+
   @RequestPath("/{f}/f-config")
   public RespVo fConfig(String f, String lang) {
     log.info("tableName:{}", f);
@@ -215,9 +221,4 @@ public class TableJsonController {
 
   }
 
-  @RequestPath("/f-names")
-  public RespVo tableNames() throws IOException, SQLException {
-    String[] data = dbJsonService.tableNames().getData();
-    return RespVo.ok(data);
-  }
 }
