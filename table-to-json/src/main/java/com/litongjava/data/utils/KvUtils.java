@@ -12,14 +12,15 @@ import com.litongjava.jfinal.plugin.activerecord.Record;
 
 /**
  * @author litong
- * @date 2020年9月29日_下午1:19:01 
- * @version 1.0 
+ * @version 1.0
+ * @date 2020年9月29日_下午1:19:01
  * @desc
  */
 public class KvUtils {
 
   /**
    * 的上传kv中的空元素
+   *
    * @param kv
    */
   public static Kv removeEmptyValue(Kv kv) {
@@ -39,7 +40,8 @@ public class KvUtils {
 
   /**
    * 1.将Map中key由驼峰转为转为下划线
-   * 2.将Map转为Kv 
+   * 2.将Map转为Kv
+   *
    * @return
    */
   @SuppressWarnings("unchecked")
@@ -59,14 +61,14 @@ public class KvUtils {
     return kv;
   }
 
-  public static List<Kv> recordsToKv(List<Record> list) {
+  public static List<Kv> recordsToKv(List<Record> list,boolean underscoreToCamel) {
     return list.stream().map(record -> {
-      return recordToKv(record);
+      return recordToKv(record, underscoreToCamel);
     }).collect(Collectors.toList());
   }
 
-  public static Kv recordToKv(Record record) {
-    if(record==null) {
+  public static Kv recordToKv(Record record, boolean underscoreToCamel) {
+    if (record == null) {
       return null;
     }
     Map<String, Object> map = record.toMap();
@@ -80,7 +82,12 @@ public class KvUtils {
         map.put(entry.getKey(), entry.getValue().toString());
       }
     }
-    return KvUtils.underscoreToCamel(map);
+    if (underscoreToCamel) {
+      return KvUtils.underscoreToCamel(map);
+    } else {
+      return Kv.create().set(map);
+    }
+
   }
 
   public static List<Map<String, Object>> recordsToMap(List<Record> records) {
