@@ -66,12 +66,11 @@ public class TioRequestParamUtils {
 
     // Convert the lists to arrays and add them to the map
     listArrayToMap(map, arrayParams, paramType);
-
     return map;
   }
 
   private static void listArrayToMap(Map<String, Object> map, Map<String, List<Object>> arrayParams,
-      Map<String, Object> paramType) {
+                                     Map<String, Object> paramType) {
     for (Map.Entry<String, List<Object>> entry : arrayParams.entrySet()) {
       map.put(entry.getKey(), entry.getValue().toArray(new String[0]));
     }
@@ -84,9 +83,9 @@ public class TioRequestParamUtils {
         Object value = entry.getValue();
         if (value instanceof String) {
           if ("int".equals(value)) {
-            map.put(paramKey, Integer.parseInt((String) map.get(paramKey)));
+            map.put(paramKey, Integer.parseInt((String) paramValue));
           } else if ("long".equals(value)) {
-            map.put(paramKey, Long.parseLong((String) map.get(paramKey)));
+            map.put(paramKey, Long.parseLong((String) paramValue));
           }
         }
 
