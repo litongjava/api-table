@@ -53,16 +53,15 @@ public class DbJsonService {
     Record record = new Record();
     record.setColumns(kv);
 
-    String primarykeyName = primaryKeyService.getPrimaryKeyName(tableName);
-    if (kv.get(primarykeyName) == null) {
-      String id = null;
+    String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
+    if (kv.get(primaryKeyName) == null) {
       // 如果主键是varchar类型,插入uuid类型
       String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
       if (!StrKit.isBlank(primaryKeyColumnType)) {
         if (primaryKeyColumnType.startsWith("varchar")) {
-          id = UUIDUtils.random();
-          record.set(primarykeyName, id);
-        } else if (primaryKeyColumnType.startsWith("bigint")) {
+          String id = UUIDUtils.random();
+          record.set(primaryKeyName, id);
+        } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long") ) {
           // 如果主键是bigint (20)类型,插入雪花Id
           long threadId = Thread.currentThread().getId();
           if (threadId > 31) {
@@ -71,8 +70,8 @@ public class DbJsonService {
           if (threadId < 0) {
             threadId = 0;
           }
-          id = new SnowflakeIdGenerator(threadId, 0).generateId() + "";
-          record.set(primarykeyName, id);
+          long id = new SnowflakeIdGenerator(threadId, 0).generateId();
+          record.set(primaryKeyName, id);
         }
       }
     }
