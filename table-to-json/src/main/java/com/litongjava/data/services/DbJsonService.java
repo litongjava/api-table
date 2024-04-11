@@ -104,12 +104,11 @@ public class DbJsonService {
         return new DbJsonBean<>(-1, "id value can't be null");
       }
     } else { // 保存
-      String id = null;
       // 如果主键是varchar类型,插入uuid类型
       String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
       if (!StrKit.isBlank(primaryKeyColumnType)) {
         if (primaryKeyColumnType.startsWith("varchar")) {
-          id = UUIDUtils.random();
+          String id = UUIDUtils.random();
           record.set(primarykeyName, id);
         } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long")) {
           // 如果主键是bigint (20)类型,插入雪花Id
@@ -120,7 +119,7 @@ public class DbJsonService {
           if (threadId < 0) {
             threadId = 0;
           }
-          id = new SnowflakeIdGenerator(threadId, 0).generateId() + "";
+          long id = new SnowflakeIdGenerator(threadId, 0).generateId();
           record.set(primarykeyName, id);
         }
       }
