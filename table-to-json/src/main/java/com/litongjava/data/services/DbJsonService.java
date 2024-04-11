@@ -111,7 +111,7 @@ public class DbJsonService {
         if (primaryKeyColumnType.startsWith("varchar")) {
           id = UUIDUtils.random();
           record.set(primarykeyName, id);
-        } else if (primaryKeyColumnType.startsWith("bigint")) {
+        } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long")) {
           // 如果主键是bigint (20)类型,插入雪花Id
           long threadId = Thread.currentThread().getId();
           if (threadId > 31) {
