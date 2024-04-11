@@ -82,11 +82,15 @@ public class TioRequestParamUtils {
       if (StrKit.notNull(paramValue)) {
         Object value = entry.getValue();
         if (value instanceof String) {
-          if ("int".equals(value)) {
-            map.put(paramKey, Integer.parseInt((String) paramValue));
-          } else if ("long".equals(value)) {
-            map.put(paramKey, Long.parseLong((String) paramValue));
+          String stringValue = (String) paramValue;
+          if (StrKit.notBlank(stringValue)) {
+            if ("int".equals(value)) {
+              map.put(paramKey, Integer.parseInt(stringValue));
+            } else if ("long".equals(value)) {
+              map.put(paramKey, Long.parseLong(stringValue));
+            }
           }
+
         }
 
       }
