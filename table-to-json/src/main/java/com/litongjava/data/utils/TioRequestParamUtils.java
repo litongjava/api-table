@@ -108,8 +108,8 @@ public class TioRequestParamUtils {
               map.put(paramKey, DateParseUtils.parseIso8601Date(stringValue));
             }
           }
-        } else if (parmTypeValue instanceof com.alibaba.fastjson2.JSONArray) {
-          com.alibaba.fastjson2.JSONArray array = (com.alibaba.fastjson2.JSONArray) parmTypeValue;
+        } else if (paramValue instanceof com.alibaba.fastjson2.JSONArray) {
+          com.alibaba.fastjson2.JSONArray array = (com.alibaba.fastjson2.JSONArray) paramValue;
 
           if ("string[]".equals(parmTypeValue)) {
             map.put(paramKey, array.toArray(new String[0]));
