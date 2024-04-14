@@ -18,6 +18,10 @@ public class TioRequestParamUtils {
   static {
     types.add("int");
     types.add("long");
+    types.add("int[]");
+    types.add("long[]");
+    types.add("string[]");
+    types.add("ISO8601");
   }
 
   public static Map<String, Object> getRequestMap(HttpRequest request) {
@@ -55,7 +59,7 @@ public class TioRequestParamUtils {
           arrayParams.put(arrayName, new ArrayList<>());
         }
         arrayParams.get(arrayName).add(paramValue);
-      } else if (paramName.endsWith("Type") && types.contains(paramValue)) {
+      } else if (paramName.endsWith("Type") || paramName.endsWith("type") && types.contains(paramValue)) {
         // 前端传递指定数缺定数据类型
         paramType.put(paramName, paramValue);
       } else {
@@ -65,34 +69,56 @@ public class TioRequestParamUtils {
     }
 
     // Convert the lists to arrays and add them to the map
-    listArrayToMap(map, arrayParams, paramType);
+    convertValueType(map, arrayParams, paramType);
     return map;
   }
 
-  private static void listArrayToMap(Map<String, Object> map, Map<String, List<Object>> arrayParams,
-                                     Map<String, Object> paramType) {
+  public static void convertValueType(Map<String, Object> map, Map<String, List<Object>> arrayParams,
+      Map<String, Object> paramType) {
+    // convert type
     for (Map.Entry<String, List<Object>> entry : arrayParams.entrySet()) {
       map.put(entry.getKey(), entry.getValue().toArray(new String[0]));
     }
+    // convert type
     for (Map.Entry<String, Object> entry : paramType.entrySet()) {
+      // idType=long
       String typeKey = entry.getKey();
+      // 支持id_type and idType
       int lastIndexOf = typeKey.lastIndexOf("Type");
-      String paramKey = typeKey.substring(0, lastIndexOf);
+      String paramKey = null;
+      if (lastIndexOf != -1) {
+        paramKey = typeKey.substring(0, lastIndexOf);
+      } else {
+        lastIndexOf = typeKey.lastIndexOf("_");
+        paramKey = typeKey.substring(0, lastIndexOf);
+      }
       Object paramValue = map.get(paramKey);
+
       if (StrKit.notNull(paramValue)) {
-        Object value = entry.getValue();
-        if (value instanceof String) {
+        Object parmTypeValue = entry.getValue();
+
+        if (paramValue instanceof String) {
           String stringValue = (String) paramValue;
           if (StrKit.notBlank(stringValue)) {
-            if ("int".equals(value)) {
+            if ("int".equals(parmTypeValue)) {
               map.put(paramKey, Integer.parseInt(stringValue));
-            } else if ("long".equals(value)) {
+            } else if ("long".equals(parmTypeValue)) {
               map.put(paramKey, Long.parseLong(stringValue));
+            } else if ("ISO8601".equals(parmTypeValue)) {
+              map.put(paramKey, DateParseUtils.parseIso8601Date(stringValue));
             }
           }
+        } else if (parmTypeValue instanceof com.alibaba.fastjson2.JSONArray) {
+          com.alibaba.fastjson2.JSONArray array = (com.alibaba.fastjson2.JSONArray) parmTypeValue;
 
+          if ("string[]".equals(parmTypeValue)) {
+            map.put(paramKey, array.toArray(new String[0]));
+          } else if ("int[]".equals(parmTypeValue)) {
+            map.put(paramKey, array.toArray(new Integer[0]));
+          } else if ("long[]".equals(parmTypeValue)) {
+            map.put(paramKey, array.toArray(new Long[0]));
+          }
         }
-
       }
     }
   }
