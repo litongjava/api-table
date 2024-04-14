@@ -40,7 +40,6 @@ public class DbJsonService {
   }
 
   /**
-   * 
    * @param tableName
    * @param kv
    * @param jsonFields
@@ -61,7 +60,7 @@ public class DbJsonService {
         if (primaryKeyColumnType.startsWith("varchar")) {
           String id = UUIDUtils.random();
           record.set(primaryKeyName, id);
-        } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long") ) {
+        } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long")) {
           // 如果主键是bigint (20)类型,插入雪花Id
           long threadId = Thread.currentThread().getId();
           if (threadId > 31) {
@@ -92,24 +91,24 @@ public class DbJsonService {
     Record record = new Record();
     record.setColumns(kv);
 
-    String primarykeyName = primaryKeyService.getPrimaryKeyName(tableName);
-    if (kv.containsKey(primarykeyName)) { // 更新
-      String idValue = kv.getStr(primarykeyName);
+    String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
+    if (kv.containsKey(primaryKeyName)) { // 更新
+      String idValue = kv.getStr(primaryKeyName);
       if (!StrKit.isBlank(idValue)) {
-        Db.update(tableName, primarykeyName, record, jsonFields);
+        Db.update(tableName, primaryKeyName, record, jsonFields);
         DbJsonBean<Kv> dbJsonBean = new DbJsonBean<>();
-        dbJsonBean.setData(Kv.by(primarykeyName, idValue));
+        dbJsonBean.setData(Kv.by(primaryKeyName, idValue));
         return dbJsonBean;
       } else {
         return new DbJsonBean<>(-1, "id value can't be null");
       }
     } else { // 保存
-      // 如果主键是varchar类型,插入uuid类型
+      // 如果主键是varchar类型,插入uuid类型 不处理uuid类型.如果是uuid类型,让数据库自动生成
       String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
       if (!StrKit.isBlank(primaryKeyColumnType)) {
-        if (primaryKeyColumnType.startsWith("varchar")) {
+        if (primaryKeyColumnType.startsWith("varchar") || primaryKeyColumnType.startsWith("text")) {
           String id = UUIDUtils.random();
-          record.set(primarykeyName, id);
+          record.set(primaryKeyName, id);
         } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long")) {
           // 如果主键是bigint (20)类型,插入雪花Id
           long threadId = Thread.currentThread().getId();
@@ -120,7 +119,7 @@ public class DbJsonService {
             threadId = 0;
           }
           long id = new SnowflakeIdGenerator(threadId, 0).generateId();
-          record.set(primarykeyName, id);
+          record.set(primaryKeyName, id);
         }
       }
 
@@ -140,17 +139,17 @@ public class DbJsonService {
   }
 
   /**
-   * 
    * @param tableName
    * @return
    */
   public DbJsonBean<List<Record>> listAll(String tableName) {
     DbPro dbPro = Db.use();
-    return listAll(dbPro,tableName);
+    return listAll(dbPro, tableName);
   }
 
   /**
    * 无任何条件过滤,包含所有数据
+   *
    * @param dbPro
    * @param tableName
    * @return
@@ -158,7 +157,7 @@ public class DbJsonService {
   public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName) {
     List<Record> records = dbPro.find("select * from " + tableName);
     if (records.size() < 1) {
-      List<DbTableStruct> columns = dbService.columns(tableName);
+      List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(tableName);
       Record record = new Record();
       for (DbTableStruct struct : columns) {
         record.set(struct.getField(), null);
@@ -188,7 +187,6 @@ public class DbJsonService {
   }
 
   /**
-   * 
    * @param dbPro
    * @param tableName
    * @param queryParam
@@ -227,9 +225,8 @@ public class DbJsonService {
   }
 
   /**
-  * 
-  * @return
-  */
+   * @return
+   */
   public DbJsonBean<Page<Record>> page(DbPro dbPro, Kv kv) {
     String tableName = (String) kv.remove("table_name");
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
@@ -270,7 +267,8 @@ public class DbJsonService {
 
   /**
    * 分页查询
-   * @param dbPro 
+   *
+   * @param dbPro
    * @param tableName
    * @param pageRequest
    * @param queryParam
@@ -315,11 +313,10 @@ public class DbJsonService {
   }
 
   /**
-   * 
    * @param dbPro
    * @param tableName
    * @param queryParam
-   * @return 
+   * @return
    */
   public DbJsonBean<Record> findFirst(DbPro dbPro, String tableName, Kv queryParam) {
     if (dbPro == null) {

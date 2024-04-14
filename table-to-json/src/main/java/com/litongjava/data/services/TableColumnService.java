@@ -52,7 +52,7 @@ public class TableColumnService {
    */
   private boolean getColumnsToMap(String tableName, String column) {
     boolean ret = false;
-    List<DbTableStruct> listRecord = dbService.columns(tableName);
+    List<DbTableStruct> listRecord = dbService.getTableColumnsOfMysql(tableName);
     List<String> columns = new ArrayList<>();
     for (DbTableStruct record : listRecord) {
       String field = record.getField();

@@ -11,7 +11,7 @@ import com.litongjava.jfinal.plugin.activerecord.dialect.Dialect;
 import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
 
 /**
- * @author bill robot
+ * @author Tong Li
  * @version 1.0
  * @date 2020年8月27日_下午2:55:52
  * @desc
@@ -22,25 +22,23 @@ public class DbService {
     List<DbTableStruct> ret = new ArrayList<>();
 
     Dialect dialect = DbKit.getConfig().getDialect();
+    List<DbTableStruct> columns = null;
     if (dialect instanceof PostgreSqlDialect) {
-      DbTableStruct dbTableStruct = new DbTableStruct();
-      dbTableStruct.setField("id");
-      dbTableStruct.setType("long");
-      dbTableStruct.setKey("PRI");
-      ret.add(dbTableStruct);
-    } else {
-      List<DbTableStruct> columns = columns(tableName);
+      columns = getTableColumnsOfPostgre(tableName, "public");
 
-      // 遍历出主键,添加到ret中
-      for (DbTableStruct record : columns) {
-        String key = record.getKey();
-        if ("PRI".equals(key)) {
-          DbTableStruct tableColumn = new DbTableStruct();
-          tableColumn.setField(record.getField());
-          tableColumn.setType(record.getType());
-          tableColumn.setKey(key);
-          ret.add(tableColumn);
-        }
+    } else {
+      columns = getTableColumnsOfMysql(tableName);
+    }
+
+    // 遍历出主键,添加到ret中
+    for (DbTableStruct record : columns) {
+      String key = record.getKey();
+      if ("PRI".equals(key)) {
+        DbTableStruct tableColumn = new DbTableStruct();
+        tableColumn.setField(record.getField());
+        tableColumn.setType(record.getType());
+        tableColumn.setKey(key);
+        ret.add(tableColumn);
       }
     }
 
@@ -73,7 +71,7 @@ public class DbService {
    * @param tableName
    * @return {"Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra": "auto_increment", "Default": null, "Key": "PRI" },
    */
-  public List<DbTableStruct> columns(String tableName) {
+  public List<DbTableStruct> getTableColumnsOfMysql(String tableName) {
     List<DbTableStruct> ret = new ArrayList<>();
 
     String sql = null;
@@ -109,6 +107,33 @@ public class DbService {
       }
     }
 
+
+    return ret;
+  }
+
+  public List<DbTableStruct> getTableColumnsOfPostgre(String tableName, String tableSchema) {
+    List<DbTableStruct> ret = new ArrayList<>();
+
+    String sql = "SELECT column_name as field, data_type as type, is_nullable as isNull, " +
+      "column_default as defaultValue, " +
+      "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name " +
+      "FROM information_schema.key_column_usage AS kcu " +
+      "JOIN information_schema.table_constraints AS tc " +
+      "ON kcu.constraint_name = tc.constraint_name " +
+      "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key " +
+      "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
+
+    List<Record> columns = Db.find(sql, tableName, tableName, tableSchema);
+
+    for (Record record : columns) {
+      DbTableStruct tableColumn = new DbTableStruct();
+      tableColumn.setField(record.getStr("field"));
+      tableColumn.setType(record.getStr("type"));
+      tableColumn.setIsNull(record.getStr("isNull"));
+      tableColumn.setDefaultValue(record.getStr("defaultValue"));
+      tableColumn.setKey(record.getStr("key"));
+      ret.add(tableColumn);
+    }
 
     return ret;
   }

@@ -37,7 +37,7 @@ public class DbTableService {
    * @return
    */
   public Map<String, Object> getTableConfig(String f, String tableName, String lang) {
-    List<DbTableStruct> columns = dbService.columns(tableName);
+    List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(tableName);
     List<Map<String, Object>> queryItems = new ArrayList<>(columns.size());
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
     List<Map<String, Object>> formItems = new ArrayList<>(columns.size());
