@@ -31,10 +31,13 @@ public class OperatorConstants {
   public static final String IL = "il";
   // not in
   public static final String NI = "ni";
-  // not null
+  // is null
   public static final String NL = "nl";
+  // is not null
+  public static final String NN = "nn";
   // empty
   public static final String EY = "ey";
   // not empty
   public static final String NY = "ny";
+
 }

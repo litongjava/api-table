@@ -1,11 +1,13 @@
 package com.litongjava.data.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.litongjava.tio.utils.json.Json;
 
 public class TioRequestParamUtilsForDateTest {
@@ -24,5 +26,18 @@ public class TioRequestParamUtilsForDateTest {
 
     TioRequestParamUtils.convertValueType(parseToMap, arrayParams, paramType);
     System.out.println(parseToMap);
+  }
+
+  @Test
+  public void isJsonArrayInstanceOfObjectArray() {
+    Object jsonArray = new JSONArray();
+    if (jsonArray instanceof Object[]) {
+      System.out.println("true");
+    }
+    if(jsonArray instanceof ArrayList) {
+      System.out.println("true");
+    }
+    System.out.println();
+
   }
 }

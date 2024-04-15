@@ -8,7 +8,6 @@ import java.util.Map;
 
 import com.jfinal.kit.Kv;
 import com.litongjava.data.model.DataQueryRequest;
-import com.litongjava.data.model.Operator;
 import com.litongjava.data.model.Sql;
 import com.litongjava.data.utils.ObjectUtils;
 
@@ -96,28 +95,35 @@ public class DbSqlService {
       }
     }
 
-    List<Operator> operators = new ArrayList<>();
     for (Map.Entry<String, Object> e : notEqualsMap.entrySet()) {
       String key = e.getKey();
       String field = key.substring(0, key.lastIndexOf("_"));
-      operators.add(new Operator(field, (String) e.getValue(), kv.remove(field)));
+
+      operatorService.addOperator(sql, paramList, field, (String) e.getValue(), kv);
+      //operators.add(new Operator(field, (String) e.getValue(), kv.remove(field)));
     }
 
     @SuppressWarnings("unchecked")
     Iterator<Map.Entry<String, Object>> iterator2 = kv.entrySet().iterator();
     while (iterator2.hasNext()) {
       Map.Entry<String, Object> entry = iterator2.next();
-      Object value = entry.getValue();
-      if(!ObjectUtils.isEmpyt(value)) {
-        operatorService.addWhereField(sql, entry.getKey(), "=");
-        paramList.add(value);  
+      String fieldName = entry.getKey();
+      if (fieldName.endsWith("_logic")) {
+        continue;
       }
-      
-    }
+      Object fieldValue = entry.getValue();
+      if (!ObjectUtils.isEmpty(fieldValue)) {
+        String logic = (String) kv.get(fieldName + "_logic");
+        if ("or".equals(logic)) {
+          operatorService.addWhereOrField(sql, fieldName, "=");
+        } else {
+          operatorService.addWhereAndField(sql, fieldName, "=");
+        }
+        paramList.add(fieldValue);
+        iterator2.remove();
+      }
 
-    operators.forEach(it -> {
-      operatorService.addOperator(sql, paramList, it.getField(), it.getValue(), it.getOprator());
-    });
+    }
 
     // 数组类型
     if (paramList.size() > 0) {
