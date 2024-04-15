@@ -95,27 +95,27 @@ public class TioRequestParamUtils {
       Object paramValue = map.get(paramKey);
 
       if (StrKit.notNull(paramValue)) {
-        Object parmTypeValue = entry.getValue();
+        Object paramTypeValue = entry.getValue();
 
         if (paramValue instanceof String) {
           String stringValue = (String) paramValue;
           if (StrKit.notBlank(stringValue)) {
-            if ("int".equals(parmTypeValue)) {
+            if ("int".equals(paramTypeValue)) {
               map.put(paramKey, Integer.parseInt(stringValue));
-            } else if ("long".equals(parmTypeValue)) {
+            } else if ("long".equals(paramTypeValue)) {
               map.put(paramKey, Long.parseLong(stringValue));
-            } else if ("ISO8601".equals(parmTypeValue)) {
+            } else if ("ISO8601".equals(paramTypeValue)) {
               map.put(paramKey, DateParseUtils.parseIso8601Date(stringValue));
             }
           }
-        } else if (paramValue instanceof com.alibaba.fastjson2.JSONArray) {
-          com.alibaba.fastjson2.JSONArray array = (com.alibaba.fastjson2.JSONArray) paramValue;
+        } else if (paramValue instanceof List) {
+          List<Object> array = (List<Object>) paramValue;
 
-          if ("string[]".equals(parmTypeValue)) {
+          if ("string[]".equals(paramTypeValue)) {
             map.put(paramKey, array.toArray(new String[0]));
-          } else if ("int[]".equals(parmTypeValue)) {
+          } else if ("int[]".equals(paramTypeValue)) {
             map.put(paramKey, array.toArray(new Integer[0]));
-          } else if ("long[]".equals(parmTypeValue)) {
+          } else if ("long[]".equals(paramTypeValue)) {
             map.put(paramKey, array.toArray(new Long[0]));
           }
         }

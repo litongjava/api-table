@@ -3,6 +3,7 @@ package com.litongjava.data.services;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
@@ -92,12 +93,25 @@ public class DbJsonService {
     record.setColumns(kv);
 
     String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
-    if (kv.containsKey(primaryKeyName)) { // 更新
-      String idValue = kv.getStr(primaryKeyName);
+    if (kv.containsKey(primaryKeyName)) { // update
+      String idValue = record.getStr(primaryKeyName);
+
       if (!StrKit.isBlank(idValue)) {
-        Db.update(tableName, primaryKeyName, record, jsonFields);
+        String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
+        boolean update = false;
+        if ("uuid".equals(primaryKeyColumnType)) {
+          UUID idUUID = UUID.fromString(idValue);
+          record.set(primaryKeyName, idUUID);
+          update = Db.update(tableName, primaryKeyName, record, jsonFields);
+
+        } else {
+          update = Db.update(tableName, primaryKeyName, record, jsonFields);
+        }
+
+        Kv by = Kv.by(primaryKeyName, idValue);
+        by.set("update", update);
         DbJsonBean<Kv> dbJsonBean = new DbJsonBean<>();
-        dbJsonBean.setData(Kv.by(primaryKeyName, idValue));
+        dbJsonBean.setData(by);
         return dbJsonBean;
       } else {
         return new DbJsonBean<>(-1, "id value can't be null");
