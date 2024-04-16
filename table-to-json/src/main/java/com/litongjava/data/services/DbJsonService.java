@@ -551,4 +551,13 @@ public class DbJsonService {
   }
 
 
+  /**
+   * Ant design procomponents proTableColumns
+   */
+  public DbJsonBean<Map<String, Object>> proTableColumns(String f) {
+    if (StrKit.isBlank(f)) {
+      return new DbJsonBean<>(-1, "tableName can't be empty");
+    }
+    return new DbJsonBean<>(dbTableService.proTableColumns(f));
+  }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.model.DbTableStruct;
 import com.litongjava.jfinal.plugin.activerecord.Record;
 
@@ -27,6 +28,38 @@ public class DbTableService {
       retval[i] = (String) tables.get(i).getColumnValues()[0];
     }
     return retval;
+  }
+
+  public Map<String, Object> proTableColumns(String f) {
+    List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(f);
+    List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
+    for (DbTableStruct record : columns) {
+      String field = record.getField();
+      String fieldType = record.getType();
+
+      // {name: 'Name', key: 'name', type: 'el-input', placeholder: '请输入 Name'},
+      String name = getName(field);
+      String key = getKey(field);
+      String type = getType(fieldType);
+
+      if (type.equals("date")) {
+        type = "datetime";
+      } else {
+        type = "text";
+      }
+
+      Map<String, Object> tableItem = new LinkedHashMap<>();
+      tableItem.put("title", name);
+      tableItem.put("dataIndex", key);
+      tableItem.put("valueType", type);
+      tableItems.add(tableItem);
+    }
+    LinkedHashMap<String, Object> table = new LinkedHashMap<String, Object>();
+    table.put("items", tableItems);
+
+    Map<String, Object> config = new LinkedHashMap<>();
+    config.put("table", table);
+    return config;
   }
 
   /**
