@@ -197,4 +197,5 @@ public class DbJsonServiceTest {
     DbJsonBean<List<Record>> result = dbJsonService.query(sql, id);
     System.out.println(result);
   }
+
 }

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class DbJsonBean<T> {
-
   // 状态码 1 success 0 fail
   private int code = 1;
 

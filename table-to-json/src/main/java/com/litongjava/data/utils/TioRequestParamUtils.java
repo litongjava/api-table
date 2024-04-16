@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.jfinal.kit.StrKit;
 import com.litongjava.tio.http.common.HttpRequest;
@@ -74,7 +75,7 @@ public class TioRequestParamUtils {
   }
 
   public static void convertValueType(Map<String, Object> map, Map<String, List<Object>> arrayParams,
-      Map<String, Object> paramType) {
+                                      Map<String, Object> paramType) {
     // convert type
     for (Map.Entry<String, List<Object>> entry : arrayParams.entrySet()) {
       map.put(entry.getKey(), entry.getValue().toArray(new String[0]));
@@ -110,13 +111,23 @@ public class TioRequestParamUtils {
           }
         } else if (paramValue instanceof List) {
           List<Object> array = (List<Object>) paramValue;
+          int size = array.size();
 
           if ("string[]".equals(paramTypeValue)) {
             map.put(paramKey, array.toArray(new String[0]));
           } else if ("int[]".equals(paramTypeValue)) {
-            map.put(paramKey, array.toArray(new Integer[0]));
+            Integer[] values = new Integer[size];
+            for (int i = 0; i < size; i++) {
+              values[i] = Integer.parseInt((String) array.get(i));
+            }
+            map.put(paramKey, values);
           } else if ("long[]".equals(paramTypeValue)) {
-            map.put(paramKey, array.toArray(new Long[0]));
+            //List<Long> collect = array.stream().map((item) -> Long.parseLong((String) item)).collect(Collectors.toList());
+            Long[] values = new Long[size];
+            for (int i = 0; i < size; i++) {
+              values[i] = Long.parseLong((String) array.get(i));
+            }
+            map.put(paramKey, values);
           }
         }
       }

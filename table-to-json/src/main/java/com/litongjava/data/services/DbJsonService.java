@@ -1,9 +1,6 @@
 package com.litongjava.data.services;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
@@ -146,6 +143,28 @@ public class DbJsonService {
     }
 
   }
+
+
+  public DbJsonBean<Kv> batchUpdateByIds(String f, Kv kv) {
+    DbPro dbPro = Db.use();
+    return batchUpdateByIds(dbPro, f, kv);
+  }
+
+  public DbJsonBean<Kv> batchUpdateByIds(DbPro dbPro, String tableName, Kv kv) {
+    Object[] ids = kv.getAs("ids", new Object[0]);
+    kv.remove("ids");
+    String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
+    List<Record> lists = new ArrayList<>();
+    for (Object id : ids) {
+      Record record = new Record();
+      record.setColumns(kv.toMap());
+      record.set(primaryKeyName, id);
+      lists.add(record);
+    }
+    int[] results = dbPro.batchUpdate(tableName, lists, lists.size());
+    return new DbJsonBean<>(Kv.by("data", results));
+  }
+
 
   public DbJsonBean<Kv> saveOrUpdate(Kv kv) {
     String tableName = (String) kv.remove("table_name");
@@ -368,15 +387,14 @@ public class DbJsonService {
 
   public DbJsonBean<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag) {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
-    String upateTemplate = "update %s set %s=%s where %s =?";
-    String sql = String.format(upateTemplate, tableName, delColumn, flag, primaryKey);
+    String updateSqlTemplate = "update %s set %s=%s where %s =?";
+    String sql = String.format(updateSqlTemplate, tableName, delColumn, flag, primaryKey);
     int updateResult = Db.update(sql, id);
     if (updateResult > 0) {
       return new DbJsonBean<>();
     } else {
       return DbJsonBean.fail(-1, "update fail");
     }
-
   }
 
   public DbJsonBean<Boolean> updateIsDelFlagById(String tableName, Object id) {
@@ -531,5 +549,6 @@ public class DbJsonService {
     }
     return new DbJsonBean<>(find);
   }
+
 
 }
