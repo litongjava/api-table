@@ -51,7 +51,7 @@ public class DbSqlService {
     String groupBy = queryRequest.getGroupBy();
 
     if (orderBy != null) {
-      where.append(" order by " + orderBy);
+      where.append(" order by ").append(orderBy);
     }
 
     if (isAsc != null && !isAsc) {
@@ -59,7 +59,7 @@ public class DbSqlService {
     }
 
     if (groupBy != null) {
-      where.append(" group by " + groupBy);
+      where.append(" group by ").append(groupBy);
     }
 
     whereClause.setWhere(where);

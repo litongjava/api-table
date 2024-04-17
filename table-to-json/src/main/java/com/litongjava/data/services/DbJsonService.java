@@ -30,7 +30,8 @@ public class DbJsonService {
   private DbService dbService = new DbService();
 
   public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv) {
-    return this.saveOrUpdate(tableName, kv, null);
+    String[] jsonFields = (String[]) kv.remove("json_fields");
+    return this.saveOrUpdate(tableName, kv, jsonFields);
   }
 
   public DbJsonBean<Kv> save(String tableName, Kv kv) {

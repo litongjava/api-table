@@ -115,8 +115,6 @@ public class OperatorService {
         addWhereNotEmptyField(where, fieldName);
       }
     }
-
-
   }
 
 
