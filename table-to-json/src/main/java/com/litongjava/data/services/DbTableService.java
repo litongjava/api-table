@@ -39,7 +39,6 @@ public class DbTableService {
 
       // {name: 'Name', key: 'name', type: 'el-input', placeholder: '请输入 Name'},
       String name = getName(field);
-      String key = getKey(field);
       String type = getType(fieldType);
 
       if (type.equals("date")) {
@@ -50,7 +49,7 @@ public class DbTableService {
 
       Map<String, Object> tableItem = new LinkedHashMap<>();
       tableItem.put("title", name);
-      tableItem.put("dataIndex", key);
+      tableItem.put("dataIndex", field);
       tableItem.put("valueType", type);
       tableItems.add(tableItem);
     }

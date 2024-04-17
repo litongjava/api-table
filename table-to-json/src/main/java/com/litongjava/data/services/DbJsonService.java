@@ -277,6 +277,16 @@ public class DbJsonService {
   }
 
   /**
+   * @param tableName
+   * @return
+   */
+  public DbJsonBean<Page<Record>> page(String tableName) {
+    Kv kv = Kv.create();
+    DataPageRequest dataPageRequest = new DataPageRequest(kv);
+    return page(tableName, dataPageRequest, kv);
+  }
+
+  /**
    * @param dbPro
    * @param f
    * @param kv
@@ -313,6 +323,7 @@ public class DbJsonService {
     }
     Integer pageNo = pageRequest.getPageNo();
     Integer pageSize = pageRequest.getPageSize();
+    String[] jsonFields = (String[]) queryParam.remove("json_fields");
 
     DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
 
@@ -325,10 +336,18 @@ public class DbJsonService {
     String sqlExceptSelect = sql.getSqlExceptSelect();
     Page<Record> listPage = null;
     if (params == null) {
-      listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect);
-
+      if (jsonFields != null && jsonFields.length > 0) {
+        listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields);
+      } else {
+        listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect);
+      }
     } else {
-      listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, params.toArray());
+      if (jsonFields != null && jsonFields.length > 0) {
+        listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields, params.toArray());
+      } else {
+        listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, params.toArray());
+      }
+
     }
     return new DbJsonBean<>(listPage);
 
@@ -357,13 +376,21 @@ public class DbJsonService {
     }
 
     String columns = (String) queryParam.remove("columns");
+    String[] jsonFields = (String[]) queryParam.remove("json_fields");
+
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereQueryClause(queryParam);
     sql.setColumns(columns);
     sql.setTableName(tableName);
 
     // 添加操作表
-    Record record = dbPro.findFirst(sql.getsql(), sql.getParams().toArray());
+    Record record = null;
+    if (jsonFields != null && jsonFields.length > 0) {
+      record = dbPro.findFirstJsonField(sql.getsql(), jsonFields, sql.getParams().toArray());
+    } else {
+      record = dbPro.findFirst(sql.getsql(), sql.getParams().toArray());
+    }
+
     return new DbJsonBean<Record>(record);
 
   }
@@ -374,6 +401,13 @@ public class DbJsonService {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     kv.put(primaryKey, idValue);
     return get(tableName, kv);
+  }
+
+  @SuppressWarnings("unchecked")
+  public DbJsonBean<Record> getById(String tableName, Object idValue) {
+    // 获取主键名称
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    return get(tableName, Kv.by(primaryKey, idValue));
   }
 
   public DbJsonBean<Boolean> delById(String tableName, Object id) {
