@@ -35,7 +35,6 @@ public class TioRequestParamUtils {
     Map<String, Object> paramType = new HashMap<>();
 
     if (contentType != null && contentType.contains("application/json")) {
-      // throw new RuntimeException("unspupport: application/json");
       String bodyString = request.getBodyString();
       requestMap = Json.getJson().parseToMap(bodyString, String.class, Object.class);
     } else {
