@@ -1,6 +1,10 @@
 package com.litongjava.data.services;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
@@ -145,7 +149,6 @@ public class DbJsonService {
 
   }
 
-
   public DbJsonBean<Kv> batchUpdateByIds(String f, Kv kv) {
     DbPro dbPro = Db.use();
     return batchUpdateByIds(dbPro, f, kv);
@@ -165,7 +168,6 @@ public class DbJsonService {
     int[] results = dbPro.batchUpdate(tableName, lists, lists.size());
     return new DbJsonBean<>(Kv.by("data", results));
   }
-
 
   public DbJsonBean<Kv> saveOrUpdate(Kv kv) {
     String tableName = (String) kv.remove("table_name");
@@ -230,6 +232,7 @@ public class DbJsonService {
     if (dbPro == null) {
       dbPro = Db.use();
     }
+    String[] jsonFields = (String[]) queryParam.remove("json_fields");
     DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
@@ -241,9 +244,19 @@ public class DbJsonService {
     // 添加操作表
     List<Record> list = null;
     if (params == null) {
-      list = dbPro.find(sql.getsql());
+      if (jsonFields != null) {
+        list = dbPro.findWithJsonFields(sql.getsql(), jsonFields);
+      } else {
+        list = dbPro.find(sql.getsql());
+      }
+
     } else {
-      list = dbPro.find(sql.getsql(), sql.getParams().toArray());
+      if (jsonFields != null) {
+        list = dbPro.findWithJsonField(sql.getsql(), jsonFields, sql.getParams().toArray());
+      } else {
+        list = dbPro.find(sql.getsql(), sql.getParams().toArray());
+      }
+
     }
     return new DbJsonBean<>(list);
   }
@@ -344,7 +357,8 @@ public class DbJsonService {
       }
     } else {
       if (jsonFields != null && jsonFields.length > 0) {
-        listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields, params.toArray());
+        listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields,
+            params.toArray());
       } else {
         listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, params.toArray());
       }
@@ -584,7 +598,6 @@ public class DbJsonService {
     }
     return new DbJsonBean<>(find);
   }
-
 
   /**
    * Ant design procomponents proTableColumns
