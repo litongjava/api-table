@@ -28,7 +28,5 @@ public class DataQueryRequest {
     } else {
       this.isAsc = Boolean.parseBoolean((String) remove);
     }
-
   }
-
 }

@@ -119,4 +119,19 @@ public class KvUtils {
     }
   }
 
+  /**
+   * json_fields
+   */
+  public static String[] getJsonFields(Kv kv) {
+    String[] jsonFields = null;
+    Object jsonFielsObject = kv.remove("json_fields");
+
+    if (jsonFielsObject instanceof String) {
+      jsonFields = ((String) jsonFielsObject).split(",");
+    } else if (jsonFielsObject instanceof String[]) {
+      jsonFields = (String[]) jsonFielsObject;
+    }
+    return jsonFields;
+  }
+
 }

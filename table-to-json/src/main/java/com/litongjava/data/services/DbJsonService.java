@@ -34,12 +34,13 @@ public class DbJsonService {
   private DbService dbService = new DbService();
 
   public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv) {
-    String[] jsonFields = (String[]) kv.remove("json_fields");
+    String[] jsonFields = KvUtils.getJsonFields(kv);
     return this.saveOrUpdate(tableName, kv, jsonFields);
   }
 
   public DbJsonBean<Kv> save(String tableName, Kv kv) {
-    return this.save(tableName, kv, null);
+    String[] jsonFields = KvUtils.getJsonFields(kv);
+    return this.save(tableName, kv, jsonFields);
   }
 
   /**
@@ -232,8 +233,9 @@ public class DbJsonService {
     if (dbPro == null) {
       dbPro = Db.use();
     }
-    String[] jsonFields = (String[]) queryParam.remove("json_fields");
     DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
+    String[] jsonFields = KvUtils.getJsonFields(queryParam);
+
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
     sql.setColumns(queryRequest.getColumns());
@@ -337,9 +339,9 @@ public class DbJsonService {
     }
     Integer pageNo = pageRequest.getPageNo();
     Integer pageSize = pageRequest.getPageSize();
-    String[] jsonFields = (String[]) queryParam.remove("json_fields");
 
     DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
+    String[] jsonFields = KvUtils.getJsonFields(queryParam);
 
     Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
     sql.setTableName(tableName);
@@ -390,20 +392,33 @@ public class DbJsonService {
       dbPro = Db.use();
     }
 
-    String columns = (String) queryParam.remove("columns");
-    String[] jsonFields = (String[]) queryParam.remove("json_fields");
+    DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
+    String[] jsonFields = KvUtils.getJsonFields(queryParam);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereQueryClause(queryParam);
-    sql.setColumns(columns);
+    Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
     sql.setTableName(tableName);
+    sql.setColumns(queryRequest.getColumns());
 
     // 添加操作表
     Record record = null;
+    List<Object> params = sql.getParams();
+
     if (jsonFields != null && jsonFields.length > 0) {
-      record = dbPro.findFirstJsonField(sql.getsql(), jsonFields, sql.getParams().toArray());
+
+      if (params == null) {
+        record = dbPro.findFirstJsonField(sql.getsql(), jsonFields);
+      } else {
+        record = dbPro.findFirstJsonField(sql.getsql(), jsonFields, params.toArray());
+      }
+
     } else {
-      record = dbPro.findFirst(sql.getsql(), sql.getParams().toArray());
+      if (params == null) {
+        record = dbPro.findFirst(sql.getsql());
+      } else {
+        record = dbPro.findFirst(sql.getsql(), params.toArray());
+      }
+
     }
 
     return new DbJsonBean<Record>(record);
