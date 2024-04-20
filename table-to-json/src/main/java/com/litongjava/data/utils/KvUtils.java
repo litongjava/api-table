@@ -93,4 +93,27 @@ public class KvUtils {
   public static List<Map<String, Object>> recordsToMap(List<Record> records) {
     return records.stream().map(record -> record.toMap()).collect(Collectors.toList());
   }
+  
+  /**
+   * 将kv中的键为is_开头的值为true转为1
+   *
+   * @param kv
+   */
+  @SuppressWarnings("unchecked")
+  public static void true21(Kv kv) {
+    Set<Map.Entry<String, Object>> entrySet = kv.entrySet();
+    for (Map.Entry<String, Object> e : entrySet) {
+      String key = e.getKey();
+      if (key.startsWith("is")) {
+        String str = kv.getStr(key);
+        // boolean b1 = Boolean.getBoolean(str); //str命名为true,但是返回false
+        if ("true".equalsIgnoreCase(str)) {
+          kv.put(key, 1);
+        } else {
+          kv.put(key, 0);
+        }
+      }
+    }
+  }
+
 }

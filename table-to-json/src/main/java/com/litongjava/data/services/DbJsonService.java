@@ -51,7 +51,7 @@ public class DbJsonService {
   @SuppressWarnings("unchecked")
   public DbJsonBean<Kv> save(String tableName, Kv kv, String[] jsonFields) {
     KvUtils.removeEmptyValue(kv);
-    true21(kv);
+    KvUtils.true21(kv);
     Record record = new Record();
     record.setColumns(kv);
 
@@ -90,7 +90,7 @@ public class DbJsonService {
   @SuppressWarnings("unchecked")
   public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv, String[] jsonFields) {
     KvUtils.removeEmptyValue(kv);
-    true21(kv);
+    KvUtils.true21(kv);
     Record record = new Record();
     record.setColumns(kv);
 
@@ -529,28 +529,6 @@ public class DbJsonService {
       }
     }
     return true;
-  }
-
-  /**
-   * 将kv中的键为is_开头的值为true转为1
-   *
-   * @param kv
-   */
-  @SuppressWarnings("unchecked")
-  private void true21(Kv kv) {
-    Set<Map.Entry<String, Object>> entrySet = kv.entrySet();
-    for (Map.Entry<String, Object> e : entrySet) {
-      String key = e.getKey();
-      if (key.startsWith("is")) {
-        String str = kv.getStr(key);
-        // boolean b1 = Boolean.getBoolean(str); //str命名为true,但是返回false
-        if ("true".equalsIgnoreCase(str)) {
-          kv.put(key, 1);
-        } else {
-          kv.put(key, 0);
-        }
-      }
-    }
   }
 
   /**
