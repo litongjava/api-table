@@ -61,7 +61,7 @@ public class KvUtils {
     return kv;
   }
 
-  public static List<Kv> recordsToKv(List<Record> list,boolean underscoreToCamel) {
+  public static List<Kv> recordsToKv(List<Record> list, boolean underscoreToCamel) {
     return list.stream().map(record -> {
       return recordToKv(record, underscoreToCamel);
     }).collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class KvUtils {
   public static List<Map<String, Object>> recordsToMap(List<Record> records) {
     return records.stream().map(record -> record.toMap()).collect(Collectors.toList());
   }
-  
+
   /**
    * 将kv中的键为is_开头的值为true转为1
    *
@@ -105,12 +105,15 @@ public class KvUtils {
     for (Map.Entry<String, Object> e : entrySet) {
       String key = e.getKey();
       if (key.startsWith("is")) {
-        String str = kv.getStr(key);
-        // boolean b1 = Boolean.getBoolean(str); //str命名为true,但是返回false
-        if ("true".equalsIgnoreCase(str)) {
-          kv.put(key, 1);
-        } else {
-          kv.put(key, 0);
+        Object object = kv.get(key);
+        if (object instanceof String) {
+          String str = kv.getStr(key);
+          // boolean b1 = Boolean.getBoolean(str); //str命名为true,但是返回false
+          if ("true".equalsIgnoreCase(str) || "1".equals(str)) {
+            kv.put(key, 1);
+          } else {
+            kv.put(key, 0);
+          }
         }
       }
     }
