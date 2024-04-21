@@ -337,6 +337,18 @@ public class DbJsonService {
     if (dbPro == null) {
       dbPro = Db.use();
     }
+    // process for primary key is uuid
+    DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(tableName);
+    String primaryKeyName = primaryKey.getField();
+
+    Object idValue = queryParam.get(primaryKeyName);
+    if (idValue != null) {
+      if ("uuid".equals(primaryKey.getType())) {
+        UUID idUUID = UUID.fromString((String) idValue);
+        queryParam.set(primaryKeyName, idUUID);
+      }
+    }
+
     Integer pageNo = pageRequest.getPageNo();
     Integer pageSize = pageRequest.getPageSize();
 
