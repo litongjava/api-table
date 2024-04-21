@@ -158,12 +158,23 @@ public class DbJsonService {
   public DbJsonBean<Kv> batchUpdateByIds(DbPro dbPro, String tableName, Kv kv) {
     Object[] ids = kv.getAs("ids", new Object[0]);
     kv.remove("ids");
-    String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
+    DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(tableName);
+    String primaryKeyName = primaryKey.getField();
+    String type = primaryKey.getType();
+    boolean isUuid = false;
+    if (type != null && type.startsWith("uuid")) {
+      isUuid = true;
+    }
     List<Record> lists = new ArrayList<>();
     for (Object id : ids) {
       Record record = new Record();
       record.setColumns(kv.toMap());
-      record.set(primaryKeyName, id);
+      if (isUuid) {
+        record.set(primaryKeyName, UUID.fromString((String) id));
+      } else {
+        record.set(primaryKeyName, id);
+      }
+
       lists.add(record);
     }
     int[] results = dbPro.batchUpdate(tableName, lists, lists.size());
