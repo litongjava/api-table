@@ -18,6 +18,7 @@ public class TioRequestParamUtils {
   static {
     types.add("int");
     types.add("long");
+    types.add("bool");
     types.add("int[]");
     types.add("long[]");
     types.add("string[]");
@@ -101,8 +102,13 @@ public class TioRequestParamUtils {
           if (StrKit.notBlank(stringValue)) {
             if ("int".equals(paramTypeValue)) {
               map.put(paramKey, Integer.parseInt(stringValue));
+              
             } else if ("long".equals(paramTypeValue)) {
               map.put(paramKey, Long.parseLong(stringValue));
+              
+            } else if ("bool".equals(paramTypeValue)) {
+              map.put(paramKey, Boolean.parseBoolean(stringValue));
+              
             } else if ("ISO8601".equals(paramTypeValue)) {
               map.put(paramKey, DateParseUtils.parseIso8601Date(stringValue));
             }
