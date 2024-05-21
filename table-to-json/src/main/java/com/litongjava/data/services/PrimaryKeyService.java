@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.litongjava.data.model.DbTableStruct;
+import com.litongjava.jfinal.plugin.activerecord.Db;
+import com.litongjava.jfinal.plugin.activerecord.DbPro;
 
 /**
  * @author bill robot
@@ -13,7 +15,7 @@ import com.litongjava.data.model.DbTableStruct;
  */
 public class PrimaryKeyService {
   private volatile Map<String, DbTableStruct> primaryKeys = new ConcurrentHashMap<>();
-  private DbService dbService =new DbService();
+  private DbService dbService = new DbService();
 
   /**
    * 获取主键的列名
@@ -21,7 +23,12 @@ public class PrimaryKeyService {
    * @return
    */
   public String getPrimaryKeyName(String tableName) {
-    DbTableStruct primaryKey = getPrimaryKey(tableName);
+    DbTableStruct primaryKey = getPrimaryKey(Db.use(), tableName);
+    return primaryKey.getField();
+  }
+
+  public String getPrimaryKeyName(DbPro dbPro, String tableName) {
+    DbTableStruct primaryKey = getPrimaryKey(dbPro, tableName);
     return primaryKey.getField();
   }
 
@@ -31,7 +38,7 @@ public class PrimaryKeyService {
    * @return
    */
   public String getPrimaryKeyColumnType(String tableName) {
-    DbTableStruct primaryKey = getPrimaryKey(tableName);
+    DbTableStruct primaryKey = getPrimaryKey(Db.use(),tableName);
     return primaryKey.getType();
   }
 
@@ -40,14 +47,14 @@ public class PrimaryKeyService {
    * @param tableName
    * @return
    */
-  public DbTableStruct getPrimaryKey(String tableName) {
+  public DbTableStruct getPrimaryKey(DbPro dbPro, String tableName) {
     DbTableStruct primaryKey = primaryKeys.get(tableName);
     if (primaryKey == null) {
       synchronized (dbService) {
         primaryKey = primaryKeys.get(tableName);
         if (primaryKey == null) {
           // 1.主键名称
-          primaryKey = dbService.getPrimaryKey(tableName).get(0);
+          primaryKey = dbService.getPrimaryKey(dbPro,tableName).get(0);
           primaryKeys.put(tableName, primaryKey);
         }
 

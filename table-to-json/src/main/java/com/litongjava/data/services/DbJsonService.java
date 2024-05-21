@@ -158,7 +158,7 @@ public class DbJsonService {
   public DbJsonBean<Kv> batchUpdateByIds(DbPro dbPro, String tableName, Kv kv) {
     Object[] ids = kv.getAs("ids", new Object[0]);
     kv.remove("ids");
-    DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(tableName);
+    DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(dbPro, tableName);
     String primaryKeyName = primaryKey.getField();
     String type = primaryKey.getType();
     boolean isUuid = false;
@@ -205,7 +205,7 @@ public class DbJsonService {
   public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName) {
     List<Record> records = dbPro.find("select * from " + tableName);
     if (records.size() < 1) {
-      List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(tableName);
+      List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(dbPro, tableName);
       Record record = new Record();
       for (DbTableStruct struct : columns) {
         record.set(struct.getField(), null);
@@ -349,7 +349,7 @@ public class DbJsonService {
       dbPro = Db.use();
     }
     // process for primary key is uuid
-    DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(tableName);
+    DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(dbPro, tableName);
     String primaryKeyName = primaryKey.getField();
 
     Object idValue = queryParam.get(primaryKeyName);

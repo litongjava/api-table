@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.litongjava.data.model.DbTableStruct;
+import com.litongjava.jfinal.plugin.activerecord.Db;
 
 /**
  * @author bill robot
@@ -52,7 +53,7 @@ public class TableColumnService {
    */
   private boolean getColumnsToMap(String tableName, String column) {
     boolean ret = false;
-    List<DbTableStruct> listRecord = dbService.getTableColumnsOfMysql(tableName);
+    List<DbTableStruct> listRecord = dbService.getTableColumnsOfMysql(Db.use(), tableName);
     List<String> columns = new ArrayList<>();
     for (DbTableStruct record : listRecord) {
       String field = record.getField();

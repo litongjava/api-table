@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.model.DbTableStruct;
+import com.litongjava.jfinal.plugin.activerecord.Db;
 import com.litongjava.jfinal.plugin.activerecord.Record;
 
 public class DbTableService {
@@ -31,7 +31,7 @@ public class DbTableService {
   }
 
   public Map<String, Object> proTableColumns(String f) {
-    List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(f);
+    List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(Db.use(), f);
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
     for (DbTableStruct record : columns) {
       String field = record.getField();
@@ -69,7 +69,7 @@ public class DbTableService {
    * @return
    */
   public Map<String, Object> getTableConfig(String f, String tableName, String lang) {
-    List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(tableName);
+    List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(Db.use(), tableName);
     List<Map<String, Object>> queryItems = new ArrayList<>(columns.size());
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
     List<Map<String, Object>> formItems = new ArrayList<>(columns.size());
@@ -204,7 +204,7 @@ public class DbTableService {
    */
   private String getName(String field) {
     return Arrays.stream(field.split("_")).map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
-      .collect(Collectors.joining(" "));
+        .collect(Collectors.joining(" "));
   }
 
   /**
@@ -254,7 +254,7 @@ public class DbTableService {
       hashMap.put("endPlaceholder", "End Date");
     }
 
-    hashMap.put("defaultTime", new String[]{"00:00:00", "23:59:59"});
+    hashMap.put("defaultTime", new String[] { "00:00:00", "23:59:59" });
 
     return hashMap;
 

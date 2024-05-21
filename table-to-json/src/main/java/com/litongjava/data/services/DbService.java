@@ -6,8 +6,10 @@ import java.util.List;
 import com.litongjava.data.model.DbTableStruct;
 import com.litongjava.jfinal.plugin.activerecord.Db;
 import com.litongjava.jfinal.plugin.activerecord.DbKit;
+import com.litongjava.jfinal.plugin.activerecord.DbPro;
 import com.litongjava.jfinal.plugin.activerecord.Record;
 import com.litongjava.jfinal.plugin.activerecord.dialect.Dialect;
+import com.litongjava.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
 
 /**
@@ -18,16 +20,22 @@ import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
  */
 public class DbService {
 
-  public List<DbTableStruct> getPrimaryKey(String tableName) {
+  public List<DbTableStruct> getPrimaryKey(DbPro dbPro, String tableName) {
     List<DbTableStruct> ret = new ArrayList<>();
 
-    Dialect dialect = DbKit.getConfig().getDialect();
+    Dialect dialect = dbPro.getConfig().getDialect();
     List<DbTableStruct> columns = null;
     if (dialect instanceof PostgreSqlDialect) {
-      columns = getTableColumnsOfPostgre(tableName, "public");
-
+      columns = getTableColumnsOfPostgre(dbPro, tableName, "public");
+    } else if (dialect instanceof MysqlDialect) {
+      columns = getTableColumnsOfMysql(dbPro, tableName);
     } else {
-      columns = getTableColumnsOfMysql(tableName);
+      DbTableStruct dbTableStruct = new DbTableStruct();
+      dbTableStruct.setField("id");
+      dbTableStruct.setKey("PRI");
+      
+      columns = new ArrayList<DbTableStruct>();
+      columns.add(dbTableStruct);
     }
 
     // 遍历出主键,添加到ret中
@@ -71,15 +79,15 @@ public class DbService {
    * @param tableName
    * @return {"Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra": "auto_increment", "Default": null, "Key": "PRI" },
    */
-  public List<DbTableStruct> getTableColumnsOfMysql(String tableName) {
+  public List<DbTableStruct> getTableColumnsOfMysql(DbPro dbPro, String tableName) {
     List<DbTableStruct> ret = new ArrayList<>();
 
     String sql = null;
     Dialect dialect = DbKit.getConfig().getDialect();
     if (dialect instanceof PostgreSqlDialect) {
-      sql = "SELECT column_name as field, data_type as type, is_nullable, column_default FROM information_schema.columns " +
-        "WHERE table_name ='" + tableName + "';";
-      List<Record> columns = Db.find(sql);
+      sql = "SELECT column_name as field, data_type as type, is_nullable, column_default FROM information_schema.columns "
+          + "WHERE table_name ='" + tableName + "';";
+      List<Record> columns = dbPro.find(sql);
       // 即便将别名设置为大写,返回的依然是小写,气人
 
       // 遍历出主键,添加到ret中
@@ -95,7 +103,6 @@ public class DbService {
       sql = "show columns from " + tableName;
       List<Record> columns = Db.find(sql);
 
-
       // 遍历出主键,添加到ret中
       for (Record record : columns) {
         DbTableStruct tableColumn = new DbTableStruct();
@@ -107,23 +114,20 @@ public class DbService {
       }
     }
 
-
     return ret;
   }
 
-  public List<DbTableStruct> getTableColumnsOfPostgre(String tableName, String tableSchema) {
+  public List<DbTableStruct> getTableColumnsOfPostgre(DbPro dbPro, String tableName, String tableSchema) {
     List<DbTableStruct> ret = new ArrayList<>();
 
-    String sql = "SELECT column_name as field, data_type as type, is_nullable as isNull, " +
-      "column_default as defaultValue, " +
-      "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name " +
-      "FROM information_schema.key_column_usage AS kcu " +
-      "JOIN information_schema.table_constraints AS tc " +
-      "ON kcu.constraint_name = tc.constraint_name " +
-      "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key " +
-      "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
+    String sql = "SELECT column_name as field, data_type as type, is_nullable as isNull, "
+        + "column_default as defaultValue, " + "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name "
+        + "FROM information_schema.key_column_usage AS kcu " + "JOIN information_schema.table_constraints AS tc "
+        + "ON kcu.constraint_name = tc.constraint_name "
+        + "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key "
+        + "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
 
-    List<Record> columns = Db.find(sql, tableName, tableName, tableSchema);
+    List<Record> columns = dbPro.find(sql, tableName, tableName, tableSchema);
 
     for (Record record : columns) {
       DbTableStruct tableColumn = new DbTableStruct();
