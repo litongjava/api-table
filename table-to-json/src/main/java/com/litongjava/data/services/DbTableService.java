@@ -10,28 +10,15 @@ import java.util.stream.Collectors;
 
 import com.litongjava.data.model.DbTableStruct;
 import com.litongjava.jfinal.plugin.activerecord.Db;
-import com.litongjava.jfinal.plugin.activerecord.Record;
 
 public class DbTableService {
 
   private DbService dbService = new DbService();
   private PrimaryKeyService primaryKeyService = new PrimaryKeyService();
 
-  /**
-   * @return
-   */
-  public String[] getAllTableNames() {
-    List<Record> tables = dbService.tables();
-    int size = tables.size();
-    String[] retval = new String[size];
-    for (int i = 0; i < size; i++) {
-      retval[i] = (String) tables.get(i).getColumnValues()[0];
-    }
-    return retval;
-  }
 
   public Map<String, Object> proTableColumns(String f) {
-    List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(Db.use(), f);
+    List<DbTableStruct> columns = dbService.getTableStruct(Db.use(), f);
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
     for (DbTableStruct record : columns) {
       String field = record.getField();
@@ -69,7 +56,7 @@ public class DbTableService {
    * @return
    */
   public Map<String, Object> getTableConfig(String f, String tableName, String lang) {
-    List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(Db.use(), tableName);
+    List<DbTableStruct> columns = dbService.getTableStruct(Db.use(), tableName);
     List<Map<String, Object>> queryItems = new ArrayList<>(columns.size());
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
     List<Map<String, Object>> formItems = new ArrayList<>(columns.size());

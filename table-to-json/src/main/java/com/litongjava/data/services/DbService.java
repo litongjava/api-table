@@ -1,12 +1,15 @@
 package com.litongjava.data.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.litongjava.data.model.DbTableStruct;
+import com.litongjava.data.utils.MarkdownTableUtils;
 import com.litongjava.jfinal.plugin.activerecord.Db;
-import com.litongjava.jfinal.plugin.activerecord.DbKit;
 import com.litongjava.jfinal.plugin.activerecord.DbPro;
+import com.litongjava.jfinal.plugin.activerecord.Page;
 import com.litongjava.jfinal.plugin.activerecord.Record;
 import com.litongjava.jfinal.plugin.activerecord.dialect.Dialect;
 import com.litongjava.jfinal.plugin.activerecord.dialect.MysqlDialect;
@@ -20,23 +23,65 @@ import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
  */
 public class DbService {
 
+  public Map<String, List<Record>> getAllTableColumns(DbPro dbPro) {
+    Map<String, List<Record>> retval = new HashMap<>();
+
+    String[] tableNames = tableNames(dbPro);
+    for (String name : tableNames) {
+      retval.put(name, getTableColumns(dbPro, name));
+    }
+    return retval;
+  }
+
+  public String getAllTableDataExamplesOfMarkdown(DbPro dbPro) {
+    StringBuilder markdown = new StringBuilder();
+
+    String[] tableNames = tableNames(dbPro);
+    for (int i = 0; i < tableNames.length; i++) {
+      String name = tableNames[i];
+      Page<Record> paginate = dbPro.paginate(1, 1, "select *", "from " + name);
+      if (paginate == null) {
+        continue;
+      }
+      List<Record> records = paginate.getList();
+      if (records == null) {
+        continue;
+      }
+
+      String markdownTable = MarkdownTableUtils.to(records);
+
+      markdown.append("**" + (i + 1) + " ." + name + "**\n");
+      markdown.append(markdownTable);
+    }
+    return markdown.toString();
+  }
+
+  /**
+   * 为ai提供的支持
+   * @param dbPro
+   * @return
+   */
+  public String getAllTableColumnsOfMarkdown(DbPro dbPro) {
+
+    StringBuilder markdown = new StringBuilder();
+
+    String[] tableNames = tableNames(dbPro);
+    for (int i = 0; i < tableNames.length; i++) {
+      String name = tableNames[i];
+      List<Record> tableColumns = getTableColumns(dbPro, name);
+
+      String markdownTable = MarkdownTableUtils.to(tableColumns);
+
+      markdown.append("**" + (i + 1) + " ." + name + "**\n");
+      markdown.append(markdownTable);
+    }
+    return markdown.toString();
+  }
+
   public List<DbTableStruct> getPrimaryKey(DbPro dbPro, String tableName) {
     List<DbTableStruct> ret = new ArrayList<>();
 
-    Dialect dialect = dbPro.getConfig().getDialect();
-    List<DbTableStruct> columns = null;
-    if (dialect instanceof PostgreSqlDialect) {
-      columns = getTableColumnsOfPostgre(dbPro, tableName, "public");
-    } else if (dialect instanceof MysqlDialect) {
-      columns = getTableColumnsOfMysql(dbPro, tableName);
-    } else {
-      DbTableStruct dbTableStruct = new DbTableStruct();
-      dbTableStruct.setField("id");
-      dbTableStruct.setKey("PRI");
-      
-      columns = new ArrayList<DbTableStruct>();
-      columns.add(dbTableStruct);
-    }
+    List<DbTableStruct> columns = getTableStruct(dbPro, tableName);
 
     // 遍历出主键,添加到ret中
     for (DbTableStruct record : columns) {
@@ -65,31 +110,60 @@ public class DbService {
 
   /**
    * 查询表名
-   *
-   * @return
+   * support mysql and postgresql
    */
-  public List<Record> tables() {
-    String sql = "show tables";
-    return Db.find(sql);
+  public String[] tableNames(DbPro dbPro) {
+    List<Record> tables = null;
+    Dialect dialect = dbPro.getConfig().getDialect();
+    if (dialect instanceof PostgreSqlDialect) {
+      String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';";
+      tables = Db.find(sql);
+    } else {
+      String sql = "show tables";
+      tables = Db.find(sql);
+    }
+
+    int size = tables.size();
+    String[] retval = new String[size];
+    for (int i = 0; i < size; i++) {
+      retval[i] = (String) tables.get(i).getColumnValues()[0];
+    }
+    return retval;
   }
 
-  /**
-   * 查询表字段
-   *
-   * @param tableName
-   * @return {"Field": "id", "Type": "int(11) unsigned", "Null": "NO", "Extra": "auto_increment", "Default": null, "Key": "PRI" },
-   */
-  public List<DbTableStruct> getTableColumnsOfMysql(DbPro dbPro, String tableName) {
+  public String[] tableNames() {
+    return tableNames(Db.use());
+  }
+
+  public List<DbTableStruct> getTableStruct(DbPro dbPro, String tableName) {
+    Dialect dialect = dbPro.getConfig().getDialect();
+    List<Record> columns = getTableColumns(dbPro, tableName);
+    ;
+
     List<DbTableStruct> ret = new ArrayList<>();
 
-    String sql = null;
-    Dialect dialect = DbKit.getConfig().getDialect();
     if (dialect instanceof PostgreSqlDialect) {
-      sql = "SELECT column_name as field, data_type as type, is_nullable, column_default FROM information_schema.columns "
-          + "WHERE table_name ='" + tableName + "';";
-      List<Record> columns = dbPro.find(sql);
-      // 即便将别名设置为大写,返回的依然是小写,气人
 
+    } else if (dialect instanceof MysqlDialect) {
+      for (Record record : columns) {
+        DbTableStruct tableColumn = new DbTableStruct();
+        tableColumn.setField(record.getStr("Field"));
+        tableColumn.setType(record.getStr("Type"));
+        tableColumn.setIsNull(record.getStr("Null"));
+        tableColumn.setDefaultValue(record.getStr("Default"));
+        tableColumn.setKey(record.getStr("Key"));
+        ret.add(tableColumn);
+      }
+      for (Record record : columns) {
+        DbTableStruct tableColumn = new DbTableStruct();
+        tableColumn.setField(record.getStr("field"));
+        tableColumn.setType(record.getStr("type"));
+        String key = record.getStr("key");
+        tableColumn.setKey(key);
+        ret.add(tableColumn);
+      }
+
+    } else {
       // 遍历出主键,添加到ret中
       for (Record record : columns) {
         DbTableStruct tableColumn = new DbTableStruct();
@@ -99,47 +173,32 @@ public class DbService {
         tableColumn.setKey(key);
         ret.add(tableColumn);
       }
-    } else {
-      sql = "show columns from " + tableName;
-      List<Record> columns = Db.find(sql);
-
-      // 遍历出主键,添加到ret中
-      for (Record record : columns) {
-        DbTableStruct tableColumn = new DbTableStruct();
-        tableColumn.setField(record.getStr("Field"));
-        tableColumn.setType(record.getStr("Type"));
-        String key = record.getStr("Key");
-        tableColumn.setKey(key);
-        ret.add(tableColumn);
-      }
     }
-
     return ret;
+
   }
 
-  public List<DbTableStruct> getTableColumnsOfPostgre(DbPro dbPro, String tableName, String tableSchema) {
-    List<DbTableStruct> ret = new ArrayList<>();
+  public List<Record> getTableColumns(DbPro dbPro, String tableName) {
+    String sql;
+    Dialect dialect = dbPro.getConfig().getDialect();
+    List<Record> records;
+    if (dialect instanceof PostgreSqlDialect) {
+      // Field,Type,Null,Key,Default,Extra
+      sql = "SELECT column_name as Field, data_type as Type, is_nullable as Null, " + "column_default as Default, "
+          + "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name "
+          + "FROM information_schema.key_column_usage AS kcu " + "JOIN information_schema.table_constraints AS tc "
+          + "ON kcu.constraint_name = tc.constraint_name "
+          + "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key "
+          + "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
 
-    String sql = "SELECT column_name as field, data_type as type, is_nullable as isNull, "
-        + "column_default as defaultValue, " + "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name "
-        + "FROM information_schema.key_column_usage AS kcu " + "JOIN information_schema.table_constraints AS tc "
-        + "ON kcu.constraint_name = tc.constraint_name "
-        + "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key "
-        + "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
-
-    List<Record> columns = dbPro.find(sql, tableName, tableName, tableSchema);
-
-    for (Record record : columns) {
-      DbTableStruct tableColumn = new DbTableStruct();
-      tableColumn.setField(record.getStr("field"));
-      tableColumn.setType(record.getStr("type"));
-      tableColumn.setIsNull(record.getStr("isNull"));
-      tableColumn.setDefaultValue(record.getStr("defaultValue"));
-      tableColumn.setKey(record.getStr("key"));
-      ret.add(tableColumn);
+      records = dbPro.find(sql, tableName, tableName, "public");
+      // 即便将别名设置为大写,返回的依然是小写,气人
+    } else {
+      // Field,Type,Null,Key,Default,Extra
+      sql = "show columns from " + tableName;
+      records = dbPro.find(sql, tableName);
     }
-
-    return ret;
+    return records;
   }
 
   /**

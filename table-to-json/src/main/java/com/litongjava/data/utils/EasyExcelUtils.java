@@ -61,7 +61,7 @@ public class EasyExcelUtils {
     List<List<String>> heads = head(columnNames);
 
     // 获取body
-    List<List<Object>> columnValues = getListData(records, size);
+    List<List<Object>> columnValues = RecordUtils.getListData(records, size);
 
     getExcelWriteBuilder(outputStream)
         //
@@ -98,7 +98,7 @@ public class EasyExcelUtils {
       }
       List<List<String>> heads = head(columnNames);
 
-      List<List<Object>> columnValues = getListData(records, listSize);
+      List<List<Object>> columnValues = RecordUtils.getListData(records, listSize);
 
       // 写入数据
       // excelWriterBuilder.sheet(sheetName).head(heads).doWrite(columnValues);
@@ -122,26 +122,6 @@ public class EasyExcelUtils {
     return excelWriterBuilder;
   }
 
-  /**
-   * 获取数据部分
-   * @param records
-   * @param size
-   * @return
-   */
-  private static List<List<Object>> getListData(List<Record> records, int size) {
-    List<List<Object>> columnValues = new ArrayList<>(size);
-    for (int i = 0; i < size; i++) {
-      Object[] columnValuesForRow = records.get(i).getColumnValues();
-      for (int j = 0; j < columnValuesForRow.length; j++) {
-        if (columnValuesForRow[j] instanceof BigInteger) {
-          columnValuesForRow[j] = columnValuesForRow[j].toString();
-        }
-      }
-      List<Object> asList = Arrays.asList(columnValuesForRow);
-      columnValues.add(asList);
-    }
-    return columnValues;
-  }
 
   public static List<List<String>> head(String... heads) {
     // 写入表头

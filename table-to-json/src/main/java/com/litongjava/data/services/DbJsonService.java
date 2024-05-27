@@ -205,7 +205,7 @@ public class DbJsonService {
   public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName) {
     List<Record> records = dbPro.find("select * from " + tableName);
     if (records.size() < 1) {
-      List<DbTableStruct> columns = dbService.getTableColumnsOfMysql(dbPro, tableName);
+      List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
       Record record = new Record();
       for (DbTableStruct struct : columns) {
         record.set(struct.getField(), null);
@@ -575,16 +575,12 @@ public class DbJsonService {
    * @return
    */
   public String[] getAllTableNames() {
-    return dbTableService.getAllTableNames();
+    return dbService.tableNames();
   }
 
   public DbJsonBean<String[]> tableNames() {
-    String[] allTableNames = dbTableService.getAllTableNames();
+    String[] allTableNames = dbService.tableNames();
     return new DbJsonBean<>(allTableNames);
-  }
-
-  public DbJsonBean<List<Record>> tables() {
-    return new DbJsonBean<>(dbService.tables());
   }
 
   /**
