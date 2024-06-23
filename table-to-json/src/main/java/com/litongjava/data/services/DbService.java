@@ -138,11 +138,18 @@ public class DbService {
   public List<DbTableStruct> getTableStruct(DbPro dbPro, String tableName) {
     Dialect dialect = dbPro.getConfig().getDialect();
     List<Record> columns = getTableColumns(dbPro, tableName);
-    ;
 
     List<DbTableStruct> ret = new ArrayList<>();
 
     if (dialect instanceof PostgreSqlDialect) {
+      for (Record record : columns) {
+        DbTableStruct tableColumn = new DbTableStruct();
+        tableColumn.setField(record.getStr("field"));
+        tableColumn.setType(record.getStr("type"));
+        String key = record.getStr("key");
+        tableColumn.setKey(key);
+        ret.add(tableColumn);
+      }
 
     } else if (dialect instanceof MysqlDialect) {
       for (Record record : columns) {
@@ -152,14 +159,6 @@ public class DbService {
         tableColumn.setIsNull(record.getStr("Null"));
         tableColumn.setDefaultValue(record.getStr("Default"));
         tableColumn.setKey(record.getStr("Key"));
-        ret.add(tableColumn);
-      }
-      for (Record record : columns) {
-        DbTableStruct tableColumn = new DbTableStruct();
-        tableColumn.setField(record.getStr("field"));
-        tableColumn.setType(record.getStr("type"));
-        String key = record.getStr("key");
-        tableColumn.setKey(key);
         ret.add(tableColumn);
       }
 
