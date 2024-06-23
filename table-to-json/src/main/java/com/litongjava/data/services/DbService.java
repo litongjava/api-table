@@ -82,6 +82,9 @@ public class DbService {
     List<DbTableStruct> ret = new ArrayList<>();
 
     List<DbTableStruct> columns = getTableStruct(dbPro, tableName);
+    if (columns.size() < 1) {
+      throw new RuntimeException("columns of " + tableName + " size is 0");
+    }
 
     // 遍历出主键,添加到ret中
     for (DbTableStruct record : columns) {
