@@ -111,11 +111,12 @@ public class DbJsonService {
           update = Db.update(tableName, primaryKeyName, record, jsonFields);
         }
 
-        Kv by = Kv.by(primaryKeyName, idValue);
-        by.set("update", update);
-        DbJsonBean<Kv> dbJsonBean = new DbJsonBean<>();
-        dbJsonBean.setData(by);
-        return dbJsonBean;
+        if (update) {
+          return new DbJsonBean<>();
+        } else {
+          return DbJsonBean.fail();
+        }
+
       } else {
         return new DbJsonBean<>(-1, "id value can't be null");
       }
@@ -142,7 +143,8 @@ public class DbJsonService {
 
       boolean save = Db.save(tableName, record, jsonFields);
       if (save) {
-        return new DbJsonBean<>(record.toKv());
+        Kv by = Kv.by(primaryKeyName, record.getObject(primaryKeyName));
+        return new DbJsonBean<>(by);
       } else {
         return DbJsonBean.fail("save fail");
       }
@@ -456,7 +458,6 @@ public class DbJsonService {
     return get(tableName, kv);
   }
 
-  @SuppressWarnings("unchecked")
   public DbJsonBean<Record> getById(String tableName, Object idValue) {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);

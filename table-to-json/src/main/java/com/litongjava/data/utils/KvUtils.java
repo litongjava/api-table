@@ -124,12 +124,15 @@ public class KvUtils {
    */
   public static String[] getJsonFields(Kv kv) {
     String[] jsonFields = null;
-    Object jsonFielsObject = kv.remove("json_fields");
+    Object jsonFieldsObject = kv.remove("json_fields");
 
-    if (jsonFielsObject instanceof String) {
-      jsonFields = ((String) jsonFielsObject).split(",");
-    } else if (jsonFielsObject instanceof String[]) {
-      jsonFields = (String[]) jsonFielsObject;
+    if (jsonFieldsObject instanceof String) {
+      jsonFields = ((String) jsonFieldsObject).split(",");
+    } else if (jsonFieldsObject instanceof String[]) {
+      jsonFields = (String[]) jsonFieldsObject;
+    } else if (jsonFieldsObject instanceof List) {
+      List<?> list = (List<?>) jsonFieldsObject;
+      jsonFields = list.toArray(new String[list.size()]);
     }
     return jsonFields;
   }
