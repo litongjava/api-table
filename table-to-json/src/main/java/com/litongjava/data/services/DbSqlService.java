@@ -122,9 +122,8 @@ public class DbSqlService {
         paramList.add(fieldValue);
         iterator2.remove();
       }
-
     }
-
+    
     // 数组类型
     if (paramList.size() > 0) {
       return new Sql(sql, paramList);

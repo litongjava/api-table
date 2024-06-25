@@ -36,18 +36,44 @@ public class OperatorService {
         paramList.add(kv.remove(fieldName));
 
       } else if (OperatorConstants.BT.equals(operator)) {
-        Object[] valueArray = (Object[]) kv.remove(fieldName);
-        if (valueArray.length > 1) {
-          addWhereFieldForWoOperator(where, fieldName, "between", "and");
-          paramList.add(valueArray[0]);
-          paramList.add(valueArray[1]);
-        }
-      } else if (OperatorConstants.NB.equals(operator)) {
-        addWhereFieldForWoOperator(where, fieldName, "not between", "and");
-        Object[] valueArray = (Object[]) kv.remove(fieldName);
-        paramList.add(valueArray[0]);
-        paramList.add(valueArray[1]);
+        Object remove = kv.remove(fieldName);
 
+        if (remove instanceof Object[]) {
+          Object[] valueArray = (Object[]) remove;
+          if (valueArray.length > 1) {
+            addWhereFieldForWoOperator(where, fieldName, "between", "and");
+            paramList.add(valueArray[0]);
+            paramList.add(valueArray[1]);
+          }
+        } else if (remove instanceof List) {
+          @SuppressWarnings("rawtypes")
+          List list = (List) remove;
+          if (list != null && list.size() > 1) {
+            addWhereFieldForWoOperator(where, fieldName, "between", "and");
+            paramList.add(list.get(0));
+            paramList.add(list.get(1));
+          }
+        }
+
+      } else if (OperatorConstants.NB.equals(operator)) {
+        Object remove = kv.remove(fieldName);
+
+        if (remove instanceof Object[]) {
+          Object[] valueArray = (Object[]) remove;
+          if (valueArray.length > 1) {
+            addWhereFieldForWoOperator(where, fieldName, "not between", "and");
+            paramList.add(valueArray[0]);
+            paramList.add(valueArray[1]);
+          }
+        } else if (remove instanceof List) {
+          @SuppressWarnings("rawtypes")
+          List list = (List) remove;
+          if (list != null && list.size() > 1) {
+            addWhereFieldForWoOperator(where, fieldName, "not between", "and");
+            paramList.add(list.get(0));
+            paramList.add(list.get(1));
+          }
+        }
       } else if (OperatorConstants.CT.equals(operator)) {
         addWhereAndField(where, fieldName, "like");
         paramList.add("%" + kv.remove(fieldName) + "%");
@@ -63,6 +89,7 @@ public class OperatorService {
         value = kv.remove(fieldName);
         addWhereAndField(where, fieldName, "like");
         paramList.add(value + "%");
+
       } else if (OperatorConstants.OL.equals(operator)) {
         value = kv.remove(fieldName);
         if (value instanceof Object[]) {
@@ -116,7 +143,6 @@ public class OperatorService {
       }
     }
   }
-
 
   /**
    * x in (?, ?, ...)
@@ -180,7 +206,6 @@ public class OperatorService {
     sql.append(String.format(format, fieldName, operator));
   }
 
-
   public void addWhereFieldForWoOperator(StringBuffer sql, String fieldName, String operator1, String operator2) {
     if (!sql.toString().endsWith("where ")) {
       sql.append(" and ");
@@ -192,7 +217,6 @@ public class OperatorService {
   }
 
   public void addWhereNotEmptyField(StringBuffer sql, String fieldName) {
-
 
     if (!sql.toString().endsWith("where ")) {
       sql.append(" and ");
