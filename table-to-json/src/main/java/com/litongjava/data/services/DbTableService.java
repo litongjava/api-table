@@ -17,7 +17,7 @@ public class DbTableService {
   private PrimaryKeyService primaryKeyService = new PrimaryKeyService();
 
 
-  public Map<String, Object> proTableColumns(String f) {
+  public List<Map<String, Object>> columns(String f) {
     List<DbTableStruct> columns = dbService.getTableStruct(Db.use(), f);
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
     for (DbTableStruct record : columns) {
@@ -29,7 +29,7 @@ public class DbTableService {
       String type = getType(fieldType);
 
       if (type.equals("date")) {
-        type = "datetime";
+        type = "dateTime";
       } else {
         type = "text";
       }
@@ -40,12 +40,7 @@ public class DbTableService {
       tableItem.put("valueType", type);
       tableItems.add(tableItem);
     }
-    LinkedHashMap<String, Object> table = new LinkedHashMap<String, Object>();
-    table.put("items", tableItems);
-
-    Map<String, Object> config = new LinkedHashMap<>();
-    config.put("table", table);
-    return config;
+    return tableItems;
   }
 
   /**
