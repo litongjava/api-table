@@ -4,8 +4,12 @@ import java.util.Random;
 
 public class SnowflakeIdUtils {
 
+  // 单例的 SnowflakeIdGenerator 实例
+  private static final SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(randomInt(1, 30),
+      randomInt(1, 30));
+
   public static long id() {
-    return new SnowflakeIdGenerator(randomInt(1, 30), randomInt(1, 30)).generateId();
+    return snowflakeIdGenerator.generateId();
   }
 
   public static int randomInt(int min, int max) {
