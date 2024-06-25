@@ -2,9 +2,7 @@ package com.litongjava.data.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,8 +34,8 @@ public class EasyExcelUtils {
    * @param <T> 泛型，保证 head 和 data 类型的一致性
    * @throws IOException 写入失败的情况
    */
-  public static <T> void write(OutputStream outputStream, String filename, String sheetName, Class<T> head, List<T> data)
-      throws IOException {
+  public static <T> void write(OutputStream outputStream, String filename, String sheetName, Class<T> head,
+      List<T> data) throws IOException {
     // 输出 Excel
     if (head != null) {
       getExcelWriteBuilder(outputStream)
@@ -121,7 +119,6 @@ public class EasyExcelUtils {
         .registerConverter(new LocalDateTimeConverter()).registerConverter(new TimestampStringConverter());
     return excelWriterBuilder;
   }
-
 
   public static List<List<String>> head(String... heads) {
     // 写入表头

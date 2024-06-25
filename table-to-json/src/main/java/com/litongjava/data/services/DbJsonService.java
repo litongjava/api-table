@@ -197,6 +197,11 @@ public class DbJsonService {
     return listAll(dbPro, tableName);
   }
 
+  public DbJsonBean<List<Record>> listAll(String f, Kv kv) {
+    DbPro dbPro = Db.use();
+    return listAll(dbPro, f, kv);
+  }
+
   /**
    * 无任何条件过滤,包含所有数据
    *
@@ -206,6 +211,26 @@ public class DbJsonService {
    */
   public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName) {
     List<Record> records = dbPro.find("select * from " + tableName);
+    if (records.size() < 1) {
+      List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
+      Record record = new Record();
+      for (DbTableStruct struct : columns) {
+        record.set(struct.getField(), null);
+      }
+      records.add(record);
+    }
+    return new DbJsonBean<List<Record>>(records);
+  }
+
+  public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName, Kv kv) {
+    String[] jsonFields = KvUtils.getJsonFields(kv);
+    String sql = "select * from " + tableName;
+    List<Record> records = null;
+    if (jsonFields != null) {
+      records = dbPro.findWithJsonField(sql, jsonFields);
+    } else {
+      records = dbPro.find(sql);
+    }
     if (records.size() < 1) {
       List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
       Record record = new Record();
@@ -621,4 +646,5 @@ public class DbJsonService {
     }
     return new DbJsonBean<>(dbTableService.columns(f));
   }
+
 }
