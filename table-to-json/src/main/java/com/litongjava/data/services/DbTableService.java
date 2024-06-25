@@ -16,7 +16,6 @@ public class DbTableService {
   private DbService dbService = new DbService();
   private PrimaryKeyService primaryKeyService = new PrimaryKeyService();
 
-
   public List<Map<String, Object>> columns(String f) {
     List<DbTableStruct> columns = dbService.getTableStruct(Db.use(), f);
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
@@ -30,6 +29,8 @@ public class DbTableService {
 
       if (type.equals("date")) {
         type = "dateTime";
+      } else if (type.equals("text")) {
+        type = "textarea";
       } else {
         type = "text";
       }
