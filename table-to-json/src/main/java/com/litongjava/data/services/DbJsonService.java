@@ -510,6 +510,28 @@ public class DbJsonService {
     }
   }
 
+  public DbJsonBean<Boolean> updateFlagByIdAndUserId(String tableName, Object id, String delColumn, int flag,
+      String userIdColumn, String userId) {
+    // 获取主键名
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+
+    // 构建更新SQL模板，使用占位符
+    String updateSqlTemplate = "UPDATE `%s` SET `%s` = ? WHERE `%s` = ? AND `%s` = ?";
+
+    // 格式化SQL语句
+    String sql = String.format(updateSqlTemplate, tableName, delColumn, primaryKey, userIdColumn);
+
+    // 执行更新操作
+    int updateResult = Db.update(sql, flag, id, userId);
+
+    // 根据更新结果返回相应的 DbJsonBean 实例
+    if (updateResult > 0) {
+      return new DbJsonBean<>(true); // 返回成功状态
+    } else {
+      return DbJsonBean.fail(-1, "update fail"); // 返回失败信息
+    }
+  }
+
   public DbJsonBean<Boolean> updateIsDelFlagById(String tableName, Object id) {
     // 判断is_del是否存在,如果不存在则创建
     String delFlagColumn = DbDataConfig.getDelColName();

@@ -19,7 +19,6 @@ public class EasyExcelResponseUtils {
   public static HttpResponse exportRecords(HttpRequest request, String filename, String sheetName, List<Record> records)
       throws IOException {
 
-    @Cleanup
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, sheetName, records);
 
@@ -32,15 +31,14 @@ public class EasyExcelResponseUtils {
     return response;
   }
 
-  public static HttpResponse exportAllTableRecords(HttpRequest request, String filename,
+  public static void exportAllTableRecords(HttpResponse response, String filename,
       LinkedHashMap<String, List<Record>> allTableData) throws IOException {
     @Cleanup
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, allTableData);
     byte[] bytes = outputStream.toByteArray();
-    HttpResponse response = Resps.bytesWithContentType(request, bytes, "application/vnd.ms-excel;charset=UTF-8");
+    Resps.bytesWithContentType(response, bytes, "application/vnd.ms-excel;charset=UTF-8");
     response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    return response;
   }
 
   /**
