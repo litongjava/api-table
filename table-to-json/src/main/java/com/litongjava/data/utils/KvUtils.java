@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.jfinal.kit.Kv;
 import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.tio.utils.name.CamelNameUtils;
 
 /**
  * @author litong
@@ -49,7 +50,7 @@ public class KvUtils {
     Kv kv = new Kv();
     // map.replaceAll((key, value) -> CamelNameUtils.convertCamelToUnderscore(key));
 
-    map.forEach((key, value) -> kv.put(CamelNameUtils.convertCamelToUnderscore(key), value));
+    map.forEach((key, value) -> kv.put(CamelNameUtils.toUnderscore(key), value));
 
     return kv;
   }
@@ -57,7 +58,7 @@ public class KvUtils {
   @SuppressWarnings("unchecked")
   public static Kv underscoreToCamel(Map<String, Object> map) {
     Kv kv = new Kv();
-    map.forEach((key, value) -> kv.put(CamelNameUtils.convertUnderscoreToCamel(key), value));
+    map.forEach((key, value) -> kv.put(CamelNameUtils.toCamel(key), value));
     return kv;
   }
 

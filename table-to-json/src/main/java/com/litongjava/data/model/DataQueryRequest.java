@@ -26,7 +26,12 @@ public class DataQueryRequest {
     if (remove == null) {
       this.isAsc = null;
     } else {
-      this.isAsc = Boolean.parseBoolean((String) remove);
+      if (remove instanceof String) {
+        this.isAsc = Boolean.parseBoolean((String) remove);
+      } else if (remove instanceof Boolean) {
+        this.isAsc = (Boolean) remove;
+      }
+
     }
   }
 }

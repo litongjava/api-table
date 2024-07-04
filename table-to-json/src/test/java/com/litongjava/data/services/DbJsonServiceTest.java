@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DbJsonServiceTest {
 
-  DbJsonService dbJsonService = new DbJsonService();
+  DbJsonService dbJsonService = DbJsonService.getInstance();
 
   @Before
   public void initDb() {

@@ -22,6 +22,9 @@ import com.litongjava.jfinal.plugin.activerecord.DbPro;
 import com.litongjava.jfinal.plugin.activerecord.Page;
 import com.litongjava.jfinal.plugin.activerecord.Record;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor(staticName = "getInstance")
 public class DbJsonService {
   private DbSqlService dbSqlService = new DbSqlService();
 

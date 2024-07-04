@@ -47,7 +47,7 @@ public class MarkdownTableUtils {
         if (cell != null) {
           table.append(cell.toString()).append(" | ");
         } else {
-          table.append("nil").append(" | ");
+          table.append("NULL").append(" | ");
         }
       }
       table.append("\n");
