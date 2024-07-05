@@ -1,9 +1,12 @@
 package com.litongjava.data.utils;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -136,6 +139,26 @@ public class KvUtils {
       jsonFields = list.toArray(new String[list.size()]);
     }
     return jsonFields;
+  }
+
+  public static Map<String, String> getEmbeddingMap(Kv kv) {
+    Map<String, String> map = new HashMap<>();
+
+    @SuppressWarnings("unchecked")
+    Set<Map.Entry<String, Object>> entrySet = kv.entrySet();
+    Iterator<Entry<String, Object>> iterator = entrySet.iterator();
+
+    while (iterator.hasNext()) {
+      Entry<String, Object> entry = iterator.next();
+
+      String key = entry.getKey();
+      if (key.endsWith("embedding")) {
+        int lastIndexOf = key.lastIndexOf("_");
+        map.put(key.substring(0, lastIndexOf), (String) entry.getValue());
+        iterator.remove();
+      }
+    }
+    return map;
   }
 
 }

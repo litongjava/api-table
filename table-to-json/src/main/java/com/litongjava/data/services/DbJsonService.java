@@ -3,8 +3,12 @@ package com.litongjava.data.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+
+import org.postgresql.util.PGobject;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
@@ -21,10 +25,13 @@ import com.litongjava.jfinal.plugin.activerecord.Db;
 import com.litongjava.jfinal.plugin.activerecord.DbPro;
 import com.litongjava.jfinal.plugin.activerecord.Page;
 import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
+import com.litongjava.jfinal.plugin.utils.PgVectorUtils;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor(staticName = "getInstance")
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class DbJsonService {
   private DbSqlService dbSqlService = new DbSqlService();
 
@@ -35,6 +42,22 @@ public class DbJsonService {
   private DbTableService dbTableService = new DbTableService();
 
   private DbService dbService = new DbService();
+
+  private Function<String, String> embeddingFun;
+
+  private static final DbJsonService INSTANCE = new DbJsonService();
+
+  public static DbJsonService getInstance() {
+    return INSTANCE;
+  }
+
+  public void setEmbeddingFun(Function<String, String> embeddingFun) {
+    this.embeddingFun = embeddingFun;
+  }
+
+  public Function<String, String> getEmbeddingFun() {
+    return this.embeddingFun;
+  }
 
   public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv) {
     String[] jsonFields = KvUtils.getJsonFields(kv);
@@ -95,8 +118,22 @@ public class DbJsonService {
   public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv, String[] jsonFields) {
     KvUtils.removeEmptyValue(kv);
     KvUtils.true21(kv);
+    Map<String, String> embeddingMap = KvUtils.getEmbeddingMap(kv);
     Record record = new Record();
     record.setColumns(kv);
+
+    Set<Entry<String, String>> set = embeddingMap.entrySet();
+    if (embeddingFun != null) {
+      for (Entry<String, String> e : set) {
+        String key = e.getKey();
+        String textValue = kv.getStr(key);
+        if (textValue != null && Db.use().getConfig().getDialect() instanceof PostgreSqlDialect) {
+          String embeddingArrayString = embeddingFun.apply(textValue);
+          PGobject pgVector = PgVectorUtils.getPgVector(embeddingArrayString);
+          record.set(e.getValue(), pgVector);
+        }
+      }
+    }
 
     String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
     if (kv.containsKey(primaryKeyName)) { // update
