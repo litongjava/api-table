@@ -12,7 +12,8 @@ import com.litongjava.tio.utils.json.Json;
 @SuppressWarnings({ "rawtypes" })
 public class TableInput extends HashMap {
   private static final long serialVersionUID = -808251639784763326L;
-
+  public static final String pageNo = "page_no";
+  public static final String pageSize = "page_size";
   public static final String columns = "columns";
   public static final String jsonFields = "json_fields";
   public static final String orderBy = "order_by";
@@ -218,5 +219,21 @@ public class TableInput extends HashMap {
 
   public String getGroupBy() {
     return getStr(groupBy);
+  }
+
+  public TableInput setPageNo(Integer inputPageNo) {
+    return set(pageNo, inputPageNo);
+  }
+
+  public Integer getPageNo() {
+    return getInt(pageNo);
+  }
+
+  public TableInput setPageSize(Integer inputPageSize) {
+    return set(pageSize, inputPageSize);
+  }
+
+  public Integer getPageSize() {
+    return getInt(pageSize);
   }
 }
