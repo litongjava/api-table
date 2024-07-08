@@ -1,16 +1,15 @@
-## table-to-json
+# api-table
 
-### 简介
+## introduction
 
-table-to-json 是自动化的Java CRUD框架
+api-table 是自动化的CRUD框架
 
-创建完成表之后,前端传入表名到后端进行curd操作只需要将表名传入后台,后台自动返回json数据
-
-### 添加依赖
+创建完成表之后,前端传入表名,action和参数传入后端,后端会自动生成sql并执行
+## 添加依赖
 ```
-    <dependency>
-      <groupId>com.litongjava</groupId>
-      <artifactId>table-to-json</artifactId>
-      <version>1.2.3</version>
-    </dependency>
+<dependency>
+  <groupId>com.litongjava</groupId>
+  <artifactId>api-table</artifactId>
+  <version>1.3.3</version>
+</dependency>
 ```
