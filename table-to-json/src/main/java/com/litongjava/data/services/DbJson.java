@@ -448,12 +448,12 @@ public class DbJson {
    * @param queryParam
    * @return
    */
-  public static DbJsonBean<Record> findFirst(String tableName, KvBean kvBean) {
-    return findFirst(null, tableName, kvBean);
+  public static DbJsonBean<Record> get(String tableName, KvBean kvBean) {
+    return get(null, tableName, kvBean);
 
   }
 
-  public static DbJsonBean<Record> findFirst(DbPro dbPro, String tableName, KvBean kvBean) {
+  public static DbJsonBean<Record> get(DbPro dbPro, String tableName, KvBean kvBean) {
     if (dbPro == null) {
       dbPro = Db.use();
     }
@@ -495,7 +495,7 @@ public class DbJson {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     kvBean.put(primaryKey, idValue);
-    return findFirst(null, kvBean);
+    return get(null, kvBean);
   }
 
   public static DbJsonBean<Record> getById(String tableName, Object idValue) {
@@ -503,7 +503,7 @@ public class DbJson {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     KvBean kvBean = new KvBean();
     kvBean.set(primaryKey, idValue);
-    return findFirst(null, tableName, kvBean);
+    return get(null, tableName, kvBean);
   }
 
   public static DbJsonBean<Boolean> delById(String tableName, Object id) {
