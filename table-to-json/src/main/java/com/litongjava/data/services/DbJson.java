@@ -17,6 +17,7 @@ import com.litongjava.data.model.DataPageRequest;
 import com.litongjava.data.model.DataQueryRequest;
 import com.litongjava.data.model.DbJsonBean;
 import com.litongjava.data.model.DbTableStruct;
+import com.litongjava.data.model.KvBean;
 import com.litongjava.data.model.Sql;
 import com.litongjava.data.utils.KvUtils;
 import com.litongjava.data.utils.SnowflakeIdGenerator;
@@ -28,45 +29,35 @@ import com.litongjava.jfinal.plugin.activerecord.Record;
 import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.jfinal.plugin.utils.PgVectorUtils;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+public class DbJson {
+  private static DbSqlService dbSqlService = new DbSqlService();
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class DbJsonService {
-  private DbSqlService dbSqlService = new DbSqlService();
+  private static PrimaryKeyService primaryKeyService = new PrimaryKeyService();
 
-  private PrimaryKeyService primaryKeyService = new PrimaryKeyService();
+  private static TableColumnService tableColumnService = new TableColumnService();
 
-  private TableColumnService tableColumnService = new TableColumnService();
+  private static DbTableService dbTableService = new DbTableService();
 
-  private DbTableService dbTableService = new DbTableService();
+  private static DbService dbService = new DbService();
 
-  private DbService dbService = new DbService();
+  private static Function<String, String> embeddingFun;
 
-  private Function<String, String> embeddingFun;
-
-  private static final DbJsonService INSTANCE = new DbJsonService();
-
-  public static DbJsonService getInstance() {
-    return INSTANCE;
+  public static void setEmbeddingFun(Function<String, String> embeddingFun) {
+    DbJson.embeddingFun = embeddingFun;
   }
 
-  public void setEmbeddingFun(Function<String, String> embeddingFun) {
-    this.embeddingFun = embeddingFun;
+  public static Function<String, String> getEmbeddingFun() {
+    return embeddingFun;
   }
 
-  public Function<String, String> getEmbeddingFun() {
-    return this.embeddingFun;
-  }
-
-  public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv) {
+  public static DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv) {
     String[] jsonFields = KvUtils.getJsonFields(kv);
-    return this.saveOrUpdate(tableName, kv, jsonFields);
+    return saveOrUpdate(tableName, kv, jsonFields);
   }
 
-  public DbJsonBean<Kv> save(String tableName, Kv kv) {
+  public static DbJsonBean<Kv> save(String tableName, Kv kv) {
     String[] jsonFields = KvUtils.getJsonFields(kv);
-    return this.save(tableName, kv, jsonFields);
+    return save(tableName, kv, jsonFields);
   }
 
   /**
@@ -76,7 +67,7 @@ public class DbJsonService {
    * @return
    */
   @SuppressWarnings("unchecked")
-  public DbJsonBean<Kv> save(String tableName, Kv kv, String[] jsonFields) {
+  public static DbJsonBean<Kv> save(String tableName, Kv kv, String[] jsonFields) {
     KvUtils.removeEmptyValue(kv);
     KvUtils.true21(kv);
     Record record = new Record();
@@ -115,7 +106,7 @@ public class DbJsonService {
   }
 
   @SuppressWarnings("unchecked")
-  public DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv, String[] jsonFields) {
+  public static DbJsonBean<Kv> saveOrUpdate(String tableName, Kv kv, String[] jsonFields) {
     KvUtils.removeEmptyValue(kv);
     KvUtils.true21(kv);
     Map<String, String> embeddingMap = KvUtils.getEmbeddingMap(kv);
@@ -192,12 +183,12 @@ public class DbJsonService {
 
   }
 
-  public DbJsonBean<Kv> batchUpdateByIds(String f, Kv kv) {
+  public static DbJsonBean<Kv> batchUpdateByIds(String f, Kv kv) {
     DbPro dbPro = Db.use();
     return batchUpdateByIds(dbPro, f, kv);
   }
 
-  public DbJsonBean<Kv> batchUpdateByIds(DbPro dbPro, String tableName, Kv kv) {
+  public static DbJsonBean<Kv> batchUpdateByIds(DbPro dbPro, String tableName, Kv kv) {
     Object[] ids = kv.getAs("ids", new Object[0]);
     kv.remove("ids");
     DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(dbPro, tableName);
@@ -223,21 +214,21 @@ public class DbJsonService {
     return new DbJsonBean<>(Kv.by("data", results));
   }
 
-  public DbJsonBean<Kv> saveOrUpdate(Kv kv) {
+  public static DbJsonBean<Kv> saveOrUpdate(Kv kv) {
     String tableName = (String) kv.remove("table_name");
-    return this.saveOrUpdate(tableName, kv);
+    return saveOrUpdate(tableName, kv);
   }
 
   /**
    * @param tableName
    * @return
    */
-  public DbJsonBean<List<Record>> listAll(String tableName) {
+  public static DbJsonBean<List<Record>> listAll(String tableName) {
     DbPro dbPro = Db.use();
     return listAll(dbPro, tableName);
   }
 
-  public DbJsonBean<List<Record>> listAll(String f, Kv kv) {
+  public static DbJsonBean<List<Record>> listAll(String f, Kv kv) {
     DbPro dbPro = Db.use();
     return listAll(dbPro, f, kv);
   }
@@ -249,7 +240,7 @@ public class DbJsonService {
    * @param tableName
    * @return
    */
-  public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName) {
+  public static DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName) {
     List<Record> records = dbPro.find("select * from " + tableName);
     if (records.size() < 1) {
       List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
@@ -262,7 +253,7 @@ public class DbJsonService {
     return new DbJsonBean<List<Record>>(records);
   }
 
-  public DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName, Kv kv) {
+  public static DbJsonBean<List<Record>> listAll(DbPro dbPro, String tableName, Kv kv) {
     String[] jsonFields = KvUtils.getJsonFields(kv);
     String sql = "select * from " + tableName;
     List<Record> records = null;
@@ -282,23 +273,13 @@ public class DbJsonService {
     return new DbJsonBean<List<Record>>(records);
   }
 
-  public DbJsonBean<List<Record>> list(Kv kv) {
-    String tableName = (String) kv.remove("table_name");
-    return list(tableName, kv);
-  }
-
-  public DbJsonBean<List<Record>> list(DbPro dbPro, Kv kv) {
-    String tableName = (String) kv.remove("table_name");
-    return list(dbPro, tableName, kv);
-  }
-
   /**
    * @param tableName
    * @param queryParam
    * @return
    */
-  public DbJsonBean<List<Record>> list(String tableName, Kv queryParam) {
-    return list(null, tableName, queryParam);
+  public static DbJsonBean<List<Record>> list(String tableName, KvBean kvBean) {
+    return list(null, tableName, kvBean);
   }
 
   /**
@@ -307,15 +288,15 @@ public class DbJsonService {
    * @param queryParam
    * @return
    */
-  public DbJsonBean<List<Record>> list(DbPro dbPro, String tableName, Kv queryParam) {
+  public static DbJsonBean<List<Record>> list(DbPro dbPro, String tableName, KvBean kvBean) {
     if (dbPro == null) {
       dbPro = Db.use();
     }
-    DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
-    String[] jsonFields = KvUtils.getJsonFields(queryParam);
+    DataQueryRequest queryRequest = new DataQueryRequest(kvBean);
+    String[] jsonFields = KvUtils.getJsonFields(kvBean);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
+    Sql sql = dbSqlService.getWhereClause(queryRequest, kvBean);
     sql.setColumns(queryRequest.getColumns());
     sql.setTableName(tableName);
 
@@ -345,7 +326,7 @@ public class DbJsonService {
    * @param kv
    * @return
    */
-  public DbJsonBean<Page<Record>> page(Kv kv) {
+  public static DbJsonBean<Page<Record>> page(Kv kv) {
     String tableName = (String) kv.remove("table_name");
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
@@ -354,7 +335,7 @@ public class DbJsonService {
   /**
    * @return
    */
-  public DbJsonBean<Page<Record>> page(DbPro dbPro, Kv kv) {
+  public static DbJsonBean<Page<Record>> page(DbPro dbPro, Kv kv) {
     String tableName = (String) kv.remove("table_name");
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(dbPro, tableName, dataPageRequest, kv);
@@ -365,7 +346,7 @@ public class DbJsonService {
    * @param kv
    * @return
    */
-  public DbJsonBean<Page<Record>> page(String tableName, Kv kv) {
+  public static DbJsonBean<Page<Record>> page(String tableName, Kv kv) {
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
   }
@@ -374,7 +355,7 @@ public class DbJsonService {
    * @param tableName
    * @return
    */
-  public DbJsonBean<Page<Record>> page(String tableName) {
+  public static DbJsonBean<Page<Record>> page(String tableName) {
     Kv kv = Kv.create();
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
@@ -386,7 +367,7 @@ public class DbJsonService {
    * @param kv
    * @return
    */
-  public DbJsonBean<Page<Record>> page(DbPro dbPro, String f, Kv kv) {
+  public static DbJsonBean<Page<Record>> page(DbPro dbPro, String f, Kv kv) {
     kv.remove("table_name");
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(dbPro, f, dataPageRequest, kv);
@@ -398,7 +379,7 @@ public class DbJsonService {
    * @param kv
    * @return
    */
-  public DbJsonBean<Page<Record>> page(String tableName, DataPageRequest dataPageRequest, Kv kv) {
+  public static DbJsonBean<Page<Record>> page(String tableName, DataPageRequest dataPageRequest, Kv kv) {
     return page(null, tableName, dataPageRequest, kv);
   }
 
@@ -411,7 +392,8 @@ public class DbJsonService {
    * @param queryParam
    * @return
    */
-  public DbJsonBean<Page<Record>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest, Kv queryParam) {
+  public static DbJsonBean<Page<Record>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest,
+      Kv queryParam) {
     if (dbPro == null) {
       dbPro = Db.use();
     }
@@ -461,32 +443,26 @@ public class DbJsonService {
   }
 
   /**
-   * 因为 需要需要获取Id,是否删除,租户id等.所以使用了queryParam
-   *
-   * @param tableName
-   * @param queryParam
-   * @return
-   */
-  public DbJsonBean<Record> get(String tableName, Kv queryParam) {
-    return findFirst(null, tableName, queryParam);
-  }
-
-  /**
    * @param dbPro
    * @param tableName
    * @param queryParam
    * @return
    */
-  public DbJsonBean<Record> findFirst(DbPro dbPro, String tableName, Kv queryParam) {
+  public static DbJsonBean<Record> findFirst(String tableName, KvBean kvBean) {
+    return findFirst(null, tableName, kvBean);
+
+  }
+
+  public static DbJsonBean<Record> findFirst(DbPro dbPro, String tableName, KvBean kvBean) {
     if (dbPro == null) {
       dbPro = Db.use();
     }
 
-    DataQueryRequest queryRequest = new DataQueryRequest(queryParam);
-    String[] jsonFields = KvUtils.getJsonFields(queryParam);
+    DataQueryRequest queryRequest = new DataQueryRequest(kvBean);
+    String[] jsonFields = KvUtils.getJsonFields(kvBean);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, queryParam);
+    Sql sql = dbSqlService.getWhereClause(queryRequest, kvBean);
     sql.setTableName(tableName);
     sql.setColumns(queryRequest.getColumns());
 
@@ -512,24 +488,25 @@ public class DbJsonService {
     }
 
     return new DbJsonBean<Record>(record);
-
   }
 
   @SuppressWarnings("unchecked")
-  public DbJsonBean<Record> getById(String tableName, Object idValue, Kv kv) {
+  public static DbJsonBean<Record> getById(String tableName, Object idValue, KvBean kvBean) {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
-    kv.put(primaryKey, idValue);
-    return get(tableName, kv);
+    kvBean.put(primaryKey, idValue);
+    return findFirst(null, kvBean);
   }
 
-  public DbJsonBean<Record> getById(String tableName, Object idValue) {
+  public static DbJsonBean<Record> getById(String tableName, Object idValue) {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
-    return get(tableName, Kv.by(primaryKey, idValue));
+    KvBean kvBean = new KvBean();
+    kvBean.set(primaryKey, idValue);
+    return findFirst(null, tableName, kvBean);
   }
 
-  public DbJsonBean<Boolean> delById(String tableName, Object id) {
+  public static DbJsonBean<Boolean> delById(String tableName, Object id) {
     if (Db.deleteById(tableName, id)) {
       return new DbJsonBean<Boolean>();
     } else {
@@ -538,7 +515,7 @@ public class DbJsonService {
 
   }
 
-  public DbJsonBean<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag) {
+  public static DbJsonBean<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag) {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String updateSqlTemplate = "update %s set %s=%s where %s =?";
     String sql = String.format(updateSqlTemplate, tableName, delColumn, flag, primaryKey);
@@ -550,7 +527,7 @@ public class DbJsonService {
     }
   }
 
-  public DbJsonBean<Boolean> updateFlagByIdAndUserId(String tableName, Object id, String delColumn, int flag,
+  public static DbJsonBean<Boolean> updateFlagByIdAndUserId(String tableName, Object id, String delColumn, int flag,
       String userIdColumn, String userId) {
     // 获取主键名
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
@@ -572,7 +549,7 @@ public class DbJsonService {
     }
   }
 
-  public DbJsonBean<Boolean> updateIsDelFlagById(String tableName, Object id) {
+  public static DbJsonBean<Boolean> updateIsDelFlagById(String tableName, Object id) {
     // 判断is_del是否存在,如果不存在则创建
     String delFlagColumn = DbDataConfig.getDelColName();
     boolean isExists = tableColumnService.isExists(delFlagColumn, tableName);
@@ -590,7 +567,7 @@ public class DbJsonService {
     }
   }
 
-  public DbJsonBean<Integer> removeByIds(String tableName, Kv kv) {
+  public static DbJsonBean<Integer> removeByIds(String tableName, Kv kv) {
     @SuppressWarnings("unchecked")
     Set<String> keySet = kv.keySet();
     // 判断size大小
@@ -638,7 +615,7 @@ public class DbJsonService {
     return new DbJsonBean<>();
   }
 
-  private String[] getParaValues(String key) {
+  private static String[] getParaValues(String key) {
     return null;
   }
 
@@ -648,7 +625,7 @@ public class DbJsonService {
    * @param str
    * @return
    */
-  private boolean isNumeric(String str) {
+  private static boolean isNumeric(String str) {
     for (int i = 0; i < str.length(); i++) {
       if (!Character.isDigit(str.charAt(i))) {
         return false;
@@ -662,11 +639,11 @@ public class DbJsonService {
    *
    * @return
    */
-  public String[] getAllTableNames() {
+  public static String[] getAllTableNames() {
     return dbService.tableNames();
   }
 
-  public DbJsonBean<String[]> tableNames() {
+  public static DbJsonBean<String[]> tableNames() {
     String[] allTableNames = dbService.tableNames();
     return new DbJsonBean<>(allTableNames);
   }
@@ -677,19 +654,19 @@ public class DbJsonService {
    * @param lang      language
    * @return
    */
-  public DbJsonBean<Map<String, Object>> tableConfig(String f, String tableName, String lang) {
+  public static DbJsonBean<Map<String, Object>> tableConfig(String f, String tableName, String lang) {
     if (StrKit.isBlank(tableName)) {
       return new DbJsonBean<>(-1, "tableName can't be empty");
     }
     return new DbJsonBean<>(dbTableService.getTableConfig(f, tableName, lang));
   }
 
-  public DbJsonBean<List<Record>> query(String sql) {
+  public static DbJsonBean<List<Record>> query(String sql) {
     List<Record> find = Db.find(sql);
     return new DbJsonBean<>(find);
   }
 
-  public DbJsonBean<List<Record>> query(String sql, Object... paras) {
+  public static DbJsonBean<List<Record>> query(String sql, Object... paras) {
     List<Record> find = null;
     if (paras == null || paras.length < 1) {
       find = Db.find(sql);
@@ -702,7 +679,7 @@ public class DbJsonService {
   /**
    * Ant design procomponents proTableColumns
    */
-  public DbJsonBean<List<Map<String, Object>>> columns(String f) {
+  public static DbJsonBean<List<Map<String, Object>>> columns(String f) {
     if (StrKit.isBlank(f)) {
       return new DbJsonBean<>(-1, "tableName can't be empty");
     }

@@ -15,9 +15,7 @@ import com.litongjava.jfinal.plugin.activerecord.Record;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DbJsonServiceTest {
-
-  DbJsonService dbJsonService = DbJsonService.getInstance();
+public class DbJsonTest {
 
   @Before
   public void initDb() {
@@ -27,7 +25,7 @@ public class DbJsonServiceTest {
   @Test
   public void test_listAll() {
     String tableName = "cf_alarm";
-    DbJsonBean<List<Record>> bean = dbJsonService.listAll(tableName);
+    DbJsonBean<List<Record>> bean = DbJson.listAll(tableName);
     System.err.println(bean);
   }
 
@@ -41,7 +39,7 @@ public class DbJsonServiceTest {
     Kv kv = new Kv();
     kv.put("table_name", tableName);
 
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(kv);
+    DbJsonBean<Page<Record>> jsonBean = DbJson.page(kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -58,7 +56,7 @@ public class DbJsonServiceTest {
     kv.put("config_id", 17);
     kv.put("order_by", "create_date");
 
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(kv);
+    DbJsonBean<Page<Record>> jsonBean = DbJson.page(kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -80,7 +78,7 @@ public class DbJsonServiceTest {
     kv.put("ship_name_op", "ew");
 
     System.out.println(dataPageRequest);
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(kv);
+    DbJsonBean<Page<Record>> jsonBean = DbJson.page(kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -102,7 +100,7 @@ public class DbJsonServiceTest {
     kv.put("create_date", createDateArray);
     kv.put("create_date_op", OperatorConstants.BT);
 
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(kv);
+    DbJsonBean<Page<Record>> jsonBean = DbJson.page(kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -121,7 +119,7 @@ public class DbJsonServiceTest {
     kv.put("longitude", "64000000");
     kv.put("longitude_op", OperatorConstants.GT);
 
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(tableName, kv);
+    DbJsonBean<Page<Record>> jsonBean = DbJson.page(tableName, kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -137,7 +135,7 @@ public class DbJsonServiceTest {
     kv.put("longitude", "64999999");
     kv.put("longitude_op", OperatorConstants.LT);
 
-    DbJsonBean<Page<Record>> jsonBean = dbJsonService.page(tableName, kv);
+    DbJsonBean<Page<Record>> jsonBean = DbJson.page(tableName, kv);
 
     System.out.println(jsonBean);
     Page<Record> page = jsonBean.getData();
@@ -171,7 +169,7 @@ public class DbJsonServiceTest {
     kv.put("tenant_id", 1);
 
     System.out.println(dataPageRequest);
-    DbJsonBean<Kv> booleanDbJsonBean = dbJsonService.saveOrUpdate(tableName, kv);
+    DbJsonBean<Kv> booleanDbJsonBean = DbJson.saveOrUpdate(tableName, kv);
 
     System.out.println(booleanDbJsonBean);
   }
@@ -179,14 +177,14 @@ public class DbJsonServiceTest {
   @Test
   public void physicalDelete() {
     String tableName = "cf_alarm";
-    DbJsonBean<Boolean> booleanDbJsonBean = dbJsonService.delById(tableName, "1532704");
+    DbJsonBean<Boolean> booleanDbJsonBean = DbJson.delById(tableName, "1532704");
     System.out.println(booleanDbJsonBean);
   }
 
   @Test
   public void logoicalDelete() {
     String tableName = "cf_alarm";
-    DbJsonBean<Boolean> deleted = dbJsonService.updateFlagById(tableName, "1532708", "deleted", 2);
+    DbJsonBean<Boolean> deleted = DbJson.updateFlagById(tableName, "1532708", "deleted", 2);
     System.out.println(deleted);
   }
 
@@ -194,7 +192,7 @@ public class DbJsonServiceTest {
   public void query() {
     String sql = "select ship_name from cf_alarm where id =?";
     String id = "1532708";
-    DbJsonBean<List<Record>> result = dbJsonService.query(sql, id);
+    DbJsonBean<List<Record>> result = DbJson.query(sql, id);
     System.out.println(result);
   }
 
