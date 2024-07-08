@@ -2,6 +2,8 @@ package com.litongjava.data.utils;
 
 import org.junit.Test;
 
+import com.litongjava.table.utils.SnowflakeIdGenerator;
+
 public class SnowflakeIdGeneratorTest {
 
   @Test

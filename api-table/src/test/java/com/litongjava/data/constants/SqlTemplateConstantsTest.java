@@ -2,6 +2,8 @@ package com.litongjava.data.constants;
 
 import org.junit.Test;
 
+import com.litongjava.table.constants.SqlTemplateConstants;
+
 public class SqlTemplateConstantsTest {
 
   @Test

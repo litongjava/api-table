@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.table.utils.MarkdownTableUtils;
 
 public class MarkdownTableUtilsTest {
 
