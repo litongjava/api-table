@@ -17,6 +17,7 @@ public class TableInput extends HashMap {
   public static final String columns = "columns";
   public static final String jsonFields = "json_fields";
   public static final String orderBy = "order_by";
+  public static final String isAsc = "is_asc";
   public static final String groupBy = "group_by";
 
   public TableInput() {
@@ -62,6 +63,12 @@ public class TableInput extends HashMap {
 
   @SuppressWarnings("unchecked")
   public TableInput set(Kv kv) {
+    super.putAll(kv);
+    return this;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public TableInput set(TableInput kv) {
     super.putAll(kv);
     return this;
   }
@@ -235,5 +242,13 @@ public class TableInput extends HashMap {
 
   public Integer getPageSize() {
     return getInt(pageSize);
+  }
+  
+  public TableInput setPageSize(Boolean inputIsAsc) {
+    return set(isAsc, inputIsAsc);
+  }
+
+  public Boolean isAsc() {
+    return getBoolean(isAsc);
   }
 }

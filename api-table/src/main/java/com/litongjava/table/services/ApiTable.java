@@ -107,7 +107,7 @@ public class ApiTable {
 
   @SuppressWarnings("unchecked")
   public static TableResult<Kv> saveOrUpdate(String tableName, TableInput kv, String[] jsonFields) {
-    KvUtils.removeEmptyValue(kv);
+    // KvUtils.removeEmptyValue(kv);
     KvUtils.true21(kv);
     Map<String, String> embeddingMap = KvUtils.getEmbeddingMap(kv);
     Record record = new Record();
@@ -131,48 +131,28 @@ public class ApiTable {
       String idValue = record.getStr(primaryKeyName);
 
       if (!StrKit.isBlank(idValue)) {
-        String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
-        boolean update = false;
-        if ("uuid".equals(primaryKeyColumnType)) {
-          UUID idUUID = UUID.fromString(idValue);
-          record.set(primaryKeyName, idUUID);
-          update = Db.update(tableName, primaryKeyName, record, jsonFields);
-
-        } else {
-          update = Db.update(tableName, primaryKeyName, record, jsonFields);
-        }
-
+        boolean update = update(tableName, jsonFields, primaryKeyName, idValue, record);
         if (update) {
           return new TableResult<>();
         } else {
           return TableResult.fail();
         }
-
       } else {
-        return new TableResult<>(-1, "id value can't be null");
-      }
-    } else { // 保存
-      // 如果主键是varchar类型,插入uuid类型 不处理uuid类型.如果是uuid类型,让数据库自动生成
-      String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
-      if (!StrKit.isBlank(primaryKeyColumnType)) {
-        if (primaryKeyColumnType.startsWith("varchar") || primaryKeyColumnType.startsWith("text")) {
-          String id = UUIDUtils.random();
+        Object id = getIdValueByType(tableName);
+        if (id != null) {
           record.set(primaryKeyName, id);
-        } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long")) {
-          // 如果主键是bigint (20)类型,插入雪花Id
-          long threadId = Thread.currentThread().getId();
-          if (threadId > 31) {
-            threadId = threadId % 31;
-          }
-          if (threadId < 0) {
-            threadId = 0;
-          }
-          long id = new SnowflakeIdGenerator(threadId, 0).generateId();
-          record.set(primaryKeyName, id);
+        }
+        boolean save = Db.save(tableName, record, jsonFields);
+        if (save) {
+          Kv by = Kv.by(primaryKeyName, record.getObject(primaryKeyName));
+          return new TableResult<>(by);
+        } else {
+          return TableResult.fail("save fail");
         }
       }
 
-      boolean save = Db.save(tableName, record, jsonFields);
+    } else { // 保存
+      boolean save = save(tableName, jsonFields, primaryKeyName, record);
       if (save) {
         Kv by = Kv.by(primaryKeyName, record.getObject(primaryKeyName));
         return new TableResult<>(by);
@@ -180,7 +160,50 @@ public class ApiTable {
         return TableResult.fail("save fail");
       }
     }
+  }
 
+  public static boolean save(String tableName, String[] jsonFields, String primaryKeyName, Record record) {
+    // 如果主键是varchar类型,插入uuid类型 不处理uuid类型.如果是uuid类型,让数据库自动生成
+    Object id = getIdValueByType(tableName);
+    if (id != null) {
+      record.set(primaryKeyName, id);
+    }
+    return Db.save(tableName, record, jsonFields);
+  }
+
+  public static Object getIdValueByType(String tableName) {
+    String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
+    if (!StrKit.isBlank(primaryKeyColumnType)) {
+      if (primaryKeyColumnType.startsWith("varchar") || primaryKeyColumnType.startsWith("text")) {
+        return UUIDUtils.random();
+      } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long")) {
+        // 如果主键是bigint (20)类型,插入雪花Id
+        long threadId = Thread.currentThread().getId();
+        if (threadId > 31) {
+          threadId = threadId % 31;
+        }
+        if (threadId < 0) {
+          threadId = 0;
+        }
+        return new SnowflakeIdGenerator(threadId, 0).generateId();
+      }
+    }
+    return null;
+  }
+
+  public static boolean update(String tableName, String[] jsonFields, String primaryKeyName, String idValue,
+      Record record) {
+    String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
+
+    boolean update = false;
+    if ("uuid".equals(primaryKeyColumnType)) {
+      UUID idUUID = UUID.fromString(idValue);
+      record.set(primaryKeyName, idUUID);
+      update = Db.update(tableName, primaryKeyName, record, jsonFields);
+    } else {
+      update = Db.update(tableName, primaryKeyName, record, jsonFields);
+    }
+    return update;
   }
 
   public static TableResult<Kv> batchUpdateByIds(String f, TableInput kv) {
@@ -685,5 +708,4 @@ public class ApiTable {
     }
     return new TableResult<>(dbTableService.columns(f));
   }
-
 }
