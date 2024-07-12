@@ -8,7 +8,7 @@ import com.litongjava.jfinal.plugin.activerecord.Record;
 import com.litongjava.table.model.TableResult;
 import com.litongjava.table.model.DbPage;
 
-public class DbJsonBeanUtils {
+public class TableResultUtils {
   public static TableResult<DbPage<Kv>> pageToDbPage(TableResult<Page<Record>> jsonBean, boolean underscoreToCamel) {
     int totalRow = jsonBean.getData().getTotalRow();
     List<Record> list = jsonBean.getData().getList();
