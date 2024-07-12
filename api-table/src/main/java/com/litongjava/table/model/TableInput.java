@@ -1,7 +1,9 @@
 package com.litongjava.table.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.jfinal.kit.Kv;
@@ -66,7 +68,7 @@ public class TableInput extends HashMap {
     super.putAll(kv);
     return this;
   }
-  
+
   @SuppressWarnings("unchecked")
   public TableInput set(TableInput kv) {
     super.putAll(kv);
@@ -243,12 +245,32 @@ public class TableInput extends HashMap {
   public Integer getPageSize() {
     return getInt(pageSize);
   }
-  
+
   public TableInput setPageSize(Boolean inputIsAsc) {
     return set(isAsc, inputIsAsc);
   }
 
   public Boolean isAsc() {
     return getBoolean(isAsc);
+  }
+
+  @SuppressWarnings("unchecked")
+  public TableInput addJsonField(String jsonField) {
+    Object object = get(jsonFields);
+    if (object != null && object instanceof List) {
+      List<String> lists = (List) object;
+      lists.add(jsonField);
+    } else {
+      List<String> list = new ArrayList<>();
+      list.add(jsonField);
+      put(jsonFields, list);
+    }
+    return this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public TableInput setJsonFieldString(String jsonFieldString) {
+    put(jsonFields, jsonFieldString);
+    return this;
   }
 }
