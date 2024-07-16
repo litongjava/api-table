@@ -96,9 +96,10 @@ public class ApiTable {
       }
     }
 
-    boolean save = Db.save(tableName, record, jsonFields);
+    boolean save = Db.save(tableName, primaryKeyName, record, jsonFields);
     if (save) {
-      return new TableResult<>(record.toKv());
+      Kv by = Kv.by(primaryKeyName, record.getObject(primaryKeyName));
+      return new TableResult<>(by);
     } else {
       return TableResult.fail("save fail");
     }
@@ -131,7 +132,7 @@ public class ApiTable {
       String idValue = record.getStr(primaryKeyName);
 
       if (!StrKit.isBlank(idValue)) {
-        boolean update = update(tableName, jsonFields, primaryKeyName, idValue, record);
+        boolean update = update(tableName, primaryKeyName, idValue, record, jsonFields);
         if (update) {
           return new TableResult<>();
         } else {
@@ -191,8 +192,8 @@ public class ApiTable {
     return null;
   }
 
-  public static boolean update(String tableName, String[] jsonFields, String primaryKeyName, String idValue,
-      Record record) {
+  public static boolean update(String tableName, String primaryKeyName, String idValue, Record record,
+      String[] jsonFields) {
     String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
 
     boolean update = false;
@@ -202,6 +203,20 @@ public class ApiTable {
       update = Db.update(tableName, primaryKeyName, record, jsonFields);
     } else {
       update = Db.update(tableName, primaryKeyName, record, jsonFields);
+    }
+    return update;
+  }
+
+  public static boolean update(String tableName, String primaryKeyName, String idValue, Record record) {
+    String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
+
+    boolean update = false;
+    if ("uuid".equals(primaryKeyColumnType)) {
+      UUID idUUID = UUID.fromString(idValue);
+      record.set(primaryKeyName, idUUID);
+      update = Db.update(tableName, primaryKeyName, record);
+    } else {
+      update = Db.update(tableName, primaryKeyName, record);
     }
     return update;
   }

@@ -62,4 +62,8 @@ public class TableResult<T> {
     return new TableResult<T>(kv);
   }
 
+  public boolean isOk() {
+    return this.code == 1;
+  }
+
 }
