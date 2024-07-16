@@ -194,12 +194,17 @@ public class TableInput extends HashMap {
     return this;
   }
 
-  public TableInput setCoumns(String inputColumns) {
+  public TableInput setColumns(String inputColumns) {
     set(columns, inputColumns);
     return this;
   }
 
-  public String getCoumns() {
+  public TableInput columns(String inputColumns) {
+    set(columns, inputColumns);
+    return this;
+  }
+
+  public String getColumns() {
     return getStr(columns);
   }
 
@@ -213,6 +218,11 @@ public class TableInput extends HashMap {
   }
 
   public TableInput setOrderBy(String inputOrderBy) {
+    set(orderBy, inputOrderBy);
+    return this;
+  }
+
+  public TableInput orderBy(String inputOrderBy) {
     set(orderBy, inputOrderBy);
     return this;
   }
@@ -234,6 +244,10 @@ public class TableInput extends HashMap {
     return set(pageNo, inputPageNo);
   }
 
+  public TableInput pageNo(int inputPageNo) {
+    return set(pageNo, inputPageNo);
+  }
+
   public Integer getPageNo() {
     return getInt(pageNo);
   }
@@ -242,11 +256,19 @@ public class TableInput extends HashMap {
     return set(pageSize, inputPageSize);
   }
 
+  public TableInput pageSize(Integer inputPageSize) {
+    return set(pageSize, inputPageSize);
+  }
+
   public Integer getPageSize() {
     return getInt(pageSize);
   }
 
-  public TableInput setPageSize(Boolean inputIsAsc) {
+  public TableInput setAsc(Boolean inputIsAsc) {
+    return set(isAsc, inputIsAsc);
+  }
+
+  public TableInput asc(boolean inputIsAsc) {
     return set(isAsc, inputIsAsc);
   }
 
@@ -273,4 +295,5 @@ public class TableInput extends HashMap {
     put(jsonFields, jsonFieldString);
     return this;
   }
+
 }

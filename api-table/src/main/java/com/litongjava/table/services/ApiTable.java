@@ -207,15 +207,16 @@ public class ApiTable {
     return update;
   }
 
-  public static boolean update(String tableName, String primaryKeyName, String idValue, Record record) {
+  public static boolean update(String tableName, String primaryKeyName, Object idValue, Record record) {
     String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
 
     boolean update = false;
     if ("uuid".equals(primaryKeyColumnType)) {
-      UUID idUUID = UUID.fromString(idValue);
+      UUID idUUID = UUID.fromString((String) idValue);
       record.set(primaryKeyName, idUUID);
       update = Db.update(tableName, primaryKeyName, record);
     } else {
+      record.set(primaryKeyName, idValue);
       update = Db.update(tableName, primaryKeyName, record);
     }
     return update;
