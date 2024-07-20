@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.jfinal.kit.StrKit;
-import com.litongjava.table.constants.OperatorConstants;
+import com.litongjava.table.constants.Operators;
 import com.litongjava.table.model.TableInput;
 import com.litongjava.table.utils.ObjectUtils;
 
@@ -12,30 +12,30 @@ public class OperatorService {
   public void addOperator(StringBuffer where, List<Object> paramList, String fieldName, String operator, TableInput kv) {
     Object value = kv.get(fieldName);
     if (!ObjectUtils.isEmpty(value)) {
-      if (OperatorConstants.EQ.equals(operator)) {
+      if (Operators.EQ.equals(operator)) {
         addWhereAndField(where, fieldName, "=");
         paramList.add(kv.remove(fieldName));
-      } else if (OperatorConstants.NE.equals(operator)) {
+      } else if (Operators.NE.equals(operator)) {
         addWhereAndField(where, fieldName, "!=");
         paramList.add(kv.remove(fieldName));
 
-      } else if (OperatorConstants.GT.equals(operator)) {
+      } else if (Operators.GT.equals(operator)) {
         addWhereAndField(where, fieldName, ">");
         paramList.add(kv.remove(fieldName));
 
-      } else if (OperatorConstants.GE.equals(operator)) {
+      } else if (Operators.GE.equals(operator)) {
         addWhereAndField(where, fieldName, ">=");
         paramList.add(kv.remove(fieldName));
 
-      } else if (OperatorConstants.LT.equals(operator)) {
+      } else if (Operators.LT.equals(operator)) {
         addWhereAndField(where, fieldName, "<");
         paramList.add(kv.remove(fieldName));
 
-      } else if (OperatorConstants.LE.equals(operator)) {
+      } else if (Operators.LE.equals(operator)) {
         addWhereAndField(where, fieldName, "<=");
         paramList.add(kv.remove(fieldName));
 
-      } else if (OperatorConstants.BT.equals(operator)) {
+      } else if (Operators.BT.equals(operator)) {
         Object remove = kv.remove(fieldName);
 
         if (remove instanceof Object[]) {
@@ -55,7 +55,7 @@ public class OperatorService {
           }
         }
 
-      } else if (OperatorConstants.NB.equals(operator)) {
+      } else if (Operators.NB.equals(operator)) {
         Object remove = kv.remove(fieldName);
 
         if (remove instanceof Object[]) {
@@ -74,23 +74,23 @@ public class OperatorService {
             paramList.add(list.get(1));
           }
         }
-      } else if (OperatorConstants.CT.equals(operator)) {
+      } else if (Operators.CT.equals(operator)) {
         addWhereAndField(where, fieldName, "like");
         paramList.add("%" + kv.remove(fieldName) + "%");
 
-      } else if (OperatorConstants.SW.equals(operator)) {
+      } else if (Operators.SW.equals(operator)) {
         value = kv.remove(fieldName);
         if (StrKit.notNull(kv.remove(fieldName))) {
           addWhereAndField(where, fieldName, "like");
           paramList.add("%" + value);
         }
 
-      } else if (OperatorConstants.EW.equals(operator)) { // EndWith
+      } else if (Operators.EW.equals(operator)) { // EndWith
         value = kv.remove(fieldName);
         addWhereAndField(where, fieldName, "like");
         paramList.add(value + "%");
 
-      } else if (OperatorConstants.OL.equals(operator)) {
+      } else if (Operators.OL.equals(operator)) {
         value = kv.remove(fieldName);
         if (value instanceof Object[]) {
           Object[] valueArray = (Object[]) value;
@@ -98,12 +98,12 @@ public class OperatorService {
           Collections.addAll(paramList, valueArray);
         }
 
-      } else if (OperatorConstants.NK.equals(operator)) {
+      } else if (Operators.NK.equals(operator)) {
         value = kv.remove(fieldName);
         addWhereAndField(where, fieldName, "not like");
         paramList.add(value);
 
-      } else if (OperatorConstants.IL.equals(operator)) {
+      } else if (Operators.IL.equals(operator)) {
         value = kv.remove(fieldName);
         if (value instanceof Object[]) {
           Object[] valueArray = (Object[]) value;
@@ -111,34 +111,34 @@ public class OperatorService {
           Collections.addAll(paramList, valueArray);
         }
 
-      } else if (OperatorConstants.NI.equals(operator)) {
+      } else if (Operators.NI.equals(operator)) {
         value = kv.remove(fieldName);
         if (value instanceof Object[]) {
           Object[] valueArray = (Object[]) value;
           addWhereInField(where, fieldName, "not in", valueArray);
           Collections.addAll(paramList, valueArray);
         }
-      } else if (OperatorConstants.NL.equals(operator)) {
+      } else if (Operators.NL.equals(operator)) {
         addWhereNotValueField(where, fieldName, "is null", "and");
 
-      } else if (OperatorConstants.NN.equals(operator)) {
+      } else if (Operators.NN.equals(operator)) {
         addWhereNotValueField(where, fieldName, "is not null", "and");
 
-      } else if (OperatorConstants.EY.equals(operator)) {
+      } else if (Operators.EY.equals(operator)) {
         addWhereEmptyField(where, fieldName);
 
-      } else if (OperatorConstants.NY.equals(operator)) {
+      } else if (Operators.NY.equals(operator)) {
         addWhereNotEmptyField(where, fieldName);
       }
     } else {
-      if (OperatorConstants.NL.equals(operator)) {
+      if (Operators.NL.equals(operator)) {
         addWhereAndField(where, fieldName, "is null");
-      } else if (OperatorConstants.NN.equals(operator)) {
+      } else if (Operators.NN.equals(operator)) {
         addWhereAndField(where, fieldName, "is not null");
-      } else if (OperatorConstants.EY.equals(operator)) {
+      } else if (Operators.EY.equals(operator)) {
         addWhereEmptyField(where, fieldName);
 
-      } else if (OperatorConstants.NY.equals(operator)) {
+      } else if (Operators.NY.equals(operator)) {
         addWhereNotEmptyField(where, fieldName);
       }
     }

@@ -1,6 +1,6 @@
 package com.litongjava.table.constants;
 
-public class OperatorConstants {
+public class Operators {
   // =
   public static final String EQ = "eq";
   // "="
