@@ -39,5 +39,9 @@ public class Operators {
   public static final String EY = "ey";
   // not empty
   public static final String NY = "ny";
+  // is not true
+  public static final String NT = "nt";
+  // is not fasle
+  public static final String NF = "nf";
 
 }

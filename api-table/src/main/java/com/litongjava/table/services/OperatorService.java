@@ -9,7 +9,8 @@ import com.litongjava.table.model.TableInput;
 import com.litongjava.table.utils.ObjectUtils;
 
 public class OperatorService {
-  public void addOperator(StringBuffer where, List<Object> paramList, String fieldName, String operator, TableInput kv) {
+  public void addOperator(StringBuffer where, List<Object> paramList, String fieldName, String operator,
+      TableInput kv) {
     Object value = kv.get(fieldName);
     if (!ObjectUtils.isEmpty(value)) {
       if (Operators.EQ.equals(operator)) {
@@ -129,18 +130,32 @@ public class OperatorService {
 
       } else if (Operators.NY.equals(operator)) {
         addWhereNotEmptyField(where, fieldName);
+      } else if (Operators.NT.equals(operator)) {
+        addWhereNotTrue(where, fieldName);
+
+      } else if (Operators.NF.equals(operator)) {
+        addWhereNotFalse(where, fieldName);
       }
     } else {
       if (Operators.NL.equals(operator)) {
         addWhereAndField(where, fieldName, "is null");
+
       } else if (Operators.NN.equals(operator)) {
         addWhereAndField(where, fieldName, "is not null");
+
       } else if (Operators.EY.equals(operator)) {
         addWhereEmptyField(where, fieldName);
 
       } else if (Operators.NY.equals(operator)) {
         addWhereNotEmptyField(where, fieldName);
+
+      } else if (Operators.NT.equals(operator)) {
+        addWhereNotTrue(where, fieldName);
+
+      } else if (Operators.NF.equals(operator)) {
+        addWhereNotFalse(where, fieldName);
       }
+
     }
   }
 
@@ -223,6 +238,26 @@ public class OperatorService {
     }
 
     String format = "%s is not null and %s != ''";
+    sql.append(String.format(format, fieldName, fieldName));
+  }
+
+  public void addWhereNotTrue(StringBuffer sql, String fieldName) {
+
+    if (!sql.toString().endsWith("where ")) {
+      sql.append(" and ");
+    }
+
+    String format = "%s is not true";
+    sql.append(String.format(format, fieldName, fieldName));
+  }
+
+  public void addWhereNotFalse(StringBuffer sql, String fieldName) {
+
+    if (!sql.toString().endsWith("where ")) {
+      sql.append(" and ");
+    }
+
+    String format = "%s is not false";
     sql.append(String.format(format, fieldName, fieldName));
   }
 
