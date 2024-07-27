@@ -558,7 +558,7 @@ public class ApiTable {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String updateSqlTemplate = "update %s set %s=%s where %s =?";
     String sql = String.format(updateSqlTemplate, tableName, delColumn, flag, primaryKey);
-    int updateResult = Db.update(sql, id);
+    int updateResult = Db.updateBySql(sql, id);
     if (updateResult > 0) {
       return new TableResult<>();
     } else {
@@ -578,7 +578,7 @@ public class ApiTable {
     String sql = String.format(updateSqlTemplate, tableName, delColumn, primaryKey, userIdColumn);
 
     // 执行更新操作
-    int updateResult = Db.update(sql, flag, id, userId);
+    int updateResult = Db.updateBySql(sql, flag, id, userId);
 
     // 根据更新结果返回相应的 DbJsonBean 实例
     if (updateResult > 0) {
@@ -598,7 +598,7 @@ public class ApiTable {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     String upateTemplate = "update %s set is_del=1 where  %s =?";
     String sql = String.format(upateTemplate, tableName, primaryKey);
-    int updateResult = Db.update(sql, id);
+    int updateResult = Db.updateBySql(sql, id);
     if (updateResult > 0) {
       return new TableResult<>();
     } else {
@@ -650,7 +650,7 @@ public class ApiTable {
     }
     String sql = "update %s set is_del=1 where " + where.toString();
     sql = String.format(sql, tableName);
-    Db.update(sql, idValues);
+    Db.updateBySql(sql, idValues);
     return new TableResult<>();
   }
 
