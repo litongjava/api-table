@@ -3,10 +3,10 @@ package com.litongjava.table.utils;
 import java.util.List;
 
 import com.jfinal.kit.Kv;
-import com.litongjava.jfinal.plugin.activerecord.Page;
-import com.litongjava.jfinal.plugin.activerecord.Record;
-import com.litongjava.table.model.TableResult;
+import com.litongjava.db.activerecord.Page;
+import com.litongjava.db.activerecord.Record;
 import com.litongjava.table.model.DbPage;
+import com.litongjava.table.model.TableResult;
 
 public class TableResultUtils {
   public static TableResult<DbPage<Kv>> pageToDbPage(TableResult<Page<Record>> jsonBean, boolean underscoreToCamel) {

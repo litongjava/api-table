@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.litongjava.jfinal.plugin.activerecord.Db;
-import com.litongjava.jfinal.plugin.activerecord.DbPro;
-import com.litongjava.jfinal.plugin.activerecord.Page;
-import com.litongjava.jfinal.plugin.activerecord.Record;
-import com.litongjava.jfinal.plugin.activerecord.dialect.Dialect;
-import com.litongjava.jfinal.plugin.activerecord.dialect.MysqlDialect;
-import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
+import com.litongjava.db.activerecord.Db;
+import com.litongjava.db.activerecord.DbPro;
+import com.litongjava.db.activerecord.Page;
+import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.activerecord.dialect.Dialect;
+import com.litongjava.db.activerecord.dialect.MysqlDialect;
+import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.table.model.DbTableStruct;
 import com.litongjava.table.utils.MarkdownTableUtils;
 

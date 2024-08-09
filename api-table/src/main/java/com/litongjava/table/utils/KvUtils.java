@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.jfinal.kit.Kv;
-import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.db.activerecord.Record;
 import com.litongjava.table.model.TableInput;
 import com.litongjava.tio.utils.name.CamelNameUtils;
 

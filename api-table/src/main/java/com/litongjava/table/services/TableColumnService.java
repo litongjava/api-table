@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import com.litongjava.jfinal.plugin.activerecord.Db;
+import com.litongjava.db.activerecord.Db;
 import com.litongjava.table.model.DbTableStruct;
 
 /**

@@ -3,8 +3,8 @@ package com.litongjava.table.services;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.litongjava.jfinal.plugin.activerecord.Db;
-import com.litongjava.jfinal.plugin.activerecord.DbPro;
+import com.litongjava.db.activerecord.Db;
+import com.litongjava.db.activerecord.DbPro;
 import com.litongjava.table.model.DbTableStruct;
 
 /**

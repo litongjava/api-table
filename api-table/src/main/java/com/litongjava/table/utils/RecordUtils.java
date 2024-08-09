@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.postgresql.util.PGobject;
 
-import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.db.activerecord.Record;
 import com.litongjava.tio.utils.json.JsonUtils;
 
 public class RecordUtils {

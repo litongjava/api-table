@@ -12,12 +12,12 @@ import org.postgresql.util.PGobject;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
-import com.litongjava.jfinal.plugin.activerecord.Db;
-import com.litongjava.jfinal.plugin.activerecord.DbPro;
-import com.litongjava.jfinal.plugin.activerecord.Page;
-import com.litongjava.jfinal.plugin.activerecord.Record;
-import com.litongjava.jfinal.plugin.activerecord.dialect.PostgreSqlDialect;
-import com.litongjava.jfinal.plugin.utils.PgVectorUtils;
+import com.litongjava.db.activerecord.Db;
+import com.litongjava.db.activerecord.DbPro;
+import com.litongjava.db.activerecord.Page;
+import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
+import com.litongjava.db.utils.PgVectorUtils;
 import com.litongjava.table.config.DbDataConfig;
 import com.litongjava.table.model.DataPageRequest;
 import com.litongjava.table.model.DataQueryRequest;
@@ -26,8 +26,8 @@ import com.litongjava.table.model.Sql;
 import com.litongjava.table.model.TableInput;
 import com.litongjava.table.model.TableResult;
 import com.litongjava.table.utils.KvUtils;
-import com.litongjava.table.utils.SnowflakeIdGenerator;
 import com.litongjava.table.utils.UUIDUtils;
+import com.litongjava.tio.utils.snowflake.SnowflakeIdGenerator;
 
 public class ApiTable {
   private static DbSqlService dbSqlService = new DbSqlService();

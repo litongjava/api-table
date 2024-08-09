@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
   <artifactId>api-table</artifactId>
-  <version>1.3.3</version>
+  <version>1.3.7</version>
   <packaging>jar</packaging>
   <name>api-table</name>
   <description>auto curd for db table</description>
@@ -18,26 +18,28 @@
   <dependencies>
     <dependency>
       <groupId>com.litongjava</groupId>
-      <artifactId>jfinal-plugins</artifactId>
-      <version>1.1.3</version>
+      <artifactId>java-db</artifactId>
+      <version>1.1.7</version>
     </dependency>
 
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>tio-utils</artifactId>
-      <version>3.7.3.v20240801-RELEASE</version>
+      <version>3.7.3.v20240803-RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>easyexcel</artifactId>
       <version>2.2.10</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.alibaba.fastjson2</groupId>
       <artifactId>fastjson2</artifactId>
       <version>2.0.12</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

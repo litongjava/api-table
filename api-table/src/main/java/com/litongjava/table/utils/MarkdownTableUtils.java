@@ -2,7 +2,7 @@ package com.litongjava.table.utils;
 
 import java.util.List;
 
-import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.db.activerecord.Record;
 
 public class MarkdownTableUtils {
 
