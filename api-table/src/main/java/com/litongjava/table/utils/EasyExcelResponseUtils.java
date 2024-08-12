@@ -9,15 +9,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.litongjava.db.activerecord.Record;
-import com.litongjava.tio.http.common.HttpRequest;
 import com.litongjava.tio.http.common.HttpResponse;
 import com.litongjava.tio.http.server.util.Resps;
 
-import lombok.Cleanup;
-
 public class EasyExcelResponseUtils {
-  public static HttpResponse exportRecords(HttpRequest request, String filename, String sheetName, List<Record> records)
-      throws IOException {
+  public static void exportRecords(HttpResponse response, String filename, String sheetName, List<Record> records) {
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, sheetName, records);
@@ -26,35 +22,50 @@ public class EasyExcelResponseUtils {
     byte[] bytes = outputStream.toByteArray();
 
     // 使用 Resps 工具类创建一个包含二维码图片的响应
-    HttpResponse response = Resps.bytesWithContentType(request, bytes, "application/vnd.ms-excel;charset=UTF-8");
-    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    return response;
+    Resps.bytesWithContentType(response, bytes, "application/vnd.ms-excel;charset=UTF-8");
+    String headeValue = "attachment;filename=";
+    try {
+      headeValue += URLEncoder.encode(filename, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    response.addHeader("Content-Disposition", headeValue);
   }
 
-  public static void exportAllTableRecords(HttpResponse response, String filename,
-      LinkedHashMap<String, List<Record>> allTableData) throws IOException {
-    @Cleanup
+  public static void exportAllTableRecords(HttpResponse response, String filename, LinkedHashMap<String, List<Record>> allTableData) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, allTableData);
     byte[] bytes = outputStream.toByteArray();
     Resps.bytesWithContentType(response, bytes, "application/vnd.ms-excel;charset=UTF-8");
-    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+    String headeValue = "attachment;filename=";
+    try {
+      headeValue += URLEncoder.encode(filename, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    response.addHeader("Content-Disposition", headeValue);
   }
 
   /**
    * 自定义导出
    */
-  public static <T> HttpResponse export(HttpRequest request, String filename, String sheetName, List<Record> records,
-      Class<T> clazz) throws UnsupportedEncodingException, IOException {
+  public static <T> void export(HttpResponse response, String filename, String sheetName, List<Record> records, Class<T> clazz) {
     List<T> exportDatas = records.stream().map(e -> e.toBean(clazz)).collect(Collectors.toList());
-
-    @Cleanup
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    EasyExcelUtils.write(outputStream, filename, sheetName, clazz, exportDatas);
+    try {
+      EasyExcelUtils.write(outputStream, filename, sheetName, clazz, exportDatas);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     byte[] bytes = outputStream.toByteArray();
-    HttpResponse response = Resps.bytesWithContentType(request, bytes, "application/vnd.ms-excel;charset=UTF-8");
-    response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-    return response;
+    Resps.bytesWithContentType(response, bytes, "application/vnd.ms-excel;charset=UTF-8");
+    String headeValue = "attachment;filename=";
+    try {
+      headeValue += URLEncoder.encode(filename, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    response.addHeader("Content-Disposition", headeValue);
   }
 
 }
