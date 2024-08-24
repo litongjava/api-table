@@ -173,7 +173,7 @@ public class ApiTable {
   }
 
   public static Object getIdValueByType(String tableName) {
-    String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
+    String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName).toLowerCase();
     if (!StrKit.isBlank(primaryKeyColumnType)) {
       if (primaryKeyColumnType.startsWith("varchar") || primaryKeyColumnType.startsWith("text")) {
         return UUIDUtils.random();

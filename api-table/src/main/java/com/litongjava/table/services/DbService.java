@@ -12,6 +12,7 @@ import com.litongjava.db.activerecord.Record;
 import com.litongjava.db.activerecord.dialect.Dialect;
 import com.litongjava.db.activerecord.dialect.MysqlDialect;
 import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
+import com.litongjava.db.activerecord.dialect.Sqlite3Dialect;
 import com.litongjava.table.model.DbTableStruct;
 import com.litongjava.table.utils.MarkdownTableUtils;
 
@@ -58,6 +59,7 @@ public class DbService {
 
   /**
    * 为ai提供的支持
+   * 
    * @param dbPro
    * @return
    */
@@ -89,7 +91,7 @@ public class DbService {
     // 遍历出主键,添加到ret中
     for (DbTableStruct record : columns) {
       String key = record.getKey();
-      if ("PRI".equals(key)) {
+      if ("PRI".equals(key) || "1".equals(key)) {
         DbTableStruct tableColumn = new DbTableStruct();
         tableColumn.setField(record.getField());
         tableColumn.setType(record.getType());
@@ -112,8 +114,7 @@ public class DbService {
   }
 
   /**
-   * 查询表名
-   * support mysql and postgresql
+   * 查询表名 support mysql and postgresql
    */
   public String[] tableNames(DbPro dbPro) {
     List<Record> tables = null;
@@ -154,6 +155,16 @@ public class DbService {
         ret.add(tableColumn);
       }
 
+    } else if (dialect instanceof Sqlite3Dialect) {
+      for (Record record : columns) {
+        DbTableStruct tableColumn = new DbTableStruct();
+        tableColumn.setField(record.getStr("name"));
+        tableColumn.setType(record.getStr("type"));
+        tableColumn.setIsNull(record.getStr("notnull"));
+        tableColumn.setDefaultValue(record.getStr("dflt_value"));
+        tableColumn.setKey(record.getStr("pk"));
+        ret.add(tableColumn);
+      }
     } else if (dialect instanceof MysqlDialect) {
       for (Record record : columns) {
         DbTableStruct tableColumn = new DbTableStruct();
@@ -183,22 +194,24 @@ public class DbService {
   public List<Record> getTableColumns(DbPro dbPro, String tableName) {
     String sql;
     Dialect dialect = dbPro.getConfig().getDialect();
-    List<Record> records;
+    List<Record> records = null;
     if (dialect instanceof PostgreSqlDialect) {
       // Field,Type,Null,Key,Default,Extra
-      sql = "SELECT column_name as Field, data_type as Type, is_nullable as Null, " + "column_default as Default, "
-          + "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name "
-          + "FROM information_schema.key_column_usage AS kcu " + "JOIN information_schema.table_constraints AS tc "
-          + "ON kcu.constraint_name = tc.constraint_name "
-          + "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key "
-          + "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
+      sql = "SELECT column_name as Field, data_type as Type, is_nullable as Null, " + "column_default as Default, " + "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name "
+          + "FROM information_schema.key_column_usage AS kcu " + "JOIN information_schema.table_constraints AS tc " + "ON kcu.constraint_name = tc.constraint_name "
+          + "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key " + "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
 
       records = dbPro.find(sql, tableName, tableName, "public");
       // 即便将别名设置为大写,返回的依然是小写,气人
+    } else if (dialect instanceof Sqlite3Dialect) {
+      // PRAGMA table_info(tablename)
+      // cid,name,type,notnull,dflt_value,pk
+      sql = "PRAGMA table_info(" + tableName + ")";
+      records = dbPro.find(sql);
     } else {
       // Field,Type,Null,Key,Default,Extra
       sql = "show columns from " + tableName;
-      records = dbPro.find(sql, tableName);
+      records = dbPro.find(sql);
     }
     return records;
   }
