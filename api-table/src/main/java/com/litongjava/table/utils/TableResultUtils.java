@@ -3,19 +3,18 @@ package com.litongjava.table.utils;
 import java.util.List;
 
 import com.jfinal.kit.Kv;
-import com.litongjava.db.activerecord.Page;
+import com.litongjava.db.TableResult;
 import com.litongjava.db.activerecord.Record;
-import com.litongjava.table.model.DbPage;
-import com.litongjava.table.model.TableResult;
+import com.litongjava.model.page.Page;
 
 public class TableResultUtils {
-  public static TableResult<DbPage<Kv>> pageToDbPage(TableResult<Page<Record>> jsonBean, boolean underscoreToCamel) {
+  public static TableResult<Page<Kv>> pageToDbPage(TableResult<Page<Record>> jsonBean, boolean underscoreToCamel) {
     int totalRow = jsonBean.getData().getTotalRow();
     List<Record> list = jsonBean.getData().getList();
     List<Kv> newList = KvUtils.recordsToKv(list, underscoreToCamel);
 
-    DbPage<Kv> pageData = new DbPage<>();
-    pageData.setTotal(totalRow);
+    Page<Kv> pageData = new Page<>();
+    pageData.setTotalRow(totalRow);
     pageData.setList(newList);
 
     return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), pageData);

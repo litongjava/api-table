@@ -12,19 +12,19 @@ import org.postgresql.util.PGobject;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
+import com.litongjava.db.TableResult;
 import com.litongjava.db.activerecord.Db;
 import com.litongjava.db.activerecord.DbPro;
-import com.litongjava.db.activerecord.Page;
 import com.litongjava.db.activerecord.Record;
 import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.db.utils.PgVectorUtils;
+import com.litongjava.model.page.Page;
 import com.litongjava.table.config.DbDataConfig;
 import com.litongjava.table.model.DataPageRequest;
 import com.litongjava.table.model.DataQueryRequest;
 import com.litongjava.table.model.DbTableStruct;
 import com.litongjava.table.model.Sql;
 import com.litongjava.table.model.TableInput;
-import com.litongjava.table.model.TableResult;
 import com.litongjava.table.utils.KvUtils;
 import com.litongjava.table.utils.UUIDUtils;
 import com.litongjava.tio.utils.snowflake.SnowflakeIdGenerator;
@@ -192,8 +192,7 @@ public class ApiTable {
     return null;
   }
 
-  public static boolean update(String tableName, String primaryKeyName, String idValue, Record record,
-      String[] jsonFields) {
+  public static boolean update(String tableName, String primaryKeyName, String idValue, Record record, String[] jsonFields) {
     String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
 
     boolean update = false;
@@ -431,8 +430,7 @@ public class ApiTable {
    * @param para
    * @return
    */
-  public static TableResult<Page<Record>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest,
-      TableInput para) {
+  public static TableResult<Page<Record>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest, TableInput para) {
     if (dbPro == null) {
       dbPro = Db.use();
     }
@@ -470,8 +468,7 @@ public class ApiTable {
       }
     } else {
       if (jsonFields != null && jsonFields.length > 0) {
-        listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields,
-            params.toArray());
+        listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields, params.toArray());
       } else {
         listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, params.toArray());
       }
@@ -566,8 +563,7 @@ public class ApiTable {
     }
   }
 
-  public static TableResult<Boolean> updateFlagByIdAndUserId(String tableName, Object id, String delColumn, int flag,
-      String userIdColumn, String userId) {
+  public static TableResult<Boolean> updateFlagByIdAndUserId(String tableName, Object id, String delColumn, int flag, String userIdColumn, String userId) {
     // 获取主键名
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
 

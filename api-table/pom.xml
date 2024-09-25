@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
   <artifactId>api-table</artifactId>
-  <version>1.4.0</version>
+  <version>1.4.1</version>
   <packaging>jar</packaging>
   <name>api-table</name>
   <description>auto curd for db table</description>
@@ -19,13 +19,7 @@
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>java-db</artifactId>
-      <version>1.1.8</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.litongjava</groupId>
-      <artifactId>tio-utils</artifactId>
-      <version>3.7.3.v20240821-RELEASE</version>
+      <version>1.2.6</version>
     </dependency>
 
     <dependency>
@@ -72,7 +66,7 @@
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>tio-boot</artifactId>
-      <version>1.4.6</version>
+      <version>1.6.4</version>
       <scope>provided</scope>
     </dependency>
 
