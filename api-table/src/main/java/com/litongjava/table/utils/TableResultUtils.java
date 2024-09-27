@@ -5,16 +5,17 @@ import java.util.List;
 import com.jfinal.kit.Kv;
 import com.litongjava.db.TableResult;
 import com.litongjava.db.activerecord.Record;
+import com.litongjava.model.page.DbPage;
 import com.litongjava.model.page.Page;
 
 public class TableResultUtils {
-  public static TableResult<Page<Kv>> pageToDbPage(TableResult<Page<Record>> jsonBean, boolean underscoreToCamel) {
+  public static TableResult<DbPage<Kv>> pageToDbPage(TableResult<Page<Record>> jsonBean, boolean underscoreToCamel) {
     int totalRow = jsonBean.getData().getTotalRow();
     List<Record> list = jsonBean.getData().getList();
     List<Kv> newList = KvUtils.recordsToKv(list, underscoreToCamel);
 
-    Page<Kv> pageData = new Page<>();
-    pageData.setTotalRow(totalRow);
+    DbPage<Kv> pageData = new DbPage<>();
+    pageData.setTotal(totalRow);
     pageData.setList(newList);
 
     return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), pageData);
