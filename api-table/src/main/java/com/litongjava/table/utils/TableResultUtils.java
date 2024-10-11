@@ -5,6 +5,7 @@ import java.util.List;
 import com.jfinal.kit.Kv;
 import com.litongjava.db.TableResult;
 import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.utils.RecordUtils;
 import com.litongjava.model.page.DbPage;
 import com.litongjava.model.page.Page;
 
@@ -12,7 +13,7 @@ public class TableResultUtils {
   public static TableResult<DbPage<Kv>> pageToDbPage(TableResult<Page<Record>> jsonBean, boolean underscoreToCamel) {
     int totalRow = jsonBean.getData().getTotalRow();
     List<Record> list = jsonBean.getData().getList();
-    List<Kv> newList = KvUtils.recordsToKv(list, underscoreToCamel);
+    List<Kv> newList = RecordUtils.recordsToKv(list, underscoreToCamel);
 
     DbPage<Kv> pageData = new DbPage<>();
     pageData.setTotal(totalRow);
@@ -27,12 +28,12 @@ public class TableResultUtils {
     if (data == null) {
       return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg());
     } else {
-      return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), KvUtils.recordToKv(data, false));
+      return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), RecordUtils.recordToKv(data, false));
     }
 
   }
 
   public static TableResult<List<Kv>> recordsToKv(TableResult<List<Record>> jsonBean, boolean underscoreToCamel) {
-    return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), KvUtils.recordsToKv(jsonBean.getData(), underscoreToCamel));
+    return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), RecordUtils.recordsToKv(jsonBean.getData(), underscoreToCamel));
   }
 }

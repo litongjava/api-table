@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import com.jfinal.kit.StrKit;
+import com.litongjava.db.TableInput;
 import com.litongjava.table.constants.Operators;
-import com.litongjava.table.model.TableInput;
 import com.litongjava.table.utils.ObjectUtils;
 
 public class OperatorService {

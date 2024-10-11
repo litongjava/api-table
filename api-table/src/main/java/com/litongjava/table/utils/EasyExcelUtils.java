@@ -13,6 +13,7 @@ import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.utils.RecordUtils;
 import com.litongjava.table.convert.LocalDateTimeConverter;
 import com.litongjava.table.convert.TimestampStringConverter;
 

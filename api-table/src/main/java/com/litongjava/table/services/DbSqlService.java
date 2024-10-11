@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.litongjava.db.TableInput;
 import com.litongjava.table.model.DataQueryRequest;
 import com.litongjava.table.model.Sql;
-import com.litongjava.table.model.TableInput;
 import com.litongjava.table.utils.ObjectUtils;
 
 /**

@@ -5,8 +5,9 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.litongjava.table.model.TableInput;
-import com.litongjava.table.utils.KvUtils;
+import com.litongjava.db.TableInput;
+import com.litongjava.table.utils.TableInputUtils;
+import com.litongjava.tio.utils.json.JsonUtils;
 
 public class KvUtilsTest {
 
@@ -19,8 +20,8 @@ public class KvUtilsTest {
     map.put("gt.longitude", "64000000");
     map.put("lt.longitude", "64999999");
 
-    TableInput kv = KvUtils.camelToUnderscore(map);
-    System.out.println(kv.toJson());
+    TableInput kv = TableInputUtils.camelToUnderscore(map);
+    System.out.println(JsonUtils.toJson(kv));
   }
 
 }

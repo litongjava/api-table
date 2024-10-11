@@ -1,5 +1,7 @@
 package com.litongjava.table.model;
 
+import com.litongjava.db.TableInput;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +18,9 @@ public class DataPageRequest {
   }
 
   public DataPageRequest(TableInput kv) {
-    Object pageNo = kv.remove("page_no");
+    Object pageNo = kv.remove(TableInput.pageNo);
     this.pageNo = getIntegerValue(pageNo, 1);
-    Object pageSize = kv.remove("page_size");
+    Object pageSize = kv.remove(TableInput.pageSize);
     this.pageSize = getIntegerValue(pageSize, 10);
   }
 

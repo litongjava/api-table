@@ -1,5 +1,7 @@
 package com.litongjava.table.model;
 
+import com.litongjava.db.TableInput;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

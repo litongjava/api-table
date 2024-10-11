@@ -12,6 +12,7 @@ import org.postgresql.util.PGobject;
 
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
+import com.litongjava.db.TableInput;
 import com.litongjava.db.TableResult;
 import com.litongjava.db.activerecord.Db;
 import com.litongjava.db.activerecord.DbPro;
@@ -24,9 +25,8 @@ import com.litongjava.table.model.DataPageRequest;
 import com.litongjava.table.model.DataQueryRequest;
 import com.litongjava.table.model.DbTableStruct;
 import com.litongjava.table.model.Sql;
-import com.litongjava.table.model.TableInput;
-import com.litongjava.table.utils.KvUtils;
-import com.litongjava.table.utils.UUIDUtils;
+import com.litongjava.table.utils.TableInputUtils;
+import com.litongjava.tio.utils.UUIDUtils;
 import com.litongjava.tio.utils.snowflake.SnowflakeIdGenerator;
 
 public class ApiTable {
@@ -51,12 +51,12 @@ public class ApiTable {
   }
 
   public static TableResult<Kv> saveOrUpdate(String tableName, TableInput kv) {
-    String[] jsonFields = KvUtils.getJsonFields(kv);
+    String[] jsonFields = TableInputUtils.getJsonFields(kv);
     return saveOrUpdate(tableName, kv, jsonFields);
   }
 
   public static TableResult<Kv> save(String tableName, TableInput kv) {
-    String[] jsonFields = KvUtils.getJsonFields(kv);
+    String[] jsonFields = TableInputUtils.getJsonFields(kv);
     return save(tableName, kv, jsonFields);
   }
 
@@ -68,8 +68,8 @@ public class ApiTable {
    */
   @SuppressWarnings("unchecked")
   public static TableResult<Kv> save(String tableName, TableInput kv, String[] jsonFields) {
-    KvUtils.removeEmptyValue(kv);
-    KvUtils.true21(kv);
+    TableInputUtils.removeEmptyValue(kv);
+    TableInputUtils.true21(kv);
     Record record = new Record();
     record.setColumns(kv);
 
@@ -109,8 +109,8 @@ public class ApiTable {
   @SuppressWarnings("unchecked")
   public static TableResult<Kv> saveOrUpdate(String tableName, TableInput kv, String[] jsonFields) {
     // KvUtils.removeEmptyValue(kv);
-    KvUtils.true21(kv);
-    Map<String, String> embeddingMap = KvUtils.getEmbeddingMap(kv);
+    TableInputUtils.true21(kv);
+    Map<String, String> embeddingMap = TableInputUtils.getEmbeddingMap(kv);
     Record record = new Record();
     record.setColumns(kv);
 
@@ -292,7 +292,7 @@ public class ApiTable {
   }
 
   public static TableResult<List<Record>> listAll(DbPro dbPro, String tableName, TableInput kv) {
-    String[] jsonFields = KvUtils.getJsonFields(kv);
+    String[] jsonFields = TableInputUtils.getJsonFields(kv);
     String sql = "select * from " + tableName;
     List<Record> records = null;
     if (jsonFields != null) {
@@ -331,7 +331,7 @@ public class ApiTable {
       dbPro = Db.use();
     }
     DataQueryRequest queryRequest = new DataQueryRequest(kvBean);
-    String[] jsonFields = KvUtils.getJsonFields(kvBean);
+    String[] jsonFields = TableInputUtils.getJsonFields(kvBean);
 
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(queryRequest, kvBean);
@@ -365,7 +365,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Record>> page(TableInput kv) {
-    String tableName = (String) kv.remove("table_name");
+    String tableName = (String) kv.remove(TableInput.table_name);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
   }
@@ -374,7 +374,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Record>> page(DbPro dbPro, TableInput kv) {
-    String tableName = (String) kv.remove("table_name");
+    String tableName = (String) kv.remove(TableInput.table_name);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(dbPro, tableName, dataPageRequest, kv);
   }
@@ -406,7 +406,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Record>> page(DbPro dbPro, String f, TableInput kv) {
-    kv.remove("table_name");
+    kv.remove(TableInput.table_name);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(dbPro, f, dataPageRequest, kv);
   }
@@ -450,7 +450,7 @@ public class ApiTable {
     Integer pageSize = pageRequest.getPageSize();
 
     DataQueryRequest queryRequest = new DataQueryRequest(para);
-    String[] jsonFields = KvUtils.getJsonFields(para);
+    String[] jsonFields = TableInputUtils.getJsonFields(para);
 
     Sql sql = dbSqlService.getWhereClause(queryRequest, para);
     sql.setTableName(tableName);
@@ -495,7 +495,7 @@ public class ApiTable {
     }
 
     DataQueryRequest queryRequest = new DataQueryRequest(kvBean);
-    String[] jsonFields = KvUtils.getJsonFields(kvBean);
+    String[] jsonFields = TableInputUtils.getJsonFields(kvBean);
 
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(queryRequest, kvBean);
