@@ -486,7 +486,6 @@ public class ApiTable {
    */
   public static TableResult<Record> get(String tableName, TableInput kvBean) {
     return get(null, tableName, kvBean);
-
   }
 
   public static TableResult<Record> get(DbPro dbPro, String tableName, TableInput kvBean) {
@@ -520,7 +519,6 @@ public class ApiTable {
       } else {
         record = dbPro.findFirst(sql.getsql(), params.toArray());
       }
-
     }
 
     return new TableResult<Record>(record);
@@ -531,7 +529,7 @@ public class ApiTable {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     kvBean.put(primaryKey, idValue);
-    return get(null, kvBean);
+    return get(tableName, kvBean);
   }
 
   public static TableResult<Record> getById(String tableName, Object idValue) {
@@ -720,4 +718,58 @@ public class ApiTable {
     }
     return new TableResult<>(dbTableService.columns(f));
   }
+
+  public static String queryStr(String tableName, Object idValue, TableInput ti) {
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    ti.set(primaryKey, idValue);
+    return queryStr(tableName, ti);
+  }
+
+  public static String queryStr(String tableName, TableInput ti) {
+    return query(null, tableName, ti);
+  }
+
+  public static Long queryLong(String tableName, Object idValue, TableInput ti) {
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    ti.set(primaryKey, idValue);
+    return queryLong(tableName, ti);
+  }
+
+  public static Long queryLong(String tableName, TableInput ti) {
+    return query(null, tableName, ti);
+  }
+
+  public static PGobject queryPGobject(String tableName, Object idValue, TableInput ti) {
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    ti.set(primaryKey, idValue);
+    return queryPGobject(tableName, ti);
+  }
+
+  public static PGobject queryPGobject(String tableName, TableInput ti) {
+    return query(null, tableName, ti);
+  }
+
+  public static <T> T query(String tableName, TableInput ti) {
+    return query(Db.use(), tableName, ti);
+  }
+
+  public static <T> T query(DbPro dbPro, String tableName, TableInput kvBean) {
+    if (dbPro == null) {
+      dbPro = Db.use();
+    }
+    DataQueryRequest queryRequest = new DataQueryRequest(kvBean);
+
+    // 添加其他查询条件
+    Sql sql = dbSqlService.getWhereClause(queryRequest, kvBean);
+    sql.setTableName(tableName);
+    sql.setColumns(queryRequest.getColumns());
+
+    List<Object> params = sql.getParams();
+    if (params == null) {
+      return Db.queryFirst(sql.getsql());
+    } else {
+      return Db.queryFirst(sql.getsql(), params.toArray());
+    }
+  }
+
 }
