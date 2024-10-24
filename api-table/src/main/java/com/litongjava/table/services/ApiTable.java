@@ -17,7 +17,9 @@ import com.litongjava.db.TableResult;
 import com.litongjava.db.activerecord.Db;
 import com.litongjava.db.activerecord.DbPro;
 import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.activerecord.dialect.Dialect;
 import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
+import com.litongjava.db.activerecord.dialect.TdEngineDialect;
 import com.litongjava.db.utils.PgVectorUtils;
 import com.litongjava.model.page.Page;
 import com.litongjava.table.config.DbDataConfig;
@@ -435,14 +437,18 @@ public class ApiTable {
       dbPro = Db.use();
     }
     // process for primary key is uuid
-    DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(dbPro, tableName);
-    String primaryKeyName = primaryKey.getField();
+    Dialect dialect = dbPro.getConfig().getDialect();
+    if (dialect instanceof TdEngineDialect) {
 
-    Object idValue = para.get(primaryKeyName);
-    if (idValue != null) {
-      if ("uuid".equals(primaryKey.getType())) {
-        UUID idUUID = UUID.fromString((String) idValue);
-        para.set(primaryKeyName, idUUID);
+    } else {
+      DbTableStruct primaryKey = primaryKeyService.getPrimaryKey(dbPro, tableName);
+      String primaryKeyName = primaryKey.getField();
+      Object idValue = para.get(primaryKeyName);
+      if (idValue != null) {
+        if ("uuid".equals(primaryKey.getType())) {
+          UUID idUUID = UUID.fromString((String) idValue);
+          para.set(primaryKeyName, idUUID);
+        }
       }
     }
 

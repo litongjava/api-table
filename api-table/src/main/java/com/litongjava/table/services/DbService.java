@@ -12,6 +12,7 @@ import com.litongjava.db.activerecord.dialect.Dialect;
 import com.litongjava.db.activerecord.dialect.MysqlDialect;
 import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.db.activerecord.dialect.Sqlite3Dialect;
+import com.litongjava.db.activerecord.dialect.TdEngineDialect;
 import com.litongjava.model.page.Page;
 import com.litongjava.table.model.DbTableStruct;
 import com.litongjava.table.utils.MarkdownTableUtils;
@@ -203,6 +204,9 @@ public class DbService {
 
       records = dbPro.find(sql, tableName, tableName, "public");
       // 即便将别名设置为大写,返回的依然是小写,气人
+    } else if (dialect instanceof TdEngineDialect) {
+      
+      
     } else if (dialect instanceof Sqlite3Dialect) {
       // PRAGMA table_info(tablename)
       // cid,name,type,notnull,dflt_value,pk

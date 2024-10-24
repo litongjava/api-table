@@ -5,7 +5,7 @@ import java.util.List;
 import com.jfinal.kit.Kv;
 import com.litongjava.db.TableResult;
 import com.litongjava.db.activerecord.Record;
-import com.litongjava.db.utils.RecordUtils;
+import com.litongjava.kit.RecordUtils;
 import com.litongjava.model.page.DbPage;
 import com.litongjava.model.page.Page;
 
