@@ -40,6 +40,13 @@ public class Sql {
     return sql.toString();
   }
 
+  public String getDelSql() {
+    StringBuffer sql = new StringBuffer();
+    sql.append("DELETE FROM " + tableName);
+    sql.append(" " + where.toString());
+    return sql.toString();
+  }
+
   public String getSqlExceptSelect() {
     return "from " + tableName + " " + where.toString();
   }

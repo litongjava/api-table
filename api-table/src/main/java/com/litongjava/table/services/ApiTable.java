@@ -552,7 +552,36 @@ public class ApiTable {
     } else {
       return TableResult.fail();
     }
+  }
 
+  public static TableResult<Boolean> del(String tableName, TableInput tableInput) {
+    DbPro use = Db.use();
+    return del(use, tableName, tableInput);
+  }
+
+  private static TableResult<Boolean> del(DbPro dbPro, String tableName, TableInput tableInput) {
+    return delete(dbPro, tableName, tableInput);
+  }
+
+  private static TableResult<Boolean> delete(DbPro dbPro, String tableName, TableInput tableInput) {
+    DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
+
+    // 添加其他查询条件
+    Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
+    sql.setTableName(tableName);
+
+    // 添加操作表
+    int delete = Db.delete(sql.getDelSql(), sql.getParams().toArray());
+    if (delete > 0) {
+      return TableResult.ok();
+    } else {
+      return TableResult.fail();
+    }
+  }
+
+  public static TableResult<Boolean> delete(String tableName, TableInput tableInput) {
+    DbPro use = Db.use();
+    return delete(use, tableName, tableInput);
   }
 
   public static TableResult<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag) {

@@ -6,4 +6,5 @@ package com.litongjava.table.constants;
 public class SqlTemplateConstants {
   public static String SELECT_ALL_FROM = "select * from %s";
   public static String SELECT_COLUMNS_FROM = "select %s from %s";
+  public static String DELETE = "DELETE %s";
 }
