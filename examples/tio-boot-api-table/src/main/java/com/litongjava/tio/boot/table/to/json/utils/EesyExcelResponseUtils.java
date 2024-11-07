@@ -8,8 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.litongjava.data.utils.EasyExcelUtils;
-import com.litongjava.jfinal.plugin.activerecord.Record;
+import com.litongjava.db.activerecord.Record;
+import com.litongjava.table.utils.EasyExcelUtils;
 import com.litongjava.tio.http.common.HttpRequest;
 import com.litongjava.tio.http.common.HttpResponse;
 import com.litongjava.tio.http.server.util.Resps;
@@ -17,8 +17,7 @@ import com.litongjava.tio.http.server.util.Resps;
 import lombok.Cleanup;
 
 public class EesyExcelResponseUtils {
-  public static HttpResponse exportRecords(HttpRequest request, String filename, String sheetName, List<Record> records)
-      throws IOException {
+  public static HttpResponse exportRecords(HttpRequest request, String filename, String sheetName, List<Record> records) throws IOException {
 
     @Cleanup
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -33,8 +32,7 @@ public class EesyExcelResponseUtils {
     return response;
   }
 
-  public static HttpResponse exportAllTableRecords(HttpRequest request, String filename,
-      LinkedHashMap<String, List<Record>> allTableData) throws IOException {
+  public static HttpResponse exportAllTableRecords(HttpRequest request, String filename, LinkedHashMap<String, List<Record>> allTableData) throws IOException {
     @Cleanup
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, allTableData);
@@ -47,8 +45,7 @@ public class EesyExcelResponseUtils {
   /**
    * 自定义导出
    */
-  public static <T> HttpResponse export(HttpRequest request, String filename, String sheetName, List<Record> records,
-      Class<T> clazz) throws UnsupportedEncodingException, IOException {
+  public static <T> HttpResponse export(HttpRequest request, String filename, String sheetName, List<Record> records, Class<T> clazz) throws UnsupportedEncodingException, IOException {
     List<T> exportDatas = records.stream().map(e -> e.toBean(clazz)).collect(Collectors.toList());
 
     @Cleanup

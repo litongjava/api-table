@@ -1,6 +1,6 @@
 package com.litongjava.tio.boot.table.to.json.controller;
 
-import com.litongjava.tio.http.server.annotation.RequestPath;
+import com.litongjava.annotation.RequestPath;
 
 @RequestPath("/")
 public class IndexController {

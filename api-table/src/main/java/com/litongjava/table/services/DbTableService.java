@@ -64,7 +64,7 @@ public class DbTableService {
 
       // {name: 'Name', key: 'name', type: 'el-input', placeholder: '请输入 Name'},
       String name = getName(field);
-      String key = getKey(field);
+      String key = getKey(field, false);
       String type = getType(fieldType);
 
       Map<String, Object> queryItem = new LinkedHashMap<>();
@@ -138,13 +138,13 @@ public class DbTableService {
     config.put("idType", primaryKeyColumnType);
     config.put("tableAlias", getName(tableName));
 
-    config.put("pageUri", "/table/json/" + f + "/page");
-    config.put("getUri", "/table/json/" + f + "/get");
-    config.put("createUri", "/table/json/" + f + "/create");
-    config.put("updateUri", "/table/json/" + f + "/update");
-    config.put("deleteUri", "/table/json/" + f + "/delete");
-    config.put("exportExcelUri", "/table/json/" + f + "/export-excel");
-    config.put("exportTableExcelUri", "/table/json/" + f + "/export-table-excel");
+    config.put("pageUri", "/api/table/" + f + "/page");
+    config.put("getUri", "/api/table/" + f + "/get");
+    config.put("createUri", "/api/table/" + f + "/create");
+    config.put("updateUri", "/api/table/" + f + "/update");
+    config.put("deleteUri", "/api/table/" + f + "/delete");
+    config.put("exportExcelUri", "/api/table/" + f + "/export-excel");
+    config.put("exportTableExcelUri", "/api/table/" + f + "/export-table-excel");
 
     config.put("query", query);
     config.put("toolBar", toolBar);
@@ -186,8 +186,7 @@ public class DbTableService {
    * @return
    */
   private String getName(String field) {
-    return Arrays.stream(field.split("_")).map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
-        .collect(Collectors.joining(" "));
+    return Arrays.stream(field.split("_")).map(word -> word.substring(0, 1).toUpperCase() + word.substring(1)).collect(Collectors.joining(" "));
   }
 
   /**
@@ -196,13 +195,18 @@ public class DbTableService {
    * @param field
    * @return
    */
-  private String getKey(String field) {
-    String[] words = field.split("_");
-    StringBuilder key = new StringBuilder(words[0]);
-    for (int i = 1; i < words.length; i++) {
-      key.append(Character.toUpperCase(words[i].charAt(0))).append(words[i].substring(1));
+  private String getKey(String field, boolean toCamel) {
+    if (toCamel) {
+      String[] words = field.split("_");
+      StringBuilder key = new StringBuilder(words[0]);
+      for (int i = 1; i < words.length; i++) {
+        key.append(Character.toUpperCase(words[i].charAt(0))).append(words[i].substring(1));
+      }
+      return key.toString();
+    } else {
+      return field;
     }
-    return key.toString();
+
   }
 
   private String getPlaceholder(String name, String lang) {
@@ -218,6 +222,10 @@ public class DbTableService {
       return "date";
     } else if ("tinyint(1)".equals(type)) {
       return "bool";
+    } else if ("int".equals(type) || "integer".equals(type)) {
+      return "int";
+    } else if ("bigint".equals(type)) {
+      return "long";
     } else {
       return "varchar";
     }
@@ -293,5 +301,17 @@ public class DbTableService {
     } else {
       return "Export All";
     }
+  }
+
+  public String getFieldType(String f, String key) {
+    List<DbTableStruct> columns = dbService.getTableStruct(Db.use(), f);
+    for (DbTableStruct record : columns) {
+      String field = record.getField();
+      String fieldType = record.getType();
+      if (key.equals(field)) {
+        return getType(fieldType);
+      }
+    }
+    return null;
   }
 }

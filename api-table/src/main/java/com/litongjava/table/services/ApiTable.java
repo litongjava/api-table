@@ -1,6 +1,7 @@
 package com.litongjava.table.services;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,6 +24,7 @@ import com.litongjava.db.activerecord.dialect.TdEngineDialect;
 import com.litongjava.db.utils.PgVectorUtils;
 import com.litongjava.model.page.Page;
 import com.litongjava.table.config.DbDataConfig;
+import com.litongjava.table.constants.FieldType;
 import com.litongjava.table.model.DataPageRequest;
 import com.litongjava.table.model.DataQueryRequest;
 import com.litongjava.table.model.DbTableStruct;
@@ -804,6 +806,30 @@ public class ApiTable {
       return Db.queryFirst(sql.getsql());
     } else {
       return Db.queryFirst(sql.getsql(), params.toArray());
+    }
+  }
+
+  public static String getFieldType(String f, String key) {
+    return dbTableService.getFieldType(f, key);
+  }
+
+  public static void transformType(String f, Map<String, Object> map) {
+    Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator();
+    while (iterator.hasNext()) {
+      Map.Entry<String, Object> entry = iterator.next();
+      String key = entry.getKey();
+      if ("pageNo".equals(key) || "pageSize".equals(key)) {
+        continue;
+      }
+      Object value = entry.getValue();
+      if (value != null) {
+        String type = ApiTable.getFieldType(f, key);
+        if (FieldType.int0.equals(type)) {
+          map.put(key, Integer.parseInt((String) value));
+        } else if (FieldType.long0.equals(type)) {
+          map.put(key, Long.parseLong((String) value));
+        }
+      }
     }
   }
 

@@ -1,17 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.litongjava</groupId>
-  <artifactId>tio-boot-table-to-json</artifactId>
+  <artifactId>tio-boot-api-table</artifactId>
   <version>1.0</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <graalvm.version>23.1.1</graalvm.version>
-    <tio.boot.version>1.4.1</tio.boot.version>
+    <fastjson2.version>2.0.52</fastjson2.version>
     <lombok-version>1.18.30</lombok-version>
-    <hotswap-classloader.version>1.2.2</hotswap-classloader.version>
+    <java-model.version>1.1.4</java-model.version>
+    <tio-utils.version>3.7.3.v20241015-RELEASE</tio-utils.version>
+    <tio-boot.version>1.8.6</tio-boot.version>
+    <hotswap-classloader.version>1.2.6</hotswap-classloader.version>
+    <jfinal-aop.version>1.3.3</jfinal-aop.version>
+    <java-db.version>1.4.4</java-db.version>
+    <api-table.version>1.4.8</api-table.version>
+
     <final.name>web-hello</final.name>
     <main.class>com.litongjava.tio.boot.table.to.json.TableToJsonApp</main.class>
   </properties>
@@ -23,27 +29,52 @@
     </dependency>
 
     <dependency>
-      <groupId>com.alibaba.fastjson2</groupId>
-      <artifactId>fastjson2</artifactId>
-      <version>2.0.12</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.litongjava</groupId>
-      <artifactId>tio-boot</artifactId>
-      <version>${tio.boot.version}</version>
+      <artifactId>java-model</artifactId>
+      <version>${java-model.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>tio-utils</artifactId>
-      <version>3.7.3.v20240401-RELEASE</version>
+      <version>${tio-utils.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.litongjava</groupId>
-      <artifactId>table-to-json</artifactId>
-      <version>1.2.8</version>
+      <artifactId>tio-boot</artifactId>
+      <version>${tio-boot.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.litongjava</groupId>
+      <artifactId>hotswap-classloader</artifactId>
+      <version>${hotswap-classloader.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.litongjava</groupId>
+      <artifactId>api-table</artifactId>
+      <version>${api-table.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.litongjava</groupId>
+      <artifactId>jfinal-aop</artifactId>
+      <version>${jfinal-aop.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.litongjava</groupId>
+      <artifactId>java-db</artifactId>
+      <version>${java-db.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba.fastjson2</groupId>
+      <artifactId>fastjson2</artifactId>
+      <version>2.0.12</version>
     </dependency>
 
     <!-- 连接池 -->
@@ -61,9 +92,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.litongjava</groupId>
-      <artifactId>hotswap-classloader</artifactId>
-      <version>${hotswap-classloader.version}</version>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.24</version>
     </dependency>
 
     <dependency>
@@ -95,25 +126,11 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-      <dependencies>
-        <dependency>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-          <version>1.2.3</version>
-        </dependency>
-      </dependencies>
     </profile>
 
     <!-- 生产环境 -->
     <profile>
       <id>production</id>
-      <dependencies>
-        <dependency>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-          <version>1.2.3</version>
-        </dependency>
-      </dependencies>
       <build>
         <plugins>
           <plugin>
