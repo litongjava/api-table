@@ -128,8 +128,30 @@ querydsl/
 
 .DS_Store
 
+*.exe
+*.out
+
 *.log
 node_modules/
 dist/
 dist.zip
 package-lock.json
+*.lock
+local.properties
+.cxx
+.externalNativeBuild
+/captures
+/build
+__pycache__/
+*.pyc
+
+
+cmake-build-debug/
+cmake-build-debug-mingw/
+venv/
+.vs/
+Debug/
+vcpkg_installed/
+.env
+.next/
+app.zip
