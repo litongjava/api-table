@@ -826,7 +826,10 @@ public class ApiTable {
         String type = ApiTable.getFieldType(f, key);
         if (FieldType.int0.equals(type)) {
           map.put(key, Integer.parseInt((String) value));
-        } else if (FieldType.long0.equals(type)) {
+        } else if (FieldType.short0.equals(type)) {
+          map.put(key, Short.parseShort((String) value));
+        }
+        else if (FieldType.long0.equals(type)) {
           map.put(key, Long.parseLong((String) value));
         }
       }

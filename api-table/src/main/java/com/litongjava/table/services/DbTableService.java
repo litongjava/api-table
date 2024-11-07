@@ -224,6 +224,8 @@ public class DbTableService {
       return "bool";
     } else if ("int".equals(type) || "integer".equals(type)) {
       return "int";
+    } else if ("smallint".equals(type)) {
+      return "short";
     } else if ("bigint".equals(type)) {
       return "long";
     } else {
