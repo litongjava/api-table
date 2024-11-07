@@ -256,7 +256,8 @@ public class DbTableService {
   private Map<String, Object> getFormItemDateProp(String lang) {
     Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
     hashMap.put("type", "datetime");
-    hashMap.put("valueFormat", "yyyy-MM-dd HH:mm:ss");
+    //hashMap.put("valueFormat", "yyyy-MM-dd HH:mm:ss");
+    hashMap.put("valueFormat", "timestamp");
 
     return hashMap;
 
