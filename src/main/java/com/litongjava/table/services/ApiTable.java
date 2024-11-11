@@ -320,8 +320,8 @@ public class ApiTable {
    * @param queryParam
    * @return
    */
-  public static TableResult<List<Record>> list(String tableName, TableInput kvBean) {
-    return list(null, tableName, kvBean);
+  public static TableResult<List<Record>> list(String tableName, TableInput tableInput) {
+    return list(null, tableName, tableInput);
   }
 
   /**
@@ -330,15 +330,15 @@ public class ApiTable {
    * @param queryParam
    * @return
    */
-  public static TableResult<List<Record>> list(DbPro dbPro, String tableName, TableInput kvBean) {
+  public static TableResult<List<Record>> list(DbPro dbPro, String tableName, TableInput tableInput) {
     if (dbPro == null) {
       dbPro = Db.use();
     }
-    DataQueryRequest queryRequest = new DataQueryRequest(kvBean);
-    String[] jsonFields = TableInputUtils.getJsonFields(kvBean);
+    DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
+    String[] jsonFields = TableInputUtils.getJsonFields(tableInput);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, kvBean);
+    Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
     sql.setColumns(queryRequest.getColumns());
     sql.setTableName(tableName);
 
@@ -492,20 +492,20 @@ public class ApiTable {
    * @param queryParam
    * @return
    */
-  public static TableResult<Record> get(String tableName, TableInput kvBean) {
-    return get(null, tableName, kvBean);
+  public static TableResult<Record> get(String tableName, TableInput tableInput) {
+    return get(null, tableName, tableInput);
   }
 
-  public static TableResult<Record> get(DbPro dbPro, String tableName, TableInput kvBean) {
+  public static TableResult<Record> get(DbPro dbPro, String tableName, TableInput tableInput) {
     if (dbPro == null) {
       dbPro = Db.use();
     }
 
-    DataQueryRequest queryRequest = new DataQueryRequest(kvBean);
-    String[] jsonFields = TableInputUtils.getJsonFields(kvBean);
+    DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
+    String[] jsonFields = TableInputUtils.getJsonFields(tableInput);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, kvBean);
+    Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
     sql.setTableName(tableName);
     sql.setColumns(queryRequest.getColumns());
 
@@ -533,27 +533,37 @@ public class ApiTable {
   }
 
   @SuppressWarnings("unchecked")
-  public static TableResult<Record> getById(String tableName, Object idValue, TableInput kvBean) {
+  public static TableResult<Record> getById(String tableName, Object idValue, TableInput tableInput) {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
-    kvBean.put(primaryKey, idValue);
-    return get(tableName, kvBean);
+    tableInput.put(primaryKey, idValue);
+    return get(tableName, tableInput);
   }
 
   public static TableResult<Record> getById(String tableName, Object idValue) {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
-    TableInput kvBean = new TableInput();
-    kvBean.set(primaryKey, idValue);
-    return get(null, tableName, kvBean);
+    TableInput tableInput = new TableInput();
+    tableInput.set(primaryKey, idValue);
+    return get(null, tableName, tableInput);
   }
 
   public static TableResult<Boolean> delById(String tableName, Object id) {
     if (Db.deleteById(tableName, id)) {
-      return new TableResult<Boolean>();
+      return TableResult.ok();
     } else {
       return TableResult.fail();
     }
+  }
+  
+
+  public static TableResult<Boolean> delById(String tableName, String primayKey, Object id) {
+    if(Db.deleteById(tableName, primayKey, id)) {
+      return TableResult.ok();
+    }else {
+      return TableResult.fail();
+    }
+    
   }
 
   public static TableResult<Boolean> del(String tableName, TableInput tableInput) {
@@ -584,6 +594,29 @@ public class ApiTable {
   public static TableResult<Boolean> delete(String tableName, TableInput tableInput) {
     DbPro use = Db.use();
     return delete(use, tableName, tableInput);
+  }
+
+  public static int[] deleteByIds(String tableName, List<?> ids) {
+    DbPro use = Db.use();
+    return deleteByIds(use, tableName, ids);
+  }
+
+  public static int[] deleteByIds(DbPro use, String tableName, List<?> ids) {
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    return deleteByIds(use, tableName, primaryKey, ids);
+  }
+
+  public static int[] deleteByIds(DbPro use, String tableName, String primaryKey, List<?> ids) {
+    List<Record> records = new ArrayList<>();
+    for (Object id : ids) {
+      Record record = Record.by(primaryKey, id);
+      records.add(record);
+    }
+    return use.batchDelete(tableName, records, 2000);
+  }
+
+  public static int[] deleteByIds(String tableName, String primaryKey, List<?> ids) {
+    return deleteByIds(Db.use(), tableName, primaryKey, ids);
   }
 
   public static TableResult<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag) {
@@ -790,14 +823,14 @@ public class ApiTable {
     return query(Db.use(), tableName, ti);
   }
 
-  public static <T> T query(DbPro dbPro, String tableName, TableInput kvBean) {
+  public static <T> T query(DbPro dbPro, String tableName, TableInput tableInput) {
     if (dbPro == null) {
       dbPro = Db.use();
     }
-    DataQueryRequest queryRequest = new DataQueryRequest(kvBean);
+    DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, kvBean);
+    Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
     sql.setTableName(tableName);
     sql.setColumns(queryRequest.getColumns());
 
@@ -822,20 +855,20 @@ public class ApiTable {
         continue;
       }
       Object value = entry.getValue();
-      if(value instanceof String) {
+      if (value instanceof String) {
         if (value != null) {
           String type = ApiTable.getFieldType(f, key);
           if (FieldType.int0.equals(type)) {
             map.put(key, Integer.parseInt((String) value));
           } else if (FieldType.short0.equals(type)) {
             map.put(key, Short.parseShort((String) value));
-          }
-          else if (FieldType.long0.equals(type)) {
+          } else if (FieldType.long0.equals(type)) {
             map.put(key, Long.parseLong((String) value));
           }
         }
       }
     }
   }
+
 
 }
