@@ -422,7 +422,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Record>> page(String tableName, DataPageRequest dataPageRequest, TableInput kv) {
-    return page(null, tableName, dataPageRequest, kv);
+    return page(Db.use(), tableName, dataPageRequest, kv);
   }
 
   /**
@@ -435,9 +435,6 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Record>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest, TableInput para) {
-    if (dbPro == null) {
-      dbPro = Db.use();
-    }
     // process for primary key is uuid
     Dialect dialect = dbPro.getConfig().getDialect();
     if (dialect instanceof TdEngineDialect) {
@@ -555,15 +552,14 @@ public class ApiTable {
       return TableResult.fail();
     }
   }
-  
 
   public static TableResult<Boolean> delById(String tableName, String primayKey, Object id) {
-    if(Db.deleteById(tableName, primayKey, id)) {
+    if (Db.deleteById(tableName, primayKey, id)) {
       return TableResult.ok();
-    }else {
+    } else {
       return TableResult.fail();
     }
-    
+
   }
 
   public static TableResult<Boolean> del(String tableName, TableInput tableInput) {
@@ -869,6 +865,5 @@ public class ApiTable {
       }
     }
   }
-
 
 }
