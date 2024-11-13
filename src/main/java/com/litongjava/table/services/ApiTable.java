@@ -266,12 +266,12 @@ public class ApiTable {
    * @return
    */
   public static TableResult<List<Record>> listAll(String tableName) {
-    DbPro dbPro = Db.use();
+    DbPro dbPro = Db.useRead();
     return listAll(dbPro, tableName);
   }
 
   public static TableResult<List<Record>> listAll(String f, TableInput kv) {
-    DbPro dbPro = Db.use();
+    DbPro dbPro = Db.useRead();
     return listAll(dbPro, f, kv);
   }
 
@@ -321,7 +321,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<List<Record>> list(String tableName, TableInput tableInput) {
-    return list(null, tableName, tableInput);
+    return list(Db.useRead(), tableName, tableInput);
   }
 
   /**
@@ -331,9 +331,6 @@ public class ApiTable {
    * @return
    */
   public static TableResult<List<Record>> list(DbPro dbPro, String tableName, TableInput tableInput) {
-    if (dbPro == null) {
-      dbPro = Db.use();
-    }
     DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
     String[] jsonFields = TableInputUtils.getJsonFields(tableInput);
 
@@ -422,7 +419,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Record>> page(String tableName, DataPageRequest dataPageRequest, TableInput kv) {
-    return page(Db.use(), tableName, dataPageRequest, kv);
+    return page(Db.useRead(), tableName, dataPageRequest, kv);
   }
 
   /**
@@ -490,14 +487,10 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Record> get(String tableName, TableInput tableInput) {
-    return get(null, tableName, tableInput);
+    return get(Db.useRead(), tableName, tableInput);
   }
 
   public static TableResult<Record> get(DbPro dbPro, String tableName, TableInput tableInput) {
-    if (dbPro == null) {
-      dbPro = Db.use();
-    }
-
     DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
     String[] jsonFields = TableInputUtils.getJsonFields(tableInput);
 
@@ -542,7 +535,7 @@ public class ApiTable {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     TableInput tableInput = new TableInput();
     tableInput.set(primaryKey, idValue);
-    return get(null, tableName, tableInput);
+    return get(Db.useRead(), tableName, tableInput);
   }
 
   public static TableResult<Boolean> delById(String tableName, Object id) {
@@ -792,7 +785,7 @@ public class ApiTable {
   }
 
   public static String queryStr(String tableName, TableInput ti) {
-    return query(null, tableName, ti);
+    return query(Db.useRead(), tableName, ti);
   }
 
   public static Long queryLong(String tableName, Object idValue, TableInput ti) {
@@ -802,7 +795,7 @@ public class ApiTable {
   }
 
   public static Long queryLong(String tableName, TableInput ti) {
-    return query(null, tableName, ti);
+    return query(Db.useRead(), tableName, ti);
   }
 
   public static PGobject queryPGobject(String tableName, Object idValue, TableInput ti) {
@@ -812,17 +805,14 @@ public class ApiTable {
   }
 
   public static PGobject queryPGobject(String tableName, TableInput ti) {
-    return query(null, tableName, ti);
+    return query(Db.useRead(), tableName, ti);
   }
 
   public static <T> T query(String tableName, TableInput ti) {
-    return query(Db.use(), tableName, ti);
+    return query(Db.useRead(), tableName, ti);
   }
 
   public static <T> T query(DbPro dbPro, String tableName, TableInput tableInput) {
-    if (dbPro == null) {
-      dbPro = Db.use();
-    }
     DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
 
     // 添加其他查询条件
