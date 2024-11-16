@@ -92,7 +92,7 @@ public class DbService {
     // 遍历出主键,添加到ret中
     for (DbTableStruct record : columns) {
       String key = record.getKey();
-      if ("PRI".equals(key) || "1".equals(key)) {
+      if ("PRI".equals(key) || "1".equals(key) || "id".endsWith(key)) {
         DbTableStruct tableColumn = new DbTableStruct();
         tableColumn.setField(record.getField());
         tableColumn.setType(record.getType());
@@ -205,8 +205,7 @@ public class DbService {
       records = dbPro.find(sql, tableName, tableName, "public");
       // 即便将别名设置为大写,返回的依然是小写,气人
     } else if (dialect instanceof TdEngineDialect) {
-      
-      
+
     } else if (dialect instanceof Sqlite3Dialect) {
       // PRAGMA table_info(tablename)
       // cid,name,type,notnull,dflt_value,pk
