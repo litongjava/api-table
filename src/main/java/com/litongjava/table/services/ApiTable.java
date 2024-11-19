@@ -336,7 +336,7 @@ public class ApiTable {
 
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
-    sql.setColumns(queryRequest.getColumns());
+    sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
     sql.setTableName(tableName);
 
     List<Object> params = sql.getParams();
@@ -456,7 +456,7 @@ public class ApiTable {
 
     Sql sql = dbSqlService.getWhereClause(queryRequest, para);
     sql.setTableName(tableName);
-    sql.setColumns(queryRequest.getColumns());
+    sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
 
     List<Object> params = sql.getParams();
 
@@ -497,7 +497,7 @@ public class ApiTable {
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
     sql.setTableName(tableName);
-    sql.setColumns(queryRequest.getColumns());
+    sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
 
     // 添加操作表
     Record record = null;
@@ -818,7 +818,7 @@ public class ApiTable {
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
     sql.setTableName(tableName);
-    sql.setColumns(queryRequest.getColumns());
+    sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
 
     List<Object> params = sql.getParams();
     if (params == null) {
