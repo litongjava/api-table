@@ -573,13 +573,23 @@ public class ApiTable {
     }
   }
 
+  public static TableResult<Boolean> delById(String tableName, Object id, String creatorColumn, Object creator) {
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    Record deleteRecord = Record.by(primaryKey, id).set(creatorColumn, creator);
+    if (Db.delete(tableName, deleteRecord)) {
+      return TableResult.ok();
+    } else {
+      return TableResult.fail();
+    }
+
+  }
+
   public static TableResult<Boolean> delById(String tableName, String primayKey, Object id) {
     if (Db.deleteById(tableName, primayKey, id)) {
       return TableResult.ok();
     } else {
       return TableResult.fail();
     }
-
   }
 
   public static TableResult<Boolean> del(String tableName, TableInput tableInput) {
@@ -640,6 +650,30 @@ public class ApiTable {
     String updateSqlTemplate = "update %s set %s=%s where %s =?";
     String sql = String.format(updateSqlTemplate, tableName, delColumn, flag, primaryKey);
     int updateResult = Db.updateBySql(sql, id);
+    if (updateResult > 0) {
+      return new TableResult<>();
+    } else {
+      return TableResult.fail(-1, "update fail");
+    }
+  }
+
+
+  public static TableResult<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag,
+      //
+      String creatorColumn, String creator) {
+    String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+
+    int updateResult = 0;
+    if (creator != null) {
+      String updateSqlTemplate = "update %s set %s=%s where %s =? and %s=?";
+      String sql = String.format(updateSqlTemplate, tableName, delColumn, flag, primaryKey, creatorColumn);
+      updateResult = Db.updateBySql(sql, id, creator);
+    } else {
+      String updateSqlTemplate = "update %s set %s=%s where %s =?";
+      String sql = String.format(updateSqlTemplate, tableName, delColumn, flag, primaryKey);
+      updateResult = Db.updateBySql(sql, id);
+    }
+
     if (updateResult > 0) {
       return new TableResult<>();
     } else {
