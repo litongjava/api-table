@@ -270,6 +270,11 @@ public class ApiTable {
     return listAll(dbPro, tableName);
   }
 
+  public static TableResult<List<Record>> listAll(String tableName, String jsonFields) {
+    DbPro dbPro = Db.useRead();
+    return listAll(dbPro, tableName, jsonFields);
+  }
+
   public static TableResult<List<Record>> listAll(String f, TableInput kv) {
     DbPro dbPro = Db.useRead();
     return listAll(dbPro, f, kv);
@@ -284,6 +289,28 @@ public class ApiTable {
    */
   public static TableResult<List<Record>> listAll(DbPro dbPro, String tableName) {
     List<Record> records = dbPro.find("select * from " + tableName);
+    if (records.size() < 1) {
+      List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
+      Record record = new Record();
+      for (DbTableStruct struct : columns) {
+        record.set(struct.getField(), null);
+      }
+      records.add(record);
+    }
+    return new TableResult<List<Record>>(records);
+  }
+
+  public static TableResult<List<Record>> listAll(DbPro dbPro, String tableName, String jsonFields) {
+    List<Record> records = null;
+    String sql = "select * from " + tableName;
+
+    if (jsonFields != null) {
+      String[] split = jsonFields.split(",");
+      records = dbPro.findWithJsonField(sql, split);
+    } else {
+      records = dbPro.find(sql);
+    }
+
     if (records.size() < 1) {
       List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
       Record record = new Record();
