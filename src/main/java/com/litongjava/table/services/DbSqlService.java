@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.litongjava.db.TableInput;
+import com.litongjava.db.activerecord.DbPro;
+import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.table.model.DataQueryRequest;
 import com.litongjava.table.model.Sql;
 import com.litongjava.table.utils.ObjectUtils;
@@ -38,12 +40,12 @@ public class DbSqlService {
     kv.remove("columns");
   }
 
-  public Sql getWhereClause(DataQueryRequest queryRequest, TableInput kv) {
+  public Sql getWhereClause(DbPro dbPro, DataQueryRequest queryRequest, TableInput kv) {
     // 移除kv中的值
     // pageNo,pageSize,tableName,orderBy,orderBy,isAsc
     removeKv(kv);
     // 获取查询条件
-    Sql whereClause = getWhereQueryClause(kv);
+    Sql whereClause = getWhereQueryClause(dbPro, kv);
     StringBuffer where = whereClause.getWhere();
 
     String orderBy = queryRequest.getOrderBy();
@@ -73,7 +75,7 @@ public class DbSqlService {
    * @param kv
    * @return
    */
-  public Sql getWhereQueryClause(TableInput kv) {
+  public Sql getWhereQueryClause(DbPro dbPro, TableInput kv) {
     StringBuffer sql = new StringBuffer();
     sql.append("where ");
     // 查询条件的值
@@ -98,7 +100,6 @@ public class DbSqlService {
     for (Map.Entry<String, Object> e : notEqualsMap.entrySet()) {
       String key = e.getKey();
       String field = key.substring(0, key.lastIndexOf("_"));
-
       operatorService.addOperator(sql, paramList, field, (String) e.getValue(), kv);
       //operators.add(new Operator(field, (String) e.getValue(), kv.remove(field)));
     }
@@ -123,7 +124,14 @@ public class DbSqlService {
         iterator2.remove();
       }
     }
-    
+    String searchKey = kv.getSearchKey();
+    if (searchKey != null) {
+      if (dbPro.getConfig().getDialect() instanceof PostgreSqlDialect) {
+        sql.append("search_vector @@ to_tsquery('english', ?)");
+        paramList.add(searchKey);
+      }
+    }
+
     // 数组类型
     if (paramList.size() > 0) {
       return new Sql(sql, paramList);

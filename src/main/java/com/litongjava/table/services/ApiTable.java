@@ -362,7 +362,7 @@ public class ApiTable {
     String[] jsonFields = TableInputUtils.getJsonFields(tableInput);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
+    Sql sql = dbSqlService.getWhereClause(dbPro, queryRequest, tableInput);
     sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
     sql.setTableName(tableName);
 
@@ -481,7 +481,7 @@ public class ApiTable {
     DataQueryRequest queryRequest = new DataQueryRequest(para);
     String[] jsonFields = TableInputUtils.getJsonFields(para);
 
-    Sql sql = dbSqlService.getWhereClause(queryRequest, para);
+    Sql sql = dbSqlService.getWhereClause(dbPro, queryRequest, para);
     sql.setTableName(tableName);
     sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
 
@@ -522,7 +522,7 @@ public class ApiTable {
     String[] jsonFields = TableInputUtils.getJsonFields(tableInput);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
+    Sql sql = dbSqlService.getWhereClause(dbPro, queryRequest, tableInput);
     sql.setTableName(tableName);
     sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
 
@@ -605,7 +605,7 @@ public class ApiTable {
     DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
+    Sql sql = dbSqlService.getWhereClause(dbPro, queryRequest, tableInput);
     sql.setTableName(tableName);
 
     // 添加操作表
@@ -656,7 +656,6 @@ public class ApiTable {
       return TableResult.fail(-1, "update fail");
     }
   }
-
 
   public static TableResult<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag,
       //
@@ -877,7 +876,7 @@ public class ApiTable {
     DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
 
     // 添加其他查询条件
-    Sql sql = dbSqlService.getWhereClause(queryRequest, tableInput);
+    Sql sql = dbSqlService.getWhereClause(dbPro, queryRequest, tableInput);
     sql.setTableName(tableName);
     sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
 
