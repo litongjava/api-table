@@ -125,8 +125,14 @@ public class DbSqlService {
       }
     }
     String searchKey = kv.getSearchKey();
+    String searchKeyLogic = kv.getStr(TableInput.search_key + "_logic");
     if (searchKey != null) {
       if (dbPro.getConfig().getDialect() instanceof PostgreSqlDialect) {
+        if (!sql.toString().endsWith("where ")) {
+          if ("or".equals(searchKeyLogic)) {
+            sql.append(" ").append(searchKeyLogic).append(" ");
+          }
+        }
         sql.append("search_vector @@ to_tsquery('english', ?)");
         paramList.add(searchKey);
       }
