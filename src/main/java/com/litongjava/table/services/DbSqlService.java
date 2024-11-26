@@ -104,6 +104,23 @@ public class DbSqlService {
       //operators.add(new Operator(field, (String) e.getValue(), kv.remove(field)));
     }
 
+    String searchKey = kv.getSearchKey();
+    String searchKeyLogic = kv.getStr(TableInput.search_key + "_logic");
+    if (searchKey != null) {
+      kv.remove(TableInput.search_key);
+      if (dbPro.getConfig().getDialect() instanceof PostgreSqlDialect) {
+        if (!sql.toString().endsWith("where ")) {
+          if ("or".equals(searchKeyLogic)) {
+            sql.append(" ").append(searchKeyLogic).append(" ");
+          } else {
+            sql.append(" ").append("and").append(" ");
+          }
+        }
+        sql.append("search_vector @@ to_tsquery('english', ?)");
+        paramList.add(searchKey);
+      }
+    }
+
     @SuppressWarnings("unchecked")
     Iterator<Map.Entry<String, Object>> iterator2 = kv.entrySet().iterator();
     while (iterator2.hasNext()) {
@@ -122,19 +139,6 @@ public class DbSqlService {
         }
         paramList.add(fieldValue);
         iterator2.remove();
-      }
-    }
-    String searchKey = kv.getSearchKey();
-    String searchKeyLogic = kv.getStr(TableInput.search_key + "_logic");
-    if (searchKey != null) {
-      if (dbPro.getConfig().getDialect() instanceof PostgreSqlDialect) {
-        if (!sql.toString().endsWith("where ")) {
-          if ("or".equals(searchKeyLogic)) {
-            sql.append(" ").append(searchKeyLogic).append(" ");
-          }
-        }
-        sql.append("search_vector @@ to_tsquery('english', ?)");
-        paramList.add(searchKey);
       }
     }
 
