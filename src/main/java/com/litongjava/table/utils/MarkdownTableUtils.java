@@ -2,24 +2,24 @@ package com.litongjava.table.utils;
 
 import java.util.List;
 
-import com.litongjava.db.activerecord.Record;
-import com.litongjava.kit.RecordUtils;
+import com.litongjava.db.activerecord.Row;
+import com.litongjava.kit.RowUtils;
 
 public class MarkdownTableUtils {
 
-  public static String to(List<Record> records) {
+  public static String to(List<Row> records) {
     // 获取head
     String[] head = null;
     int size = records.size();
     if (size > 0) {
-      Record record = records.get(0);
+      Row record = records.get(0);
       head = record.getColumnNames();
     } else {
       return null;
     }
 
     // 获取body
-    List<List<Object>> body = RecordUtils.getListData(records, size);
+    List<List<Object>> body = RowUtils.getListData(records, size);
 
     return toMarkdownTable(head, body);
   }

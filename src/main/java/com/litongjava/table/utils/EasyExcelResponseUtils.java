@@ -8,12 +8,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.activerecord.Row;
 import com.litongjava.tio.http.common.HttpResponse;
 import com.litongjava.tio.http.server.util.Resps;
 
 public class EasyExcelResponseUtils {
-  public static HttpResponse exportRecords(HttpResponse response, String filename, String sheetName, List<Record> records) {
+  public static HttpResponse exportRecords(HttpResponse response, String filename, String sheetName, List<Row> records) {
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, sheetName, records);
@@ -33,7 +33,7 @@ public class EasyExcelResponseUtils {
     return response;
   }
 
-  public static HttpResponse exportAllTableRecords(HttpResponse response, String filename, LinkedHashMap<String, List<Record>> allTableData) {
+  public static HttpResponse exportAllTableRecords(HttpResponse response, String filename, LinkedHashMap<String, List<Row>> allTableData) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     EasyExcelUtils.write(outputStream, allTableData);
     byte[] bytes = outputStream.toByteArray();
@@ -53,7 +53,7 @@ public class EasyExcelResponseUtils {
    * 
    * @param <T>
    */
-  public static <T> HttpResponse export(HttpResponse response, String filename, String sheetName, List<Record> records, Class<T> clazz) {
+  public static <T> HttpResponse export(HttpResponse response, String filename, String sheetName, List<Row> records, Class<T> clazz) {
     List<T> exportDatas = records.stream().map(e -> e.toBean(clazz)).collect(Collectors.toList());
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try {

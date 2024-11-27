@@ -5,17 +5,17 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.activerecord.Row;
 import com.litongjava.table.utils.MarkdownTableUtils;
 
 public class MarkdownTableUtilsTest {
 
   @Test
   public void test() {
-    List<Record> records = new ArrayList<>();
+    List<Row> records = new ArrayList<>();
 
     for (int i = 0; i < 10; i++) {
-      Record record = new Record();
+      Row record = new Row();
       record.set("name", "litong" + i);
       record.set("age", i);
       records.add(record);

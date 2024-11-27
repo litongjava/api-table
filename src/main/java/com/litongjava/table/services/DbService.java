@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.litongjava.db.activerecord.Db;
 import com.litongjava.db.activerecord.DbPro;
-import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.activerecord.Row;
 import com.litongjava.db.activerecord.dialect.Dialect;
 import com.litongjava.db.activerecord.dialect.MysqlDialect;
 import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
@@ -24,9 +25,10 @@ import com.litongjava.table.utils.MarkdownTableUtils;
  * @desc
  */
 public class DbService {
+  private Map<String, List<DbTableStruct>> dbTableStructCache = new ConcurrentHashMap<>();
 
-  public Map<String, List<Record>> getAllTableColumns(DbPro dbPro) {
-    Map<String, List<Record>> retval = new HashMap<>();
+  public Map<String, List<Row>> getAllTableColumns(DbPro dbPro) {
+    Map<String, List<Row>> retval = new HashMap<>();
 
     String[] tableNames = tableNames(dbPro);
     for (String name : tableNames) {
@@ -41,11 +43,11 @@ public class DbService {
     String[] tableNames = tableNames(dbPro);
     for (int i = 0; i < tableNames.length; i++) {
       String name = tableNames[i];
-      Page<Record> paginate = dbPro.paginate(1, 1, "select *", "from " + name);
+      Page<Row> paginate = dbPro.paginate(1, 1, "select *", "from " + name);
       if (paginate == null) {
         continue;
       }
-      List<Record> records = paginate.getList();
+      List<Row> records = paginate.getList();
       if (records == null) {
         continue;
       }
@@ -71,7 +73,7 @@ public class DbService {
     String[] tableNames = tableNames(dbPro);
     for (int i = 0; i < tableNames.length; i++) {
       String name = tableNames[i];
-      List<Record> tableColumns = getTableColumns(dbPro, name);
+      List<Row> tableColumns = getTableColumns(dbPro, name);
 
       String markdownTable = MarkdownTableUtils.to(tableColumns);
 
@@ -92,7 +94,7 @@ public class DbService {
     // 遍历出主键,添加到ret中
     for (DbTableStruct record : columns) {
       String key = record.getKey();
-      if ("PRI".equals(key) || "1".equals(key) || "id".endsWith(key)) {
+      if ("PRI".equals(key) || "1".equals(key) || "id".equals(key)) {
         DbTableStruct tableColumn = new DbTableStruct();
         tableColumn.setField(record.getField());
         tableColumn.setType(record.getType());
@@ -118,7 +120,7 @@ public class DbService {
    * 查询表名 support mysql and postgresql
    */
   public String[] tableNames(DbPro dbPro) {
-    List<Record> tables = null;
+    List<Row> tables = null;
     Dialect dialect = dbPro.getConfig().getDialect();
     if (dialect instanceof PostgreSqlDialect) {
       String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';";
@@ -142,60 +144,64 @@ public class DbService {
 
   public List<DbTableStruct> getTableStruct(DbPro dbPro, String tableName) {
     Dialect dialect = dbPro.getConfig().getDialect();
-    List<Record> columns = getTableColumns(dbPro, tableName);
+    String cacheKey = dbPro.getConfig().getName() + "_" + tableName;
+    List<DbTableStruct> ret = dbTableStructCache.get(cacheKey);
+    if (ret == null) {
+      ret = new ArrayList<>();
+      List<Row> columns = getTableColumns(dbPro, tableName);
+      if (dialect instanceof PostgreSqlDialect) {
+        for (Row record : columns) {
+          DbTableStruct tableColumn = new DbTableStruct();
+          tableColumn.setField(record.getStr("field"));
+          tableColumn.setType(record.getStr("type"));
+          String key = record.getStr("key");
+          tableColumn.setKey(key);
+          ret.add(tableColumn);
+        }
 
-    List<DbTableStruct> ret = new ArrayList<>();
+      } else if (dialect instanceof Sqlite3Dialect) {
+        for (Row record : columns) {
+          DbTableStruct tableColumn = new DbTableStruct();
+          tableColumn.setField(record.getStr("name"));
+          tableColumn.setType(record.getStr("type"));
+          tableColumn.setIsNull(record.getStr("notnull"));
+          tableColumn.setDefaultValue(record.getStr("dflt_value"));
+          tableColumn.setKey(record.getStr("pk"));
+          ret.add(tableColumn);
+        }
+      } else if (dialect instanceof MysqlDialect) {
+        for (Row record : columns) {
+          DbTableStruct tableColumn = new DbTableStruct();
+          tableColumn.setField(record.getStr("Field"));
+          tableColumn.setType(record.getStr("Type"));
+          tableColumn.setIsNull(record.getStr("Null"));
+          tableColumn.setDefaultValue(record.getStr("Default"));
+          tableColumn.setKey(record.getStr("Key"));
+          ret.add(tableColumn);
+        }
 
-    if (dialect instanceof PostgreSqlDialect) {
-      for (Record record : columns) {
-        DbTableStruct tableColumn = new DbTableStruct();
-        tableColumn.setField(record.getStr("field"));
-        tableColumn.setType(record.getStr("type"));
-        String key = record.getStr("key");
-        tableColumn.setKey(key);
-        ret.add(tableColumn);
+      } else {
+        // 遍历出主键,添加到ret中
+        for (Row record : columns) {
+          DbTableStruct tableColumn = new DbTableStruct();
+          tableColumn.setField(record.getStr("field"));
+          tableColumn.setType(record.getStr("type"));
+          String key = record.getStr("key");
+          tableColumn.setKey(key);
+          ret.add(tableColumn);
+        }
       }
-
-    } else if (dialect instanceof Sqlite3Dialect) {
-      for (Record record : columns) {
-        DbTableStruct tableColumn = new DbTableStruct();
-        tableColumn.setField(record.getStr("name"));
-        tableColumn.setType(record.getStr("type"));
-        tableColumn.setIsNull(record.getStr("notnull"));
-        tableColumn.setDefaultValue(record.getStr("dflt_value"));
-        tableColumn.setKey(record.getStr("pk"));
-        ret.add(tableColumn);
-      }
-    } else if (dialect instanceof MysqlDialect) {
-      for (Record record : columns) {
-        DbTableStruct tableColumn = new DbTableStruct();
-        tableColumn.setField(record.getStr("Field"));
-        tableColumn.setType(record.getStr("Type"));
-        tableColumn.setIsNull(record.getStr("Null"));
-        tableColumn.setDefaultValue(record.getStr("Default"));
-        tableColumn.setKey(record.getStr("Key"));
-        ret.add(tableColumn);
-      }
-
-    } else {
-      // 遍历出主键,添加到ret中
-      for (Record record : columns) {
-        DbTableStruct tableColumn = new DbTableStruct();
-        tableColumn.setField(record.getStr("field"));
-        tableColumn.setType(record.getStr("type"));
-        String key = record.getStr("key");
-        tableColumn.setKey(key);
-        ret.add(tableColumn);
-      }
+      dbTableStructCache.putIfAbsent(cacheKey, ret);
     }
+
     return ret;
 
   }
 
-  public List<Record> getTableColumns(DbPro dbPro, String tableName) {
+  public List<Row> getTableColumns(DbPro dbPro, String tableName) {
     String sql;
     Dialect dialect = dbPro.getConfig().getDialect();
-    List<Record> records = null;
+    List<Row> records = null;
     if (dialect instanceof PostgreSqlDialect) {
       // Field,Type,Null,Key,Default,Extra
       sql = "SELECT column_name as Field, data_type as Type, is_nullable as Null, " + "column_default as Default, " + "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name "

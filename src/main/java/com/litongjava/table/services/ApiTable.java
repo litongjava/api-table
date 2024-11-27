@@ -17,7 +17,7 @@ import com.litongjava.db.TableInput;
 import com.litongjava.db.TableResult;
 import com.litongjava.db.activerecord.Db;
 import com.litongjava.db.activerecord.DbPro;
-import com.litongjava.db.activerecord.Record;
+import com.litongjava.db.activerecord.Row;
 import com.litongjava.db.activerecord.dialect.Dialect;
 import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.db.activerecord.dialect.TdEngineDialect;
@@ -74,7 +74,7 @@ public class ApiTable {
   public static TableResult<Kv> save(String tableName, TableInput kv, String[] jsonFields) {
     TableInputUtils.removeEmptyValue(kv);
     TableInputUtils.true21(kv);
-    Record record = new Record();
+    Row record = new Row();
     record.setColumns(kv);
 
     String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
@@ -115,7 +115,7 @@ public class ApiTable {
     // KvUtils.removeEmptyValue(kv);
     TableInputUtils.true21(kv);
     Map<String, String> embeddingMap = TableInputUtils.getEmbeddingMap(kv);
-    Record record = new Record();
+    Row record = new Row();
     record.setColumns(kv);
 
     Set<Entry<String, String>> set = embeddingMap.entrySet();
@@ -167,7 +167,7 @@ public class ApiTable {
     }
   }
 
-  public static boolean save(String tableName, String[] jsonFields, String primaryKeyName, Record record) {
+  public static boolean save(String tableName, String[] jsonFields, String primaryKeyName, Row record) {
     // 如果主键是varchar类型,插入uuid类型 不处理uuid类型.如果是uuid类型,让数据库自动生成
     Object id = getIdValueByType(tableName);
     if (id != null) {
@@ -196,7 +196,7 @@ public class ApiTable {
     return null;
   }
 
-  public static boolean update(String tableName, String primaryKeyName, String idValue, Record record, String[] jsonFields) {
+  public static boolean update(String tableName, String primaryKeyName, String idValue, Row record, String[] jsonFields) {
     String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
 
     boolean update = false;
@@ -210,7 +210,7 @@ public class ApiTable {
     return update;
   }
 
-  public static boolean update(String tableName, String primaryKeyName, Object idValue, Record record) {
+  public static boolean update(String tableName, String primaryKeyName, Object idValue, Row record) {
     String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
 
     boolean update = false;
@@ -240,9 +240,9 @@ public class ApiTable {
     if (type != null && type.startsWith("uuid")) {
       isUuid = true;
     }
-    List<Record> lists = new ArrayList<>();
+    List<Row> lists = new ArrayList<>();
     for (Object id : ids) {
-      Record record = new Record();
+      Row record = new Row();
       record.setColumns(kv.toMap());
       if (isUuid) {
         record.set(primaryKeyName, UUID.fromString((String) id));
@@ -265,17 +265,17 @@ public class ApiTable {
    * @param tableName
    * @return
    */
-  public static TableResult<List<Record>> listAll(String tableName) {
+  public static TableResult<List<Row>> listAll(String tableName) {
     DbPro dbPro = Db.useRead();
     return listAll(dbPro, tableName);
   }
 
-  public static TableResult<List<Record>> listAll(String tableName, String jsonFields) {
+  public static TableResult<List<Row>> listAll(String tableName, String jsonFields) {
     DbPro dbPro = Db.useRead();
     return listAll(dbPro, tableName, jsonFields);
   }
 
-  public static TableResult<List<Record>> listAll(String f, TableInput kv) {
+  public static TableResult<List<Row>> listAll(String f, TableInput kv) {
     DbPro dbPro = Db.useRead();
     return listAll(dbPro, f, kv);
   }
@@ -287,21 +287,21 @@ public class ApiTable {
    * @param tableName
    * @return
    */
-  public static TableResult<List<Record>> listAll(DbPro dbPro, String tableName) {
-    List<Record> records = dbPro.find("select * from " + tableName);
+  public static TableResult<List<Row>> listAll(DbPro dbPro, String tableName) {
+    List<Row> records = dbPro.find("select * from " + tableName);
     if (records.size() < 1) {
       List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
-      Record record = new Record();
+      Row record = new Row();
       for (DbTableStruct struct : columns) {
         record.set(struct.getField(), null);
       }
       records.add(record);
     }
-    return new TableResult<List<Record>>(records);
+    return new TableResult<List<Row>>(records);
   }
 
-  public static TableResult<List<Record>> listAll(DbPro dbPro, String tableName, String jsonFields) {
-    List<Record> records = null;
+  public static TableResult<List<Row>> listAll(DbPro dbPro, String tableName, String jsonFields) {
+    List<Row> records = null;
     String sql = "select * from " + tableName;
 
     if (jsonFields != null) {
@@ -313,19 +313,19 @@ public class ApiTable {
 
     if (records.size() < 1) {
       List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
-      Record record = new Record();
+      Row record = new Row();
       for (DbTableStruct struct : columns) {
         record.set(struct.getField(), null);
       }
       records.add(record);
     }
-    return new TableResult<List<Record>>(records);
+    return new TableResult<List<Row>>(records);
   }
 
-  public static TableResult<List<Record>> listAll(DbPro dbPro, String tableName, TableInput kv) {
+  public static TableResult<List<Row>> listAll(DbPro dbPro, String tableName, TableInput kv) {
     String[] jsonFields = TableInputUtils.getJsonFields(kv);
     String sql = "select * from " + tableName;
-    List<Record> records = null;
+    List<Row> records = null;
     if (jsonFields != null) {
       records = dbPro.findWithJsonField(sql, jsonFields);
     } else {
@@ -333,13 +333,13 @@ public class ApiTable {
     }
     if (records.size() < 1) {
       List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
-      Record record = new Record();
+      Row record = new Row();
       for (DbTableStruct struct : columns) {
         record.set(struct.getField(), null);
       }
       records.add(record);
     }
-    return new TableResult<List<Record>>(records);
+    return new TableResult<List<Row>>(records);
   }
 
   /**
@@ -347,7 +347,7 @@ public class ApiTable {
    * @param queryParam
    * @return
    */
-  public static TableResult<List<Record>> list(String tableName, TableInput tableInput) {
+  public static TableResult<List<Row>> list(String tableName, TableInput tableInput) {
     return list(Db.useRead(), tableName, tableInput);
   }
 
@@ -357,7 +357,7 @@ public class ApiTable {
    * @param queryParam
    * @return
    */
-  public static TableResult<List<Record>> list(DbPro dbPro, String tableName, TableInput tableInput) {
+  public static TableResult<List<Row>> list(DbPro dbPro, String tableName, TableInput tableInput) {
     DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
     String[] jsonFields = TableInputUtils.getJsonFields(tableInput);
 
@@ -369,7 +369,7 @@ public class ApiTable {
     List<Object> params = sql.getParams();
 
     // 添加操作表
-    List<Record> list = null;
+    List<Row> list = null;
     if (params == null) {
       if (jsonFields != null) {
         list = dbPro.findWithJsonFields(sql.getsql(), jsonFields);
@@ -392,7 +392,7 @@ public class ApiTable {
    * @param kv
    * @return
    */
-  public static TableResult<Page<Record>> page(TableInput kv) {
+  public static TableResult<Page<Row>> page(TableInput kv) {
     String tableName = (String) kv.remove(TableInput.table_name);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
@@ -401,7 +401,7 @@ public class ApiTable {
   /**
    * @return
    */
-  public static TableResult<Page<Record>> page(DbPro dbPro, TableInput kv) {
+  public static TableResult<Page<Row>> page(DbPro dbPro, TableInput kv) {
     String tableName = (String) kv.remove(TableInput.table_name);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(dbPro, tableName, dataPageRequest, kv);
@@ -412,7 +412,7 @@ public class ApiTable {
    * @param kv
    * @return
    */
-  public static TableResult<Page<Record>> page(String tableName, TableInput kv) {
+  public static TableResult<Page<Row>> page(String tableName, TableInput kv) {
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
   }
@@ -421,7 +421,7 @@ public class ApiTable {
    * @param tableName
    * @return
    */
-  public static TableResult<Page<Record>> page(String tableName) {
+  public static TableResult<Page<Row>> page(String tableName) {
     TableInput kv = TableInput.create();
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
@@ -433,7 +433,7 @@ public class ApiTable {
    * @param kv
    * @return
    */
-  public static TableResult<Page<Record>> page(DbPro dbPro, String f, TableInput kv) {
+  public static TableResult<Page<Row>> page(DbPro dbPro, String f, TableInput kv) {
     kv.remove(TableInput.table_name);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(dbPro, f, dataPageRequest, kv);
@@ -445,7 +445,7 @@ public class ApiTable {
    * @param kv
    * @return
    */
-  public static TableResult<Page<Record>> page(String tableName, DataPageRequest dataPageRequest, TableInput kv) {
+  public static TableResult<Page<Row>> page(String tableName, DataPageRequest dataPageRequest, TableInput kv) {
     return page(Db.useRead(), tableName, dataPageRequest, kv);
   }
 
@@ -458,7 +458,7 @@ public class ApiTable {
    * @param para
    * @return
    */
-  public static TableResult<Page<Record>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest, TableInput para) {
+  public static TableResult<Page<Row>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest, TableInput para) {
     // process for primary key is uuid
     Dialect dialect = dbPro.getConfig().getDialect();
     if (dialect instanceof TdEngineDialect) {
@@ -488,7 +488,7 @@ public class ApiTable {
     List<Object> params = sql.getParams();
 
     String sqlExceptSelect = sql.getSqlExceptSelect();
-    Page<Record> listPage = null;
+    Page<Row> listPage = null;
     if (params == null) {
       if (jsonFields != null && jsonFields.length > 0) {
         listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields);
@@ -513,11 +513,11 @@ public class ApiTable {
    * @param queryParam
    * @return
    */
-  public static TableResult<Record> get(String tableName, TableInput tableInput) {
+  public static TableResult<Row> get(String tableName, TableInput tableInput) {
     return get(Db.useRead(), tableName, tableInput);
   }
 
-  public static TableResult<Record> get(DbPro dbPro, String tableName, TableInput tableInput) {
+  public static TableResult<Row> get(DbPro dbPro, String tableName, TableInput tableInput) {
     DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
     String[] jsonFields = TableInputUtils.getJsonFields(tableInput);
 
@@ -527,7 +527,7 @@ public class ApiTable {
     sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
 
     // 添加操作表
-    Record record = null;
+    Row record = null;
     List<Object> params = sql.getParams();
 
     if (jsonFields != null && jsonFields.length > 0) {
@@ -546,18 +546,18 @@ public class ApiTable {
       }
     }
 
-    return new TableResult<Record>(record);
+    return new TableResult<Row>(record);
   }
 
   @SuppressWarnings("unchecked")
-  public static TableResult<Record> getById(String tableName, Object idValue, TableInput tableInput) {
+  public static TableResult<Row> getById(String tableName, Object idValue, TableInput tableInput) {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     tableInput.put(primaryKey, idValue);
     return get(tableName, tableInput);
   }
 
-  public static TableResult<Record> getById(String tableName, Object idValue) {
+  public static TableResult<Row> getById(String tableName, Object idValue) {
     // 获取主键名称
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     TableInput tableInput = new TableInput();
@@ -575,7 +575,7 @@ public class ApiTable {
 
   public static TableResult<Boolean> delById(String tableName, Object id, String creatorColumn, Object creator) {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
-    Record deleteRecord = Record.by(primaryKey, id).set(creatorColumn, creator);
+    Row deleteRecord = Row.by(primaryKey, id).set(creatorColumn, creator);
     if (Db.delete(tableName, deleteRecord)) {
       return TableResult.ok();
     } else {
@@ -633,9 +633,9 @@ public class ApiTable {
   }
 
   public static int[] deleteByIds(DbPro use, String tableName, String primaryKey, List<?> ids) {
-    List<Record> records = new ArrayList<>();
+    List<Row> records = new ArrayList<>();
     for (Object id : ids) {
-      Record record = Record.by(primaryKey, id);
+      Row record = Row.by(primaryKey, id);
       records.add(record);
     }
     return use.batchDelete(tableName, records, 2000);
@@ -813,13 +813,13 @@ public class ApiTable {
     return new TableResult<>(dbTableService.getTableConfig(f, tableName, lang));
   }
 
-  public static TableResult<List<Record>> query(String sql) {
-    List<Record> find = Db.find(sql);
+  public static TableResult<List<Row>> query(String sql) {
+    List<Row> find = Db.find(sql);
     return new TableResult<>(find);
   }
 
-  public static TableResult<List<Record>> query(String sql, Object... paras) {
-    List<Record> find = null;
+  public static TableResult<List<Row>> query(String sql, Object... paras) {
+    List<Row> find = null;
     if (paras == null || paras.length < 1) {
       find = Db.find(sql);
     } else {

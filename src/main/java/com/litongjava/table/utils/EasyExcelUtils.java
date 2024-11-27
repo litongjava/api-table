@@ -12,8 +12,8 @@ import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
-import com.litongjava.db.activerecord.Record;
-import com.litongjava.kit.RecordUtils;
+import com.litongjava.db.activerecord.Row;
+import com.litongjava.kit.RowUtils;
 import com.litongjava.table.convert.LocalDateTimeConverter;
 import com.litongjava.table.convert.TimestampStringConverter;
 
@@ -47,12 +47,12 @@ public class EasyExcelUtils {
     }
   }
 
-  public static void write(OutputStream outputStream, String sheetName, List<Record> records) {
+  public static void write(OutputStream outputStream, String sheetName, List<Row> records) {
     // 获取head
     String[] columnNames = null;
     int size = records.size();
     if (size > 0) {
-      Record record = records.get(0);
+      Row record = records.get(0);
       columnNames = record.getColumnNames();
     } else {
       return;
@@ -60,7 +60,7 @@ public class EasyExcelUtils {
     List<List<String>> heads = head(columnNames);
 
     // 获取body
-    List<List<Object>> columnValues = RecordUtils.getListData(records, size);
+    List<List<Object>> columnValues = RowUtils.getListData(records, size);
 
     getExcelWriteBuilder(outputStream)
         //
@@ -77,7 +77,7 @@ public class EasyExcelUtils {
    * @param outputStream
    * @param allTableData
    */
-  public static void write(OutputStream outputStream, Map<String, List<Record>> allTableData) {
+  public static void write(OutputStream outputStream, Map<String, List<Row>> allTableData) {
     // 写入
     ExcelWriterBuilder excelWriterBuilder = getExcelWriteBuilder(outputStream);
 
@@ -85,19 +85,19 @@ public class EasyExcelUtils {
 
     Set<String> sheetNames = allTableData.keySet();
     for (String sheetName : sheetNames) {
-      List<Record> records = allTableData.get(sheetName);
+      List<Row> records = allTableData.get(sheetName);
       int listSize = records.size();
       // 获取head
       String[] columnNames = null;
       if (listSize > 0) {
-        Record record = records.get(0);
+        Row record = records.get(0);
         columnNames = record.getColumnNames();
       } else {
         continue;
       }
       List<List<String>> heads = head(columnNames);
 
-      List<List<Object>> columnValues = RecordUtils.getListData(records, listSize);
+      List<List<Object>> columnValues = RowUtils.getListData(records, listSize);
 
       // 写入数据
       // excelWriterBuilder.sheet(sheetName).head(heads).doWrite(columnValues);
