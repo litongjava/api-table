@@ -14,9 +14,9 @@ import com.litongjava.db.activerecord.dialect.MysqlDialect;
 import com.litongjava.db.activerecord.dialect.PostgreSqlDialect;
 import com.litongjava.db.activerecord.dialect.Sqlite3Dialect;
 import com.litongjava.db.activerecord.dialect.TdEngineDialect;
+import com.litongjava.db.utils.MarkdownTableUtils;
 import com.litongjava.model.page.Page;
 import com.litongjava.table.model.DbTableStruct;
-import com.litongjava.table.utils.MarkdownTableUtils;
 
 /**
  * @author Tong Li
