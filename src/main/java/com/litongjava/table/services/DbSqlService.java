@@ -51,6 +51,8 @@ public class DbSqlService {
     String orderBy = queryRequest.getOrderBy();
     Boolean isAsc = queryRequest.getIsAsc();
     String groupBy = queryRequest.getGroupBy();
+    Integer pageNo = queryRequest.getPageNo();
+    Integer pageSize = queryRequest.getPageSize();
 
     if (orderBy != null) {
       where.append(" order by ").append(orderBy);
@@ -63,7 +65,13 @@ public class DbSqlService {
     if (groupBy != null) {
       where.append(" group by ").append(groupBy);
     }
-
+    if (pageNo != null && pageSize != null) {
+      int offset = (pageNo - 1) * pageSize;
+      where.append(" limit ").append(pageSize).append(" offset ").append(offset);
+    
+    } else if (pageSize != null) {
+      where.append(" limit ").append(pageSize);
+    }
     whereClause.setWhere(where);
     return whereClause;
 

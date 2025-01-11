@@ -15,12 +15,15 @@ public class DataQueryRequest {
   private String orderBy;
   private Boolean isAsc;
   private String groupBy;
+  private Integer pageNo;
+  private Integer pageSize;
 
   public DataQueryRequest(TableInput kv) {
-    this.columns = (String) kv.remove("columns");
-    this.orderBy = (String) kv.remove("order_by");
-
-    this.groupBy = (String) kv.remove("group_by");
+    this.columns = (String) kv.remove(TableInput.columns);
+    this.orderBy = (String) kv.remove(TableInput.orderBy);
+    this.groupBy = (String) kv.remove(TableInput.groupBy);
+    this.pageNo = (Integer) kv.remove(TableInput.pageNo);
+    this.pageSize = (Integer) kv.remove(TableInput.pageSize);
 
     Object remove = kv.remove("is_asc");
     if (remove == null) {
