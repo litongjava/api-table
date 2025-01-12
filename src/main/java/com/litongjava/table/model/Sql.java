@@ -20,6 +20,10 @@ public class Sql {
   private StringBuffer where = new StringBuffer();
   private List<Object> params;
 
+  public Sql(StringBuffer where) {
+    this.where = where;
+  }
+
   public Sql(StringBuffer where, List<Object> params) {
     this.where = where;
     this.params = params;
@@ -54,4 +58,5 @@ public class Sql {
   public String getSelectColumns() {
     return "select " + columns;
   }
+
 }

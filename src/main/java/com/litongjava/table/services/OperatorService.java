@@ -9,8 +9,7 @@ import com.litongjava.table.constants.Operators;
 import com.litongjava.table.utils.ObjectUtils;
 
 public class OperatorService {
-  public void addOperator(StringBuffer where, List<Object> paramList, String fieldName, String operator,
-      TableInput kv) {
+  public void addOperator(StringBuffer where, List<Object> paramList, String fieldName, String operator, TableInput kv) {
     Object value = kv.get(fieldName);
     if (!ObjectUtils.isEmpty(value)) {
       if (Operators.EQ.equals(operator)) {
@@ -138,10 +137,10 @@ public class OperatorService {
       }
     } else {
       if (Operators.NL.equals(operator)) {
-        addWhereAndField(where, fieldName, "is null");
+        addWhereNotValueField(where, fieldName, "is null");
 
       } else if (Operators.NN.equals(operator)) {
-        addWhereAndField(where, fieldName, "is not null");
+        addWhereNotValueField(where, fieldName, "is not null");
 
       } else if (Operators.EY.equals(operator)) {
         addWhereEmptyField(where, fieldName);
@@ -210,6 +209,11 @@ public class OperatorService {
       sql.append(" ").append(logic).append(" ");
     }
     String format = "%s %s ?";
+    sql.append(String.format(format, fieldName, operator));
+  }
+
+  public void addWhereNotValueField(StringBuffer sql, String fieldName, String operator) {
+    String format = "%s %s";
     sql.append(String.format(format, fieldName, operator));
   }
 

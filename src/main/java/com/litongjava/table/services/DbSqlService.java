@@ -154,7 +154,7 @@ public class DbSqlService {
     if (paramList.size() > 0) {
       return new Sql(sql, paramList);
     }
-    return new Sql();
+    return new Sql(sql);
   }
 
 }
