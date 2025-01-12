@@ -916,4 +916,24 @@ public class ApiTable {
     }
   }
 
+  public static Long count(String tableName, TableInput tableInput) {
+    return count(Db.useRead(), tableName, tableInput);
+  }
+
+  public static Long count(DbPro dbPro, String tableName, TableInput tableInput) {
+    DataQueryRequest queryRequest = new DataQueryRequest(tableInput);
+
+    Sql sql = dbSqlService.getWhereClause(dbPro, queryRequest, tableInput);
+    sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
+    sql.setTableName(tableName);
+
+    List<Object> params = sql.getParams();
+    if (params != null) {
+      return dbPro.countBySql(sql.getsql(), params.toArray());
+    } else {
+      return dbPro.countBySql(sql.getsql());
+    }
+
+  }
+
 }
