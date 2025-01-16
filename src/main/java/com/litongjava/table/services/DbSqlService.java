@@ -47,6 +47,9 @@ public class DbSqlService {
     // 获取查询条件
     Sql whereClause = getWhereQueryClause(dbPro, kv);
     StringBuffer where = whereClause.getWhere();
+    if (where.toString().equals("where ")) {
+      where.setLength(0);
+    }
 
     String orderBy = queryRequest.getOrderBy();
     Boolean isAsc = queryRequest.getIsAsc();
@@ -68,7 +71,7 @@ public class DbSqlService {
     if (pageNo != null && pageSize != null) {
       int offset = (pageNo - 1) * pageSize;
       where.append(" limit ").append(pageSize).append(" offset ").append(offset);
-    
+
     } else if (pageSize != null) {
       where.append(" limit ").append(pageSize);
     }

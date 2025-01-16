@@ -238,4 +238,26 @@ public class DbService {
     sql = String.format(sql, tableName, field, type, comment);
     Db.update(sql);
   }
+
+  public String[] getJsonField(DbPro dbPro, String tableName) {
+    List<DbTableStruct> columns = getTableStruct(dbPro, tableName);
+    if (columns.size() < 1) {
+      throw new RuntimeException("columns of " + tableName + " size is 0");
+    }
+
+    List<String> fields = new ArrayList<>();
+    // 遍历出主键,添加到ret中
+    for (DbTableStruct record : columns) {
+      String type = record.getType();
+      if ("jsonb".equals(type) || "json".equals(type)) {
+        String field = record.getField();
+        fields.add(field);
+      }
+    }
+    String[] jsonFields = new String[fields.size()];
+    for (int i = 0; i < fields.size(); i++) {
+      jsonFields[i] = fields.get(i);
+    }
+    return jsonFields;
+  }
 }

@@ -38,7 +38,12 @@ public class PrimaryKeyService {
    * @return
    */
   public String getPrimaryKeyColumnType(String tableName) {
-    DbTableStruct primaryKey = getPrimaryKey(Db.use(),tableName);
+    DbTableStruct primaryKey = getPrimaryKey(Db.use(), tableName);
+    return primaryKey.getType();
+  }
+
+  public String getPrimaryKeyColumnType(DbPro dbPro, String tableName) {
+    DbTableStruct primaryKey = getPrimaryKey(dbPro, tableName);
     return primaryKey.getType();
   }
 
@@ -54,7 +59,7 @@ public class PrimaryKeyService {
         primaryKey = primaryKeys.get(tableName);
         if (primaryKey == null) {
           // 1.主键名称
-          primaryKey = dbService.getPrimaryKey(dbPro,tableName).get(0);
+          primaryKey = dbService.getPrimaryKey(dbPro, tableName).get(0);
           primaryKeys.put(tableName, primaryKey);
         }
 

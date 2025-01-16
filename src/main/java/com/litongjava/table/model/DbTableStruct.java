@@ -13,5 +13,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DbTableStruct {
-  private String field,type,isNull,extra,defaultValue,key;
+  /**
+   * type
+   * bigint
+  integer
+  character varying
+  boolean
+  text
+  jsonb
+  timestamp with time zone
+  USER-DEFINED
+  tsvector
+  smallint
+  
+   */
+  private String field, type, isNull, extra, defaultValue, key;
 }

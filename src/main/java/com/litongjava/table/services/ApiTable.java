@@ -107,11 +107,14 @@ public class ApiTable {
     } else {
       return TableResult.fail("save fail");
     }
+  }
 
+  public static TableResult<Kv> saveOrUpdate(String tableName, TableInput kv, String[] jsonFields) {
+    return saveOrUpdate(Db.use(), tableName, kv, jsonFields);
   }
 
   @SuppressWarnings("unchecked")
-  public static TableResult<Kv> saveOrUpdate(String tableName, TableInput kv, String[] jsonFields) {
+  public static TableResult<Kv> saveOrUpdate(DbPro dbPro, String tableName, TableInput kv, String[] jsonFields) {
     // KvUtils.removeEmptyValue(kv);
     TableInputUtils.true21(kv);
     Map<String, String> embeddingMap = TableInputUtils.getEmbeddingMap(kv);
@@ -131,19 +134,23 @@ public class ApiTable {
       }
     }
 
-    String primaryKeyName = primaryKeyService.getPrimaryKeyName(tableName);
+    String primaryKeyName = primaryKeyService.getPrimaryKeyName(dbPro, tableName);
+    if (jsonFields == null) {
+      jsonFields = dbService.getJsonField(dbPro, tableName);
+    }
+
     if (kv.containsKey(primaryKeyName)) { // update
       String idValue = record.getStr(primaryKeyName);
 
       if (!StrKit.isBlank(idValue)) {
-        boolean update = update(tableName, primaryKeyName, idValue, record, jsonFields);
+        boolean update = update(dbPro, tableName, primaryKeyName, idValue, record, jsonFields);
         if (update) {
           return new TableResult<>();
         } else {
           return TableResult.fail();
         }
       } else {
-        Object id = getIdValueByType(tableName);
+        Object id = getIdValueByType(dbPro, tableName);
         if (id != null) {
           record.set(primaryKeyName, id);
         }
@@ -157,7 +164,7 @@ public class ApiTable {
       }
 
     } else { // 保存
-      boolean save = save(tableName, jsonFields, primaryKeyName, record);
+      boolean save = save(dbPro, tableName, jsonFields, primaryKeyName, record);
       if (save) {
         Kv by = Kv.by(primaryKeyName, record.getObject(primaryKeyName));
         return new TableResult<>(by);
@@ -168,16 +175,20 @@ public class ApiTable {
   }
 
   public static boolean save(String tableName, String[] jsonFields, String primaryKeyName, Row record) {
+    return save(Db.use(), tableName, jsonFields, primaryKeyName, record);
+  }
+
+  public static boolean save(DbPro dbPro, String tableName, String[] jsonFields, String primaryKeyName, Row record) {
     // 如果主键是varchar类型,插入uuid类型 不处理uuid类型.如果是uuid类型,让数据库自动生成
-    Object id = getIdValueByType(tableName);
+    Object id = getIdValueByType(dbPro, tableName);
     if (id != null) {
       record.set(primaryKeyName, id);
     }
-    return Db.save(tableName, record, jsonFields);
+    return dbPro.save(tableName, record, jsonFields);
   }
 
-  public static Object getIdValueByType(String tableName) {
-    String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName).toLowerCase();
+  public static Object getIdValueByType(DbPro dbPro, String tableName) {
+    String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(dbPro, tableName).toLowerCase();
     if (!StrKit.isBlank(primaryKeyColumnType)) {
       if (primaryKeyColumnType.startsWith("varchar") || primaryKeyColumnType.startsWith("text")) {
         return UUIDUtils.random();
@@ -197,15 +208,19 @@ public class ApiTable {
   }
 
   public static boolean update(String tableName, String primaryKeyName, String idValue, Row record, String[] jsonFields) {
+    return update(Db.use(), tableName, primaryKeyName, idValue, record, jsonFields);
+  }
+
+  public static boolean update(DbPro dbPro, String tableName, String primaryKeyName, String idValue, Row record, String[] jsonFields) {
     String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
 
     boolean update = false;
     if ("uuid".equals(primaryKeyColumnType)) {
       UUID idUUID = UUID.fromString(idValue);
       record.set(primaryKeyName, idUUID);
-      update = Db.update(tableName, primaryKeyName, record, jsonFields);
+      update = dbPro.update(tableName, primaryKeyName, record, jsonFields);
     } else {
-      update = Db.update(tableName, primaryKeyName, record, jsonFields);
+      update = dbPro.update(tableName, primaryKeyName, record, jsonFields);
     }
     return update;
   }
@@ -480,6 +495,9 @@ public class ApiTable {
 
     DataQueryRequest queryRequest = new DataQueryRequest(para);
     String[] jsonFields = TableInputUtils.getJsonFields(para);
+    if (jsonFields == null) {
+      jsonFields = dbService.getJsonField(dbPro, tableName);
+    }
 
     Sql sql = dbSqlService.getWhereClause(dbPro, queryRequest, para);
     sql.setTableName(tableName);
