@@ -31,6 +31,7 @@ import com.litongjava.table.model.DbTableStruct;
 import com.litongjava.table.model.Sql;
 import com.litongjava.table.utils.TableInputUtils;
 import com.litongjava.tio.utils.UUIDUtils;
+import com.litongjava.tio.utils.hutool.StrUtil;
 import com.litongjava.tio.utils.snowflake.SnowflakeIdGenerator;
 
 public class ApiTable {
@@ -920,7 +921,7 @@ public class ApiTable {
       }
       Object value = entry.getValue();
       if (value instanceof String) {
-        if (value != null) {
+        if (StrUtil.isNotBlank((String) value)) {
           String type = ApiTable.getFieldType(f, key);
           if (FieldType.int0.equals(type)) {
             map.put(key, Integer.parseInt((String) value));
