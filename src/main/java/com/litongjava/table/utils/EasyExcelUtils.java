@@ -15,6 +15,7 @@ import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy
 import com.litongjava.db.activerecord.Row;
 import com.litongjava.kit.RowUtils;
 import com.litongjava.table.convert.LocalDateTimeConverter;
+import com.litongjava.table.convert.StringArrayConverter;
 import com.litongjava.table.convert.TimestampStringConverter;
 
 /**
@@ -117,7 +118,10 @@ public class EasyExcelUtils {
         // 基于 column 长度，自动适配。最大 255 宽度
         .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
         // 日期格式转换
-        .registerConverter(new LocalDateTimeConverter()).registerConverter(new TimestampStringConverter());
+        .registerConverter(new LocalDateTimeConverter()).registerConverter(new TimestampStringConverter())
+        //
+        .registerConverter(new StringArrayConverter())
+        ;
     return excelWriterBuilder;
   }
 
