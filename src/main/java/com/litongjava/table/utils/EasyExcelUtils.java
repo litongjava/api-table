@@ -111,7 +111,7 @@ public class EasyExcelUtils {
 
   }
 
-  private static ExcelWriterBuilder getExcelWriteBuilder(OutputStream outputStream) {
+  public static ExcelWriterBuilder getExcelWriteBuilder(OutputStream outputStream) {
     ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(outputStream)
         // 不要自动关闭，交给 Servlet 自己处理
         .autoCloseStream(false)
@@ -120,8 +120,8 @@ public class EasyExcelUtils {
         // 日期格式转换
         .registerConverter(new LocalDateTimeConverter()).registerConverter(new TimestampStringConverter())
         //
-        .registerConverter(new StringArrayConverter())
-        ;
+        .registerConverter(new StringArrayConverter());
+        
     return excelWriterBuilder;
   }
 
