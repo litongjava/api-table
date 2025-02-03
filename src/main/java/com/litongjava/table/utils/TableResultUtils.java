@@ -16,7 +16,7 @@ public class TableResultUtils {
     if (data == null) {
       return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg());
     } else {
-      return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), RowUtils.recordToKv(data, false));
+      return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), RowUtils.toKv(data, false));
     }
   }
 
@@ -25,14 +25,14 @@ public class TableResultUtils {
     if (data == null) {
       return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg());
     } else {
-      return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), RowUtils.recordToKv(data, underscoreToCamel));
+      return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), RowUtils.toKv(data, underscoreToCamel));
     }
   }
 
   public static TableResult<DbPage<Kv>> pageToDbPage(TableResult<Page<Row>> jsonBean, boolean underscoreToCamel) {
     int totalRow = jsonBean.getData().getTotalRow();
     List<Row> list = jsonBean.getData().getList();
-    List<Kv> newList = RowUtils.recordsToKv(list, underscoreToCamel);
+    List<Kv> newList = RowUtils.toKv(list, underscoreToCamel);
 
     DbPage<Kv> pageData = new DbPage<>();
     pageData.setTotal(totalRow);
@@ -41,6 +41,6 @@ public class TableResultUtils {
   }
 
   public static TableResult<List<Kv>> recordsToKv(TableResult<List<Row>> jsonBean, boolean underscoreToCamel) {
-    return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), RowUtils.recordsToKv(jsonBean.getData(), underscoreToCamel));
+    return new TableResult<>(jsonBean.getCode(), jsonBean.getMsg(), RowUtils.toKv(jsonBean.getData(), underscoreToCamel));
   }
 }
