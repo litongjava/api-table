@@ -669,6 +669,7 @@ public class ApiTable {
 
   public static TableResult<Boolean> updateFlagById(String tableName, Object id, String delColumn, int flag) {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    id = transformValueType(tableName, primaryKey, id);
     String updateSqlTemplate = "update %s set %s=%s where %s =?";
     String sql = String.format(updateSqlTemplate, tableName, delColumn, flag, primaryKey);
     int updateResult = Db.updateBySql(sql, id);
@@ -683,7 +684,7 @@ public class ApiTable {
       //
       String creatorColumn, String creator) {
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
-
+    id = transformValueType(tableName, primaryKey, id);
     int updateResult = 0;
     if (creator != null) {
       String updateSqlTemplate = "update %s set %s=%s where %s =? and %s=?";
@@ -705,7 +706,7 @@ public class ApiTable {
   public static TableResult<Boolean> updateFlagByIdAndUserId(String tableName, Object id, String delColumn, int flag, String userIdColumn, String userId) {
     // 获取主键名
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
-
+    id = transformValueType(tableName, primaryKey, id);
     // 构建更新SQL模板，使用占位符
     String updateSqlTemplate = "UPDATE `%s` SET `%s` = ? WHERE `%s` = ? AND `%s` = ?";
 
@@ -731,6 +732,7 @@ public class ApiTable {
       tableColumnService.addColumn(tableName, delFlagColumn, "int(1) unsigned DEFAULT 0 ", "是否删除,1删除,0未删除");
     }
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
+    id = transformValueType(tableName, primaryKey, id);
     String upateTemplate = "update %s set is_del=1 where  %s =?";
     String sql = String.format(upateTemplate, tableName, primaryKey);
     int updateResult = Db.updateBySql(sql, id);
