@@ -584,8 +584,11 @@ public class ApiTable {
     return get(Db.useRead(), tableName, tableInput);
   }
 
-  public static TableResult<Boolean> delById(String tableName, Object id) {
-    if (Db.deleteById(tableName, id)) {
+  public static TableResult<Boolean> delById(String tableName, Object value) {
+    String key = primaryKeyService.getPrimaryKeyName(tableName);
+    value = transformValueType(tableName, key, value);
+
+    if (Db.deleteById(tableName, key, value)) {
       return TableResult.ok();
     } else {
       return TableResult.fail();
@@ -920,19 +923,31 @@ public class ApiTable {
         continue;
       }
       Object value = entry.getValue();
-      if (value instanceof String) {
-        if (StrUtil.isNotBlank((String) value)) {
-          String type = ApiTable.getFieldType(f, key);
-          if (FieldType.int0.equals(type)) {
-            map.put(key, Integer.parseInt((String) value));
-          } else if (FieldType.short0.equals(type)) {
-            map.put(key, Short.parseShort((String) value));
-          } else if (FieldType.long0.equals(type)) {
-            map.put(key, Long.parseLong((String) value));
-          }
+      if (StrUtil.isNotBlank((String) value)) {
+        String type = ApiTable.getFieldType(f, key);
+        if (FieldType.int0.equals(type)) {
+          map.put(key, Integer.parseInt((String) value));
+        } else if (FieldType.short0.equals(type)) {
+          map.put(key, Short.parseShort((String) value));
+        } else if (FieldType.long0.equals(type)) {
+          map.put(key, Long.parseLong((String) value));
         }
       }
     }
+  }
+
+  public static Object transformValueType(String tableName, String key, Object value) {
+    if (StrUtil.isNotBlank((String) value)) {
+      String type = ApiTable.getFieldType(tableName, key);
+      if (FieldType.int0.equals(type)) {
+        value = Integer.parseInt((String) value);
+      } else if (FieldType.short0.equals(type)) {
+        value = Short.parseShort((String) value);
+      } else if (FieldType.long0.equals(type)) {
+        value = Long.parseLong((String) value);
+      }
+    }
+    return value;
   }
 
   public static Long count(String tableName, TableInput tableInput) {
