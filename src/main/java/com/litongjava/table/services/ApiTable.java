@@ -925,7 +925,7 @@ public class ApiTable {
         continue;
       }
       Object value = entry.getValue();
-      if (StrUtil.isNotBlank((String) value)) {
+      if (value instanceof String && StrUtil.isNotBlank((String) value)) {
         String type = ApiTable.getFieldType(f, key);
         if (FieldType.int0.equals(type)) {
           map.put(key, Integer.parseInt((String) value));
@@ -939,7 +939,7 @@ public class ApiTable {
   }
 
   public static Object transformValueType(String tableName, String key, Object value) {
-    if (StrUtil.isNotBlank((String) value)) {
+    if (value instanceof String && StrUtil.isNotBlank((String) value)) {
       String type = ApiTable.getFieldType(tableName, key);
       if (FieldType.int0.equals(type)) {
         value = Integer.parseInt((String) value);
