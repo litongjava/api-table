@@ -146,7 +146,7 @@ public class DbService {
     Dialect dialect = dbPro.getConfig().getDialect();
     String cacheKey = dbPro.getConfig().getName() + "_" + tableName;
     List<DbTableStruct> ret = dbTableStructCache.get(cacheKey);
-    if (ret == null) {
+    if (ret == null || ret.size() < 1) {
       ret = new ArrayList<>();
       List<Row> columns = getTableColumns(dbPro, tableName);
       if (dialect instanceof PostgreSqlDialect) {
