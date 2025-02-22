@@ -32,7 +32,7 @@ import com.litongjava.table.model.Sql;
 import com.litongjava.table.utils.TableInputUtils;
 import com.litongjava.tio.utils.UUIDUtils;
 import com.litongjava.tio.utils.hutool.StrUtil;
-import com.litongjava.tio.utils.snowflake.SnowflakeIdGenerator;
+import com.litongjava.tio.utils.snowflake.SnowflakeIdUtils;
 
 public class ApiTable {
   private static DbSqlService dbSqlService = new DbSqlService();
@@ -95,7 +95,7 @@ public class ApiTable {
           if (threadId < 0) {
             threadId = 0;
           }
-          long id = new SnowflakeIdGenerator(threadId, 0).generateId();
+          long id = SnowflakeIdUtils.id();
           record.set(primaryKeyName, id);
         }
       }
@@ -202,7 +202,7 @@ public class ApiTable {
         if (threadId < 0) {
           threadId = 0;
         }
-        return new SnowflakeIdGenerator(threadId, 0).generateId();
+        return SnowflakeIdUtils.id();
       }
     }
     return null;
