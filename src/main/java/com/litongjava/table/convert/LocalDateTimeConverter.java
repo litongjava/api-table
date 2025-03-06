@@ -5,8 +5,10 @@ import java.time.format.DateTimeFormatter;
 
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
-import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.metadata.GlobalConfiguration;
+import com.alibaba.excel.metadata.data.CellData;
+import com.alibaba.excel.metadata.data.ReadCellData;
+import com.alibaba.excel.metadata.data.WriteCellData;
 import com.alibaba.excel.metadata.property.ExcelContentProperty;
 
 public class LocalDateTimeConverter implements Converter<LocalDateTime> {
@@ -22,7 +24,7 @@ public class LocalDateTimeConverter implements Converter<LocalDateTime> {
   }
 
   @Override
-  public LocalDateTime convertToJavaData(@SuppressWarnings("rawtypes") CellData cellData,
+  public LocalDateTime convertToJavaData(@SuppressWarnings("rawtypes") ReadCellData cellData,
       ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) throws Exception {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     String stringValue = cellData.getStringValue();
@@ -30,11 +32,11 @@ public class LocalDateTimeConverter implements Converter<LocalDateTime> {
   }
 
   @Override
-  public CellData<LocalDateTime> convertToExcelData(LocalDateTime value, ExcelContentProperty contentProperty,
+  public WriteCellData<LocalDateTime> convertToExcelData(LocalDateTime value, ExcelContentProperty contentProperty,
       GlobalConfiguration globalConfiguration) throws Exception {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     String formattedValue = value.format(formatter);
-    return new CellData<>(formattedValue);
+    return new WriteCellData<>(formattedValue);
   }
 
 }
