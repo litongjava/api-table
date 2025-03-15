@@ -4,5 +4,6 @@ public interface FieldType {
   String short0 = "short";
   String int0 = "int";
   String long0 = "long";
-  Object date = "date";
+  String date = "date";
+  String numeric = "numeric";
 }

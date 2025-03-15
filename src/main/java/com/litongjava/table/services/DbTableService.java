@@ -228,8 +228,10 @@ public class DbTableService {
       return "short";
     } else if ("bigint".equals(type)) {
       return "long";
-    } else {
+    } else if ("character varying".equals(type) || "varchar".equals(type)) {
       return "varchar";
+    } else {
+      return type;
     }
   }
 

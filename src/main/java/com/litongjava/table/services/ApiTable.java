@@ -1,5 +1,6 @@
 package com.litongjava.table.services;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -930,13 +931,30 @@ public class ApiTable {
         String type = ApiTable.getFieldType(f, key);
         if (FieldType.int0.equals(type)) {
           map.put(key, Integer.parseInt((String) value));
+
         } else if (FieldType.short0.equals(type)) {
           map.put(key, Short.parseShort((String) value));
+
         } else if (FieldType.long0.equals(type)) {
           map.put(key, Long.parseLong((String) value));
+
         } else if (FieldType.date.equals(type)) {
           if (value instanceof String) {
             map.put(key, Timestamp.valueOf((String) value));
+          }
+
+        } else if (FieldType.numeric.equals(type)) {
+          if (value instanceof String) {
+            BigDecimal amount = new BigDecimal((String) value);
+            map.put(key, amount);
+          
+          } else if (value instanceof Number) {
+            BigDecimal amount = new BigDecimal(((Number) value).toString());
+            map.put(key, amount);
+
+          } else if (value instanceof Boolean) {
+            BigDecimal amount = (Boolean) value ? BigDecimal.ONE : BigDecimal.ZERO;
+            map.put(key, amount);
           }
         }
       } else if (value instanceof Long) {
