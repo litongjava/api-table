@@ -1,5 +1,6 @@
 package com.litongjava.table.services;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -933,6 +934,15 @@ public class ApiTable {
           map.put(key, Short.parseShort((String) value));
         } else if (FieldType.long0.equals(type)) {
           map.put(key, Long.parseLong((String) value));
+        } else if (FieldType.date.equals(type)) {
+          if (value instanceof String) {
+            map.put(key, Timestamp.valueOf((String) value));
+          }
+        }
+      } else if (value instanceof Long) {
+        String type = ApiTable.getFieldType(f, key);
+        if (FieldType.date.equals(type)) {
+          map.put(key, new Timestamp((Long) value));
         }
       }
     }
