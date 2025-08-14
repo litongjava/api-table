@@ -18,9 +18,9 @@ public class DataPageRequest {
   }
 
   public DataPageRequest(TableInput kv) {
-    Object pageNo = kv.remove(TableInput.pageNo);
+    Object pageNo = kv.remove(TableInput.PAGE_NO);
     this.pageNo = getIntegerValue(pageNo, 1);
-    Object pageSize = kv.remove(TableInput.pageSize);
+    Object pageSize = kv.remove(TableInput.PAGE_SIZE);
     this.pageSize = getIntegerValue(pageSize, 10);
   }
 

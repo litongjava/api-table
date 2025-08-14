@@ -19,11 +19,11 @@ public class DataQueryRequest {
   private Integer pageSize;
 
   public DataQueryRequest(TableInput kv) {
-    this.columns = (String) kv.remove(TableInput.columns);
-    this.orderBy = (String) kv.remove(TableInput.orderBy);
-    this.groupBy = (String) kv.remove(TableInput.groupBy);
-    this.pageNo = (Integer) kv.remove(TableInput.pageNo);
-    this.pageSize = (Integer) kv.remove(TableInput.pageSize);
+    this.columns = (String) kv.remove(TableInput.COLUMNS);
+    this.orderBy = (String) kv.remove(TableInput.ORDER_BY);
+    this.groupBy = (String) kv.remove(TableInput.GROUP_BY);
+    this.pageNo = (Integer) kv.remove(TableInput.PAGE_NO);
+    this.pageSize = (Integer) kv.remove(TableInput.PAGE_SIZE);
 
     Object remove = kv.remove("is_asc");
     if (remove == null) {

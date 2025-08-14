@@ -411,7 +411,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Row>> page(TableInput kv) {
-    String tableName = (String) kv.remove(TableInput.table_name);
+    String tableName = (String) kv.remove(TableInput.TABLE_NAME);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(tableName, dataPageRequest, kv);
   }
@@ -420,7 +420,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Row>> page(DbPro dbPro, TableInput kv) {
-    String tableName = (String) kv.remove(TableInput.table_name);
+    String tableName = (String) kv.remove(TableInput.TABLE_NAME);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(dbPro, tableName, dataPageRequest, kv);
   }
@@ -452,7 +452,7 @@ public class ApiTable {
    * @return
    */
   public static TableResult<Page<Row>> page(DbPro dbPro, String f, TableInput kv) {
-    kv.remove(TableInput.table_name);
+    kv.remove(TableInput.TABLE_NAME);
     DataPageRequest dataPageRequest = new DataPageRequest(kv);
     return page(dbPro, f, dataPageRequest, kv);
   }

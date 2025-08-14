@@ -116,9 +116,9 @@ public class DbSqlService {
     }
 
     String searchKey = kv.getSearchKey();
-    String searchKeyLogic = kv.getStr(TableInput.search_key + "_logic");
+    String searchKeyLogic = kv.getStr(TableInput.SEARCH_KEY + "_logic");
     if (searchKey != null) {
-      kv.remove(TableInput.search_key);
+      kv.remove(TableInput.SEARCH_KEY);
       if (dbPro.getConfig().getDialect() instanceof PostgreSqlDialect) {
         if (!sql.toString().endsWith("where ")) {
           if ("or".equals(searchKeyLogic)) {
