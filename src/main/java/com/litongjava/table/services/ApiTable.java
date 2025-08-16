@@ -210,11 +210,13 @@ public class ApiTable {
     return null;
   }
 
-  public static boolean update(String tableName, String primaryKeyName, String idValue, Row record, String[] jsonFields) {
+  public static boolean update(String tableName, String primaryKeyName, String idValue, Row record,
+      String[] jsonFields) {
     return update(Db.use(), tableName, primaryKeyName, idValue, record, jsonFields);
   }
 
-  public static boolean update(DbPro dbPro, String tableName, String primaryKeyName, String idValue, Row record, String[] jsonFields) {
+  public static boolean update(DbPro dbPro, String tableName, String primaryKeyName, String idValue, Row record,
+      String[] jsonFields) {
     String primaryKeyColumnType = primaryKeyService.getPrimaryKeyColumnType(tableName);
 
     boolean update = false;
@@ -476,7 +478,8 @@ public class ApiTable {
    * @param para
    * @return
    */
-  public static TableResult<Page<Row>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest, TableInput para) {
+  public static TableResult<Page<Row>> page(DbPro dbPro, String tableName, DataPageRequest pageRequest,
+      TableInput para) {
     // process for primary key is uuid
     Dialect dialect = dbPro.getConfig().getDialect();
     if (dialect instanceof TdEngineDialect) {
@@ -518,7 +521,8 @@ public class ApiTable {
       }
     } else {
       if (jsonFields != null && jsonFields.length > 0) {
-        listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields, params.toArray());
+        listPage = dbPro.paginateJsonFields(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, jsonFields,
+            params.toArray());
       } else {
         listPage = dbPro.paginate(pageNo, pageSize, sql.getSelectColumns(), sqlExceptSelect, params.toArray());
       }
@@ -705,7 +709,8 @@ public class ApiTable {
     }
   }
 
-  public static TableResult<Boolean> updateFlagByIdAndUserId(String tableName, Object id, String delColumn, int flag, String userIdColumn, String userId) {
+  public static TableResult<Boolean> updateFlagByIdAndUserId(String tableName, Object id, String delColumn, int flag,
+      String userIdColumn, String userId) {
     // 获取主键名
     String primaryKey = primaryKeyService.getPrimaryKeyName(tableName);
     id = transformValueType(tableName, primaryKey, id);
@@ -929,32 +934,34 @@ public class ApiTable {
       Object value = entry.getValue();
       if (value instanceof String && StrUtil.isNotBlank((String) value)) {
         String type = ApiTable.getFieldType(f, key);
-        if (FieldType.int0.equals(type)) {
-          map.put(key, Integer.parseInt((String) value));
+        if (type != null) {
+          if (FieldType.int0.equals(type)) {
+            map.put(key, Integer.parseInt((String) value));
 
-        } else if (FieldType.short0.equals(type)) {
-          map.put(key, Short.parseShort((String) value));
+          } else if (FieldType.short0.equals(type)) {
+            map.put(key, Short.parseShort((String) value));
 
-        } else if (FieldType.long0.equals(type)) {
-          map.put(key, Long.parseLong((String) value));
+          } else if (FieldType.long0.equals(type)) {
+            map.put(key, Long.parseLong((String) value));
 
-        } else if (FieldType.date.equals(type)) {
-          if (value instanceof String) {
-            map.put(key, Timestamp.valueOf((String) value));
-          }
+          } else if (FieldType.date.equals(type)) {
+            if (value instanceof String) {
+              map.put(key, Timestamp.valueOf((String) value));
+            }
 
-        } else if (FieldType.numeric.equals(type)) {
-          if (value instanceof String) {
-            BigDecimal amount = new BigDecimal((String) value);
-            map.put(key, amount);
-          
-          } else if (value instanceof Number) {
-            BigDecimal amount = new BigDecimal(((Number) value).toString());
-            map.put(key, amount);
+          } else if (FieldType.numeric.equals(type)) {
+            if (value instanceof String) {
+              BigDecimal amount = new BigDecimal((String) value);
+              map.put(key, amount);
 
-          } else if (value instanceof Boolean) {
-            BigDecimal amount = (Boolean) value ? BigDecimal.ONE : BigDecimal.ZERO;
-            map.put(key, amount);
+            } else if (value instanceof Number) {
+              BigDecimal amount = new BigDecimal(((Number) value).toString());
+              map.put(key, amount);
+
+            } else if (value instanceof Boolean) {
+              BigDecimal amount = (Boolean) value ? BigDecimal.ONE : BigDecimal.ZERO;
+              map.put(key, amount);
+            }
           }
         }
       } else if (value instanceof Long) {
