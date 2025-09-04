@@ -40,22 +40,19 @@ public class TableInputUtils {
   }
 
   /**
-   * 1.将Map中key由驼峰转为转为下划线
-   * 2.将Map转为Kv
+   * 1.将Map中key由驼峰转为转为下划线 2.将Map转为Kv
    *
    * @return
    */
-  @SuppressWarnings("unchecked")
-  public static TableInput camelToUnderscore(Map<String, Object> map) {
+  public static <T> TableInput camelToUnderscore(Map<String, T> map) {
     TableInput kv = new TableInput();
-    // map.replaceAll((key, value) -> CamelNameUtils.convertCamelToUnderscore(key));
 
-    map.forEach((key, value) -> kv.put(CamelNameUtils.toUnderscore(key), value));
-
+    for (Map.Entry<String, T> entry : map.entrySet()) {
+      String newKey = CamelNameUtils.toUnderscore(entry.getKey());
+      kv.set(newKey, entry.getValue());
+    }
     return kv;
   }
-
-
 
   /**
    * 将kv中的键为is_开头的值为true转为1
