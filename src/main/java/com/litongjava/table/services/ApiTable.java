@@ -26,7 +26,7 @@ import com.litongjava.db.activerecord.dialect.TdEngineDialect;
 import com.litongjava.db.utils.PgVectorUtils;
 import com.litongjava.model.page.Page;
 import com.litongjava.table.config.DbDataConfig;
-import com.litongjava.table.constants.FieldType;
+import com.litongjava.table.constants.DbFieldType;
 import com.litongjava.table.model.DataPageRequest;
 import com.litongjava.table.model.DataQueryRequest;
 import com.litongjava.table.model.DbTableStruct;
@@ -935,21 +935,21 @@ public class ApiTable {
       if (value instanceof String && StrUtil.isNotBlank((String) value)) {
         String type = ApiTable.getFieldType(f, key);
         if (type != null) {
-          if (FieldType.int0.equals(type)) {
+          if (DbFieldType.int0.equals(type)) {
             map.put(key, Integer.parseInt((String) value));
 
-          } else if (FieldType.short0.equals(type)) {
+          } else if (DbFieldType.short0.equals(type)) {
             map.put(key, Short.parseShort((String) value));
 
-          } else if (FieldType.long0.equals(type)) {
+          } else if (DbFieldType.long0.equals(type)) {
             map.put(key, Long.parseLong((String) value));
 
-          } else if (FieldType.date.equals(type)) {
+          } else if (DbFieldType.date.equals(type)) {
             if (value instanceof String) {
               map.put(key, Timestamp.valueOf((String) value));
             }
 
-          } else if (FieldType.numeric.equals(type)) {
+          } else if (DbFieldType.numeric.equals(type)) {
             if (value instanceof String) {
               BigDecimal amount = new BigDecimal((String) value);
               map.put(key, amount);
@@ -966,7 +966,7 @@ public class ApiTable {
         }
       } else if (value instanceof Long) {
         String type = ApiTable.getFieldType(f, key);
-        if (FieldType.date.equals(type)) {
+        if (DbFieldType.date.equals(type)) {
           map.put(key, new Timestamp((Long) value));
         }
       }
@@ -976,11 +976,11 @@ public class ApiTable {
   public static Object transformValueType(String tableName, String key, Object value) {
     if (value instanceof String && StrUtil.isNotBlank((String) value)) {
       String type = ApiTable.getFieldType(tableName, key);
-      if (FieldType.int0.equals(type)) {
+      if (DbFieldType.int0.equals(type)) {
         value = Integer.parseInt((String) value);
-      } else if (FieldType.short0.equals(type)) {
+      } else if (DbFieldType.short0.equals(type)) {
         value = Short.parseShort((String) value);
-      } else if (FieldType.long0.equals(type)) {
+      } else if (DbFieldType.long0.equals(type)) {
         value = Long.parseLong((String) value);
       }
     }

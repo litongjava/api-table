@@ -1,6 +1,6 @@
 package com.litongjava.table.constants;
 
-public interface FieldType {
+public interface DbFieldType {
   String short0 = "short";
   String int0 = "int";
   String long0 = "long";
