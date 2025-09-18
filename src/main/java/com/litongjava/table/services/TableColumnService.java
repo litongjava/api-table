@@ -3,6 +3,7 @@ package com.litongjava.table.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.litongjava.db.activerecord.Db;
@@ -53,15 +54,16 @@ public class TableColumnService {
    */
   private boolean getColumnsToMap(String tableName, String column) {
     boolean ret = false;
-    List<DbTableStruct> listRecord = dbService.getTableStruct(Db.use(), tableName);
+    Map<String, DbTableStruct> tableStruct = dbService.getTableStruct(Db.use(), tableName);
+    Set<String> fields = tableStruct.keySet();
     List<String> columns = new ArrayList<>();
-    for (DbTableStruct record : listRecord) {
-      String field = record.getField();
+    for (String field : fields) {
       columns.add(field);
       if (field.equals(column)) {
         ret = true;
       }
     }
+
     // 添加到map中
     synchronized (dbService) {
       List<String> list = tableColumns.get(tableName);

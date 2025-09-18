@@ -2,8 +2,11 @@ package com.litongjava.table.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.litongjava.db.activerecord.Db;
@@ -25,7 +28,7 @@ import com.litongjava.table.model.DbTableStruct;
  * @desc
  */
 public class DbService {
-  private Map<String, List<DbTableStruct>> dbTableStructCache = new ConcurrentHashMap<>();
+  private Map<String, Map<String, DbTableStruct>> dbTableStructCache = new ConcurrentHashMap<>();
 
   public Map<String, List<Row>> getAllTableColumns(DbPro dbPro) {
     Map<String, List<Row>> retval = new HashMap<>();
@@ -86,23 +89,24 @@ public class DbService {
   public List<DbTableStruct> getPrimaryKey(DbPro dbPro, String tableName) {
     List<DbTableStruct> ret = new ArrayList<>();
 
-    List<DbTableStruct> columns = getTableStruct(dbPro, tableName);
+    Map<String, DbTableStruct> columns = getTableStruct(dbPro, tableName);
     if (columns.size() < 1) {
       throw new RuntimeException("columns of " + tableName + " size is 0");
     }
 
     // 遍历出主键,添加到ret中
-    for (DbTableStruct record : columns) {
-      String key = record.getKey();
+    Set<Entry<String, DbTableStruct>> entrySet = columns.entrySet();
+    for (Entry<String, DbTableStruct> entry : entrySet) {
+      String key = entry.getKey();
       if ("PRI".equals(key) || "1".equals(key) || "id".equals(key)) {
         DbTableStruct tableColumn = new DbTableStruct();
-        tableColumn.setField(record.getField());
-        tableColumn.setType(record.getType());
+        DbTableStruct ev = entry.getValue();
+        tableColumn.setField(ev.getField());
+        tableColumn.setType(ev.getType());
         tableColumn.setKey(key);
         ret.add(tableColumn);
       }
     }
-
     return ret;
   }
 
@@ -142,53 +146,59 @@ public class DbService {
     return tableNames(Db.use());
   }
 
-  public List<DbTableStruct> getTableStruct(DbPro dbPro, String tableName) {
+  public Map<String, DbTableStruct> getTableStruct(DbPro dbPro, String tableName) {
     Dialect dialect = dbPro.getConfig().getDialect();
     String cacheKey = dbPro.getConfig().getName() + "_" + tableName;
-    List<DbTableStruct> ret = dbTableStructCache.get(cacheKey);
+    Map<String, DbTableStruct> ret = dbTableStructCache.get(cacheKey);
     if (ret == null || ret.size() < 1) {
-      ret = new ArrayList<>();
+      ret = new LinkedHashMap<>();
       List<Row> columns = getTableColumns(dbPro, tableName);
       if (dialect instanceof PostgreSqlDialect) {
         for (Row record : columns) {
           DbTableStruct tableColumn = new DbTableStruct();
-          tableColumn.setField(record.getStr("field"));
+          String field = record.getStr("field");
+          tableColumn.setField(field);
           tableColumn.setType(record.getStr("type"));
           String key = record.getStr("key");
           tableColumn.setKey(key);
-          ret.add(tableColumn);
+          
+          ret.put(field, tableColumn);
         }
 
       } else if (dialect instanceof Sqlite3Dialect) {
         for (Row record : columns) {
           DbTableStruct tableColumn = new DbTableStruct();
-          tableColumn.setField(record.getStr("name"));
+          String field = record.getStr("name");
+          tableColumn.setField(field);
           tableColumn.setType(record.getStr("type"));
           tableColumn.setIsNull(record.getStr("notnull"));
           tableColumn.setDefaultValue(record.getStr("dflt_value"));
           tableColumn.setKey(record.getStr("pk"));
-          ret.add(tableColumn);
+          ret.put(field, tableColumn);
         }
       } else if (dialect instanceof MysqlDialect) {
         for (Row record : columns) {
           DbTableStruct tableColumn = new DbTableStruct();
-          tableColumn.setField(record.getStr("Field"));
+          String field = record.getStr("Field");
+          tableColumn.setField(field);
           tableColumn.setType(record.getStr("Type"));
           tableColumn.setIsNull(record.getStr("Null"));
           tableColumn.setDefaultValue(record.getStr("Default"));
-          tableColumn.setKey(record.getStr("Key"));
-          ret.add(tableColumn);
+          String key = record.getStr("Key");
+          tableColumn.setKey(key);
+          ret.put(field, tableColumn);
         }
 
       } else {
         // 遍历出主键,添加到ret中
         for (Row record : columns) {
           DbTableStruct tableColumn = new DbTableStruct();
-          tableColumn.setField(record.getStr("field"));
+          String field = record.getStr("field");
+          tableColumn.setField(field);
           tableColumn.setType(record.getStr("type"));
           String key = record.getStr("key");
           tableColumn.setKey(key);
-          ret.add(tableColumn);
+          ret.put(field, tableColumn);
         }
       }
       dbTableStructCache.putIfAbsent(cacheKey, ret);
@@ -204,9 +214,12 @@ public class DbService {
     List<Row> records = null;
     if (dialect instanceof PostgreSqlDialect) {
       // Field,Type,Null,Key,Default,Extra
-      sql = "SELECT column_name as Field, data_type as Type, is_nullable as Null, " + "column_default as Default, " + "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name "
-          + "FROM information_schema.key_column_usage AS kcu " + "JOIN information_schema.table_constraints AS tc " + "ON kcu.constraint_name = tc.constraint_name "
-          + "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key " + "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
+      sql = "SELECT column_name as Field, data_type as Type, is_nullable as Null, " + "column_default as Default, "
+          + "CASE WHEN column_name = ANY (ARRAY(SELECT kcu.column_name "
+          + "FROM information_schema.key_column_usage AS kcu " + "JOIN information_schema.table_constraints AS tc "
+          + "ON kcu.constraint_name = tc.constraint_name "
+          + "WHERE tc.table_name = ? AND tc.constraint_type = 'PRIMARY KEY')) THEN 'PRI' ELSE '' END AS key "
+          + "FROM information_schema.columns WHERE table_name = ? and table_schema = ?;";
 
       records = dbPro.find(sql, tableName, tableName, "public");
       // 即便将别名设置为大写,返回的依然是小写,气人
@@ -240,20 +253,23 @@ public class DbService {
   }
 
   public String[] getJsonField(DbPro dbPro, String tableName) {
-    List<DbTableStruct> columns = getTableStruct(dbPro, tableName);
+    Map<String, DbTableStruct> columns = getTableStruct(dbPro, tableName);
     if (columns.size() < 1) {
       throw new RuntimeException("columns of " + tableName + " size is 0");
     }
 
     List<String> fields = new ArrayList<>();
-    // 遍历出主键,添加到ret中
-    for (DbTableStruct record : columns) {
+    Set<Entry<String, DbTableStruct>> entrySet = columns.entrySet();
+    for (Entry<String, DbTableStruct> entry : entrySet) {
+      // 遍历出主键,添加到ret中
+      DbTableStruct record = entry.getValue();
       String type = record.getType();
       if ("jsonb".equals(type) || "json".equals(type)) {
         String field = record.getField();
         fields.add(field);
       }
     }
+
     String[] jsonFields = new String[fields.size()];
     for (int i = 0; i < fields.size(); i++) {
       jsonFields[i] = fields.get(i);

@@ -26,6 +26,7 @@ import com.litongjava.db.activerecord.dialect.TdEngineDialect;
 import com.litongjava.db.utils.PgVectorUtils;
 import com.litongjava.model.page.Page;
 import com.litongjava.table.config.DbDataConfig;
+import com.litongjava.table.constants.ApiFieldType;
 import com.litongjava.table.constants.DbFieldType;
 import com.litongjava.table.model.DataPageRequest;
 import com.litongjava.table.model.DataQueryRequest;
@@ -33,6 +34,7 @@ import com.litongjava.table.model.DbTableStruct;
 import com.litongjava.table.model.Sql;
 import com.litongjava.table.utils.TableInputUtils;
 import com.litongjava.tio.utils.UUIDUtils;
+import com.litongjava.tio.utils.date.DateParseUtils;
 import com.litongjava.tio.utils.hutool.StrUtil;
 import com.litongjava.tio.utils.snowflake.SnowflakeIdUtils;
 
@@ -310,10 +312,11 @@ public class ApiTable {
   public static TableResult<List<Row>> listAll(DbPro dbPro, String tableName) {
     List<Row> records = dbPro.find("select * from " + tableName);
     if (records.size() < 1) {
-      List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
+      Map<String, DbTableStruct> tableStruct = dbService.getTableStruct(dbPro, tableName);
+      Set<String> keySet = tableStruct.keySet();
       Row record = new Row();
-      for (DbTableStruct struct : columns) {
-        record.set(struct.getField(), null);
+      for (String field : keySet) {
+        record.set(field, null);
       }
       records.add(record);
     }
@@ -332,10 +335,11 @@ public class ApiTable {
     }
 
     if (records.size() < 1) {
-      List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
+      Map<String, DbTableStruct> tableStruct = dbService.getTableStruct(dbPro, tableName);
+      Set<String> keySet = tableStruct.keySet();
       Row record = new Row();
-      for (DbTableStruct struct : columns) {
-        record.set(struct.getField(), null);
+      for (String field : keySet) {
+        record.set(field, null);
       }
       records.add(record);
     }
@@ -352,10 +356,11 @@ public class ApiTable {
       records = dbPro.find(sql);
     }
     if (records.size() < 1) {
-      List<DbTableStruct> columns = dbService.getTableStruct(dbPro, tableName);
+      Map<String, DbTableStruct> tableStruct = dbService.getTableStruct(dbPro, tableName);
       Row record = new Row();
-      for (DbTableStruct struct : columns) {
-        record.set(struct.getField(), null);
+      Set<String> keySet = tableStruct.keySet();
+      for (String field : keySet) {
+        record.set(field, null);
       }
       records.add(record);
     }
@@ -919,10 +924,11 @@ public class ApiTable {
     }
   }
 
-  public static String getFieldType(String f, String key) {
-    return dbTableService.getFieldType(f, key);
+  public static String getFieldLongType(String f, String key) {
+    return dbTableService.getFieldLongType(f, key);
   }
 
+  @SuppressWarnings("unchecked")
   public static void transformType(String f, Map<String, Object> map) {
     Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator();
     while (iterator.hasNext()) {
@@ -932,42 +938,58 @@ public class ApiTable {
         continue;
       }
       Object value = entry.getValue();
+      if (value == null) {
+        continue;
+      }
       if (value instanceof String && StrUtil.isNotBlank((String) value)) {
-        String type = ApiTable.getFieldType(f, key);
+        String type = ApiTable.getFieldLongType(f, key);
         if (type != null) {
-          if (DbFieldType.int0.equals(type)) {
-            map.put(key, Integer.parseInt((String) value));
+          if (ApiFieldType.int0.equals(type)) {
+            entry.setValue(Integer.parseInt((String) value));
 
-          } else if (DbFieldType.short0.equals(type)) {
-            map.put(key, Short.parseShort((String) value));
+          } else if (ApiFieldType.short0.equals(type)) {
+            entry.setValue(Short.parseShort((String) value));
 
-          } else if (DbFieldType.long0.equals(type)) {
-            map.put(key, Long.parseLong((String) value));
+          } else if (ApiFieldType.long0.equals(type)) {
+            entry.setValue(Long.parseLong((String) value));
 
-          } else if (DbFieldType.date.equals(type)) {
+          } else if (ApiFieldType.date.equals(type)) {
             if (value instanceof String) {
-              map.put(key, Timestamp.valueOf((String) value));
+              entry.setValue(Timestamp.valueOf((String) value));
             }
 
-          } else if (DbFieldType.numeric.equals(type)) {
+          } else if (ApiFieldType.numeric.equals(type)) {
             if (value instanceof String) {
               BigDecimal amount = new BigDecimal((String) value);
-              map.put(key, amount);
+              entry.setValue(amount);
 
             } else if (value instanceof Number) {
               BigDecimal amount = new BigDecimal(((Number) value).toString());
-              map.put(key, amount);
+              entry.setValue(amount);
 
             } else if (value instanceof Boolean) {
               BigDecimal amount = (Boolean) value ? BigDecimal.ONE : BigDecimal.ZERO;
-              map.put(key, amount);
+              entry.setValue(amount);
             }
           }
         }
       } else if (value instanceof Long) {
-        String type = ApiTable.getFieldType(f, key);
-        if (DbFieldType.date.equals(type)) {
-          map.put(key, new Timestamp((Long) value));
+        String type = ApiTable.getFieldLongType(f, key);
+        if (ApiFieldType.date.equals(type)) {
+          entry.setValue(new Timestamp((Long) value));
+        }
+      } else if (value instanceof List) {
+        String type = ApiTable.getFieldLongType(f, key);
+        if (ApiFieldType.timestamp_with_time_zone.equals(type)) {
+          List<Object> list = (List<Object>) value;
+          if (list.size() > 0) {
+            Object object = list.get(0);
+            if (object instanceof String) {
+              value = DateParseUtils.convertToIso8601FromDefault(list);
+              entry.setValue(value);
+            }
+          }
+
         }
       }
     }
@@ -975,7 +997,7 @@ public class ApiTable {
 
   public static Object transformValueType(String tableName, String key, Object value) {
     if (value instanceof String && StrUtil.isNotBlank((String) value)) {
-      String type = ApiTable.getFieldType(tableName, key);
+      String type = ApiTable.getFieldLongType(tableName, key);
       if (DbFieldType.int0.equals(type)) {
         value = Integer.parseInt((String) value);
       } else if (DbFieldType.short0.equals(type)) {

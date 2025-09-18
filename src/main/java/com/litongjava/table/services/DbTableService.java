@@ -6,9 +6,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.litongjava.db.activerecord.Db;
+import com.litongjava.table.constants.ApiFieldType;
+import com.litongjava.table.constants.DbFieldType;
 import com.litongjava.table.model.DbTableStruct;
 
 public class DbTableService {
@@ -17,15 +21,17 @@ public class DbTableService {
   private PrimaryKeyService primaryKeyService = new PrimaryKeyService();
 
   public List<Map<String, Object>> columns(String f) {
-    List<DbTableStruct> columns = dbService.getTableStruct(Db.use(), f);
+    Map<String, DbTableStruct> columns = dbService.getTableStruct(Db.use(), f);
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
-    for (DbTableStruct record : columns) {
+    Set<Entry<String, DbTableStruct>> entrySet = columns.entrySet();
+    for (Entry<String, DbTableStruct> entry : entrySet) {
+      DbTableStruct record = entry.getValue();
       String field = record.getField();
       String fieldType = record.getType();
 
       // {name: 'Name', key: 'name', type: 'el-input', placeholder: '请输入 Name'},
       String name = getName(field);
-      String type = getType(fieldType);
+      String type = getShortType(fieldType);
 
       if (type.equals("date")) {
         type = "dateTime";
@@ -41,6 +47,7 @@ public class DbTableService {
       tableItem.put("valueType", type);
       tableItems.add(tableItem);
     }
+
     return tableItems;
   }
 
@@ -52,20 +59,22 @@ public class DbTableService {
    * @return
    */
   public Map<String, Object> getTableConfig(String f, String tableName, String lang) {
-    List<DbTableStruct> columns = dbService.getTableStruct(Db.use(), tableName);
+    Map<String, DbTableStruct> columns = dbService.getTableStruct(Db.use(), tableName);
     List<Map<String, Object>> queryItems = new ArrayList<>(columns.size());
     List<Map<String, Object>> tableItems = new ArrayList<>(columns.size());
     List<Map<String, Object>> formItems = new ArrayList<>(columns.size());
     Map<String, String> operator = new LinkedHashMap<>();
 
-    for (DbTableStruct record : columns) {
+    Set<Entry<String, DbTableStruct>> entrySet = columns.entrySet();
+    for (Entry<String, DbTableStruct> entry : entrySet) {
+      DbTableStruct record = entry.getValue();
       String field = record.getField();
       String fieldType = record.getType();
 
       // {name: 'Name', key: 'name', type: 'el-input', placeholder: '请输入 Name'},
       String name = getName(field);
       String key = getKey(field, false);
-      String type = getType(fieldType);
+      String type = getShortType(fieldType);
 
       Map<String, Object> queryItem = new LinkedHashMap<>();
       queryItem.put("name", name);
@@ -186,7 +195,8 @@ public class DbTableService {
    * @return
    */
   private String getName(String field) {
-    return Arrays.stream(field.split("_")).map(word -> word.substring(0, 1).toUpperCase() + word.substring(1)).collect(Collectors.joining(" "));
+    return Arrays.stream(field.split("_")).map(word -> word.substring(0, 1).toUpperCase() + word.substring(1))
+        .collect(Collectors.joining(" "));
   }
 
   /**
@@ -217,7 +227,32 @@ public class DbTableService {
     }
   }
 
-  private String getType(String type) {
+  private String getLongType(String type) {
+    if (DbFieldType.tinyint_1.equals(type)) {
+      return ApiFieldType.bool;
+    
+    } else if (DbFieldType.int0.equals(type) || DbFieldType.integer.equals(type)) {
+      return ApiFieldType.int0;
+    
+    } else if (DbFieldType.smallint.equals(type)) {
+      return ApiFieldType.short0;
+    
+    } else if (DbFieldType.bigint.equals(type)) {
+      return ApiFieldType.long0;
+    
+    } else if ("character varying".equals(type) || "varchar".equals(type)) {
+      return ApiFieldType.varchar;
+    
+    } else if (DbFieldType.timestamp_with_time_zone.contentEquals(type)) {
+      return ApiFieldType.timestamp_with_time_zone;
+    } else if (type.startsWith("date") || type.startsWith("timestamp") || type.startsWith("datetime")) {
+      return ApiFieldType.date;
+    } else {
+      return type;
+    }
+  }
+
+  private String getShortType(String type) {
     if (type.startsWith("date") || type.startsWith("timestamp") || type.startsWith("datetime")) {
       return "date";
     } else if ("tinyint(1)".equals(type)) {
@@ -258,7 +293,7 @@ public class DbTableService {
   private Map<String, Object> getFormItemDateProp(String lang) {
     Map<String, Object> hashMap = new LinkedHashMap<String, Object>();
     hashMap.put("type", "datetime");
-    //hashMap.put("valueFormat", "yyyy-MM-dd HH:mm:ss");
+    // hashMap.put("valueFormat", "yyyy-MM-dd HH:mm:ss");
     hashMap.put("valueFormat", "timestamp");
 
     return hashMap;
@@ -308,14 +343,11 @@ public class DbTableService {
     }
   }
 
-  public String getFieldType(String f, String key) {
-    List<DbTableStruct> columns = dbService.getTableStruct(Db.use(), f);
-    for (DbTableStruct record : columns) {
-      String field = record.getField();
-      String fieldType = record.getType();
-      if (key.equals(field)) {
-        return getType(fieldType);
-      }
+  public String getFieldLongType(String f, String key) {
+    Map<String, DbTableStruct> tableStruct = dbService.getTableStruct(Db.use(), f);
+    DbTableStruct dbTableStruct = tableStruct.get(key);
+    if (dbTableStruct != null) {
+      return getLongType(dbTableStruct.getType());
     }
     return null;
   }
