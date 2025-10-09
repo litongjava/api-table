@@ -13,7 +13,7 @@
     <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <java-db.version>1.5.4</java-db.version>
+    <java-db.version>1.5.5</java-db.version>
   </properties>
 
   <dependencies>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>com.litongjava</groupId>
       <artifactId>java-model</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
     </dependency>
 
     <dependency>
