@@ -37,7 +37,7 @@
   <dependency>
     <groupId>com.litongjava</groupId>
     <artifactId>api-table</artifactId>
-    <version>${tio.boot.version}</version>
+    <version>1.5.7</version>
   </dependency>
 
   <dependency>
