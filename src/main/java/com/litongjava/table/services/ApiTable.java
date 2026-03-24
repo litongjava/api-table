@@ -92,13 +92,6 @@ public class ApiTable {
           record.set(primaryKeyName, id);
         } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long")) {
           // 如果主键是bigint (20)类型,插入雪花Id
-          long threadId = Thread.currentThread().getId();
-          if (threadId > 31) {
-            threadId = threadId % 31;
-          }
-          if (threadId < 0) {
-            threadId = 0;
-          }
           long id = SnowflakeIdUtils.id();
           record.set(primaryKeyName, id);
         }
@@ -199,13 +192,6 @@ public class ApiTable {
         return UUIDUtils.random();
       } else if (primaryKeyColumnType.startsWith("bigint") || primaryKeyColumnType.startsWith("long")) {
         // 如果主键是bigint (20)类型,插入雪花Id
-        long threadId = Thread.currentThread().getId();
-        if (threadId > 31) {
-          threadId = threadId % 31;
-        }
-        if (threadId < 0) {
-          threadId = 0;
-        }
         return SnowflakeIdUtils.id();
       }
     }
@@ -554,7 +540,8 @@ public class ApiTable {
     // 添加其他查询条件
     Sql sql = dbSqlService.getWhereClause(dbPro, queryRequest, tableInput);
     sql.setTableName(tableName);
-    sql.setColumns(dbPro.getConfig().getDialect().forColumns(queryRequest.getColumns()));
+    String columns = queryRequest.getColumns();
+    sql.setColumns(dbPro.getConfig().getDialect().forColumns(columns));
 
     // 添加操作表
     Row record = null;
