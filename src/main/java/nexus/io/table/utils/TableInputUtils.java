@@ -8,9 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.litongjava.tio.utils.name.CamelNameUtils;
-
 import nexus.io.db.TableInput;
+import nexus.io.tio.utils.name.CamelNameUtils;
 
 /**
  * @author litong

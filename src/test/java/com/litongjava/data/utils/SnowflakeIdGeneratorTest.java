@@ -2,7 +2,7 @@ package com.litongjava.data.utils;
 
 import org.junit.Test;
 
-import com.litongjava.tio.utils.snowflake.SnowflakeIdUtils;
+import nexus.io.tio.utils.snowflake.SnowflakeIdUtils;
 
 public class SnowflakeIdGeneratorTest {
 

@@ -2,7 +2,7 @@ package com.litongjava.data.utils;
 
 import org.junit.Test;
 
-import com.litongjava.tio.utils.UUIDUtils;
+import nexus.io.tio.utils.UUIDUtils;
 
 public class UUIDUtilsTest {
 
