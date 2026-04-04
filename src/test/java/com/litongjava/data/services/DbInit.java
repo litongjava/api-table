@@ -1,7 +1,7 @@
 package com.litongjava.data.services;
 
-import com.litongjava.db.activerecord.ActiveRecordPlugin;
-import com.litongjava.db.druid.DruidPlugin;
+import nexus.io.db.activerecord.ActiveRecordPlugin;
+import nexus.io.db.druid.DruidPlugin;
 
 public class DbInit {
 

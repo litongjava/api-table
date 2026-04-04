@@ -2,7 +2,7 @@ package com.litongjava.data.utils;
 
 import org.junit.Test;
 
-import com.litongjava.table.utils.ObjectUtils;
+import nexus.io.table.utils.ObjectUtils;
 
 public class ObjectUtilsTest {
 
