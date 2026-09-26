@@ -4,10 +4,9 @@ import org.junit.Test;
 
 public class DataPageRequestTest {
 
-  @Test
-  public void test() {
+  @Test(expected = NumberFormatException.class)
+  public void emptyPageNumberIsNotAnInteger() {
     Integer.parseInt("");
-    System.out.println( "1");
   }
 
 }

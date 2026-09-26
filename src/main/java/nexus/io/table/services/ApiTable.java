@@ -551,9 +551,9 @@ public class ApiTable {
     if (jsonFields != null && jsonFields.length > 0) {
 
       if (params == null) {
-        record = dbPro.findFirstJsonField(sql.getsql(), jsonFields);
+        record = dbPro.findFirstWithJsonField(sql.getsql(), jsonFields);
       } else {
-        record = dbPro.findFirstJsonField(sql.getsql(), jsonFields, params.toArray());
+        record = dbPro.findFirstWithJsonField(sql.getsql(), jsonFields, params.toArray());
       }
 
     } else {
