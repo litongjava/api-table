@@ -11,6 +11,10 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.style.WriteCellStyle;
+import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
+
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 import nexus.io.db.activerecord.Row;
 import nexus.io.kit.RowUtils;
@@ -119,12 +123,24 @@ public class EasyExcelUtils {
         .autoCloseStream(false)
         // 基于 column 长度，自动适配。最大 255 宽度
         .registerWriteHandler(new MaxColumnWidthStyleStrategy(15, 30))
+        // 表头与内容统一左对齐
+        .registerWriteHandler(new HorizontalCellStyleStrategy(leftAlignStyle(), leftAlignStyle()))
         // 日期格式转换
         .registerConverter(new LocalDateTimeConverter()).registerConverter(new TimestampStringConverter())
         //
         .registerConverter(new StringArrayConverter());
 
     return excelWriterBuilder;
+  }
+
+  /**
+   * 左对齐样式。只声明对齐方式，其余属性沿用 EasyExcel 默认值：
+   * merge 只覆盖非 null 字段，因此表头仍保留默认的加粗、灰底与边框，数字也随内容一起左对齐。
+   */
+  public static WriteCellStyle leftAlignStyle() {
+    WriteCellStyle writeCellStyle = new WriteCellStyle();
+    writeCellStyle.setHorizontalAlignment(HorizontalAlignment.LEFT);
+    return writeCellStyle;
   }
 
   public static List<List<String>> head(String... heads) {
